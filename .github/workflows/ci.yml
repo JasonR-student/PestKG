@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install Python dependencies
+        run: python -m pip install -e "./apps/api[dev]"
+
+      - name: Install web dependencies
+        run: npm ci --prefix apps/web
+
+      - name: Verify Python
+        run: |
+          python -m pytest apps/api/tests tools/release-pipeline/tests
+          python -m unittest discover -s research/figures/tests -v
+          python -m compileall apps/api/src tools/release-pipeline research/figures
+
+      - name: Verify generated contracts
+        run: |
+          cp packages/api-contract/openapi-v1.1.json /tmp/openapi-v1.1.json
+          python packages/api-contract/export_openapi.py
+          cmp /tmp/openapi-v1.1.json packages/api-contract/openapi-v1.1.json
+          cp apps/web/src/shared/api/generated/types.gen.ts /tmp/types.gen.ts
+          cp apps/web/src/shared/api/generated/index.ts /tmp/generated-index.ts
+          npm --prefix apps/web run api:generate
+          cmp /tmp/types.gen.ts apps/web/src/shared/api/generated/types.gen.ts
+          cmp /tmp/generated-index.ts apps/web/src/shared/api/generated/index.ts
+
+      - name: Verify web
+        run: |
+          npm --prefix apps/web run lint
+          npm --prefix apps/web run test
+          npm --prefix apps/web run build
+
+      - name: Verify Compose configuration
+        run: |
+          docker compose config --quiet
+          docker compose -f docker-compose.yml -f infra/docker-compose.prod.yml config --quiet
+          docker run --rm -v "$PWD:/workspace:ro" -w /workspace bash:5.2 \
+            bash -n infra/scripts/build-images.sh infra/scripts/export-images.sh \
+              infra/scripts/release.sh infra/scripts/rollback.sh infra/scripts/smoke-test.sh
+
+      - name: Build delivery images
+        env:
+          VCS_REF: ${{ github.sha }}
+          PESTKG_IMAGE_TAG: ci
+        run: |
+          export BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          docker compose build api web
+
+      - name: Install Chromium
+        run: npm --prefix apps/web exec playwright install --with-deps chromium
+
+      - name: Run browser acceptance tests
+        env:
+          PESTKG_DATA_DIR: ${{ github.workspace }}/data/releases
+        run: |
+          python -m uvicorn pestkg_api.main:app --app-dir apps/api/src --host 127.0.0.1 --port 8000 > /tmp/pestkg-api.log 2>&1 &
+          npm --prefix apps/web run dev -- --host 127.0.0.1 > /tmp/pestkg-web.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null && curl --fail --silent http://127.0.0.1:8000/health > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          npm --prefix apps/web run test:e2e
+
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: apps/web/test-results
+          if-no-files-found: ignore

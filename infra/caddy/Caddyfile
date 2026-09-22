@@ -1,0 +1,23 @@
+{$SITE_ADDRESS:http://localhost} {
+	encode zstd gzip
+
+	@api path /api/* /health /health/* /docs* /openapi.json
+	handle @api {
+		reverse_proxy api:8000
+	}
+
+	handle /downloads/* {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		reverse_proxy web:80
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+}

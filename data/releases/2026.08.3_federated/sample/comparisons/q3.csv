@@ -1,0 +1,96 @@
+﻿crop_shared_id,crop_label_en,target_shared_id,target_label_en,country_count,countries,registration_use_count,product_count,source_record_count,pairing_status
+http://aims.fao.org/aos/agrovoc/c_7443,strawberries,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,3,CN | KR | TW,423,423,423,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1938,cowpeas,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,3,CN | KR | TW,399,291,399,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_27225,Lycium chinense,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,3,CN | KR | TW,196,195,196,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_4903,Momordica charantia,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,3,CN | KR | TW,144,143,144,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_6369,pumpkins,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,3,CN | KR | TW,143,143,143,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_15277,watermelons,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,3,CN | KR | TW,136,135,136,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,http://aims.fao.org/aos/agrovoc/c_30279,Spodoptera litura,3,CN | JP | KR,115,108,115,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_10195,cucumbers,http://aims.fao.org/aos/agrovoc/c_10450,downy mildews,2,CN | KR,1543,1535,1543,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_6599,rice,http://aims.fao.org/aos/agrovoc/c_27157,Chilo suppressalis,2,CN | KR,1159,1133,1159,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_10195,cucumbers,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | KR,787,783,787,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_8373,wheat,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | KR,707,705,707,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,608,608,608,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_3359,grapes,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | TW,496,496,496,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_4098,common beans,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | TW,451,175,451,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12283,litchis,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,430,430,430,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_13177,peas,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | TW,369,261,369,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_15277,watermelons,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,361,359,361,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7443,strawberries,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,318,318,318,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_14791,taro,http://aims.fao.org/aos/agrovoc/c_957,blight,2,CN | TW,302,301,302,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12934,onions,http://aims.fao.org/aos/agrovoc/c_10450,downy mildews,2,CN | KR,281,260,281,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_6599,rice,http://aims.fao.org/aos/agrovoc/c_36608,Laodelphax striatellus,2,CN | KR,231,171,231,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_3539,Helianthus annuus,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,227,227,227,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12246,loquats,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,226,226,226,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_14727,sweet peppers,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,215,215,215,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_9795,chillies,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,209,208,209,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_14477,soybeans,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,209,193,209,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_27225,Lycium chinense,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,202,117,202,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12487,muskmelons,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | KR,201,199,201,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1173,cabbages,http://aims.fao.org/aos/agrovoc/c_30279,Spodoptera litura,2,JP | KR,198,115,198,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_6599,rice,http://aims.fao.org/aos/agrovoc/c_25204,Nilaparvata lugens,2,CN | KR,175,131,175,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_14508,spinach,http://aims.fao.org/aos/agrovoc/c_10450,downy mildews,2,CN | KR,169,168,169,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12151,lettuces,http://aims.fao.org/aos/agrovoc/c_30279,Spodoptera litura,2,JP | KR,166,117,166,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12151,lettuces,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | KR,136,136,136,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_9795,chillies,http://aims.fao.org/aos/agrovoc/c_957,blight,2,CN | TW,130,130,130,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12151,lettuces,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,JP | KR,128,118,128,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12487,muskmelons,http://aims.fao.org/aos/agrovoc/c_10450,downy mildews,2,CN | KR,125,125,125,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1173,cabbages,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,JP | KR,124,112,124,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_14727,sweet peppers,http://aims.fao.org/aos/agrovoc/c_957,blight,2,CN | TW,124,114,124,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,http://aims.fao.org/aos/agrovoc/c_10450,downy mildews,2,CN | KR,115,98,115,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1601,Chrysanthemum coronarium,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,114,114,114,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1938,cowpeas,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,112,96,112,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7443,strawberries,http://aims.fao.org/aos/agrovoc/c_26721,Tetranychus urticae,2,CN | KR,112,112,112,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7805,tomatoes,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,110,110,110,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7805,tomatoes,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,KR | TW,103,103,103,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_3539,Helianthus annuus,http://aims.fao.org/aos/agrovoc/c_10450,downy mildews,2,CN | KR,102,102,102,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1227,Camellia sinensis,http://aims.fao.org/aos/agrovoc/c_481,anthracnosis,2,CN | TW,101,101,101,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1601,Chrysanthemum coronarium,http://aims.fao.org/aos/agrovoc/c_10450,downy mildews,2,CN | KR,101,101,101,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_13551,potatoes,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,CN | KR,101,101,101,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7805,tomatoes,http://aims.fao.org/aos/agrovoc/c_30755,Bemisia tabaci,2,CN | JP,101,101,101,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12332,maize,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,CN | KR,95,95,95,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7805,tomatoes,http://aims.fao.org/aos/agrovoc/c_30756,Trialeurodes vaporariorum,2,JP | KR,93,93,93,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_9795,chillies,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | TW,90,90,90,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_8998,eggplants,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | TW,87,87,87,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_14477,soybeans,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,CN | KR,86,86,86,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_435824c5,sorghum,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,JP | KR,83,80,83,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_3936,Ipomoea aquatica,http://aims.fao.org/aos/agrovoc/c_30279,Spodoptera litura,2,CN | KR,82,82,82,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_11091,garlic,http://aims.fao.org/aos/agrovoc/c_6710,rusts,2,CN | KR,82,80,82,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_11091,garlic,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,CN | KR,81,81,81,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,http://aims.fao.org/aos/agrovoc/c_30387,Plutella xylostella,2,CN | JP,78,72,78,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7805,tomatoes,http://aims.fao.org/aos/agrovoc/c_30255,Helicoverpa armigera,2,CN | JP,78,65,78,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7805,tomatoes,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,JP | KR,77,64,77,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_3128,fruit trees,http://aims.fao.org/aos/agrovoc/c_30366,Grapholita molesta,2,CN | JP,71,40,71,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12151,lettuces,http://aims.fao.org/aos/agrovoc/c_16425,footrot (plant),2,JP | KR,66,53,66,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1938,cowpeas,http://aims.fao.org/aos/agrovoc/c_26721,Tetranychus urticae,2,CN | KR,64,64,64,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_2719,Euphorbia pulcherrima,http://aims.fao.org/aos/agrovoc/c_30756,Trialeurodes vaporariorum,2,JP | KR,61,61,61,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1938,cowpeas,http://aims.fao.org/aos/agrovoc/c_30279,Spodoptera litura,2,CN | KR,54,54,54,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7796,tobacco,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,CN | KR,53,53,53,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7796,tobacco,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | KR,53,53,53,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_876,Benincasa hispida,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,CN | TW,52,52,52,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_10097,coriander,http://aims.fao.org/aos/agrovoc/c_30279,Spodoptera litura,2,JP | KR,48,48,48,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_14791,taro,http://aims.fao.org/aos/agrovoc/c_30279,Spodoptera litura,2,CN | KR,45,45,45,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12487,muskmelons,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,JP | KR,41,32,41,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_14729,sweet potatoes,http://aims.fao.org/aos/agrovoc/c_30279,Spodoptera litura,2,CN | KR,39,39,39,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_15277,watermelons,http://aims.fao.org/aos/agrovoc/c_957,blight,2,CN | TW,38,38,38,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_5973,plant nurseries,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,CN | KR,37,37,37,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_8373,wheat,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,CN | KR,37,37,37,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_823,barley,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,CN | KR,35,35,35,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_8174,vegetables,http://aims.fao.org/aos/agrovoc/c_30387,Plutella xylostella,2,CN | JP,28,20,28,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_3539,Helianthus annuus,http://aims.fao.org/aos/agrovoc/c_13557,powdery mildews,2,KR | TW,24,24,24,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12151,lettuces,http://aims.fao.org/aos/agrovoc/c_30245,Agrotis segetum,2,JP | KR,23,21,23,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12934,onions,http://aims.fao.org/aos/agrovoc/c_6710,rusts,2,CN | KR,20,18,20,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_6599,rice,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,CN | KR,19,19,19,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_8174,vegetables,http://aims.fao.org/aos/agrovoc/c_30279,Spodoptera litura,2,CN | JP,19,11,19,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7805,tomatoes,http://aims.fao.org/aos/agrovoc/c_957,blight,2,CN | TW,17,17,17,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_8174,vegetables,http://aims.fao.org/aos/agrovoc/c_30277,Spodoptera exigua,2,JP | TW,17,9,17,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,http://aims.fao.org/aos/agrovoc/c_459,annual weeds,2,JP | KR,16,10,16,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_13551,potatoes,http://aims.fao.org/aos/agrovoc/c_6836,scabs,2,CN | KR,12,12,12,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7805,tomatoes,http://aims.fao.org/aos/agrovoc/c_30431,Liriomyza sativae,2,CN | JP,9,9,9,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7805,tomatoes,http://aims.fao.org/aos/agrovoc/c_30277,Spodoptera exigua,2,CN | JP,8,8,8,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_4988,mung beans,http://aims.fao.org/aos/agrovoc/c_6710,rusts,2,CN | KR,7,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_14477,soybeans,http://aims.fao.org/aos/agrovoc/c_6710,rusts,2,CN | KR,7,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_7443,strawberries,http://aims.fao.org/aos/agrovoc/c_30279,Spodoptera litura,2,CN | KR,7,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_12487,muskmelons,http://aims.fao.org/aos/agrovoc/c_30755,Bemisia tabaci,2,CN | JP,6,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_2719,Euphorbia pulcherrima,http://aims.fao.org/aos/agrovoc/c_30755,Bemisia tabaci,2,CN | JP,5,4,5,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_8174,vegetables,http://aims.fao.org/aos/agrovoc/c_7111,slugs,2,CN | JP,5,5,5,official_pair_asserted

@@ -1,0 +1,201 @@
+﻿active_shared_id,active_ingredient_label_en,active_country_count,jurisdiction,formulation_local_id,formulation_local_label,formulation_label_en,product_count,source_record_count
+SHARED:AI:b22aaed213e313188e85,ACETAMIPRID,9,AU,AU:FORM:06c9421fa50b37f9aa81025c,SOLUBLE CONCENTRATE,SOLUBLE CONCENTRATE,13,13
+SHARED:AI:b22aaed213e313188e85,ACETAMIPRID,9,AU,AU:FORM:65ae8915820da5e2b5c6daf9,DISPERSIBLE CONCENTRATE,DISPERSIBLE CONCENTRATE,5,5
+SHARED:AI:b22aaed213e313188e85,ACETAMIPRID,9,AU,AU:FORM:0fb532081657b0142eaa25b1,BAIT,BAIT,2,2
+SHARED:AI:b22aaed213e313188e85,ACETAMIPRID,9,AU,AU:FORM:42110162e06395fd53647c77,LIQUID,LIQUID,2,2
+SHARED:AI:b22aaed213e313188e85,ACETAMIPRID,9,AU,AU:FORM:1304952488c6bbca3cf04962,MICRO EMULSION,MICRO EMULSION,1,1
+SHARED:AI:b22aaed213e313188e85,ACETAMIPRID,9,AU,AU:FORM:c99d2758f29fb1f54b677ffc,WATER SOLUBLE GRANULES,WATER SOLUBLE GRANULES,1,1
+SHARED:AI:b22aaed213e313188e85,ACETAMIPRID,9,TW,TW:FORM:8ed74468ea7bfcbfab08d708,SP 水溶性粉劑,,52,9568
+SHARED:AI:b22aaed213e313188e85,ACETAMIPRID,9,TW,TW:FORM:8a97a1ceaac34b306f90fcad,SG 水溶性粒劑,,1,174
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,HU,HU:FORM:c844d3275279442dc1756c9b,vízoldható granulátum (SG),,22,22
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,HU,HU:FORM:12ae794aaae2d69c289e6652,folyékony vízoldható koncentrátum (SL),,21,21
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,HU,HU:FORM:ad73d551545c856307d4a838,"szuszpo-emulzió, (szilárd részeckék stabil vizes diszperziója) (SE)",,20,20
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,HU,HU:FORM:d851eef0196b3dd16986aebb,vízoldható por (SP),,14,14
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,JP,JP:FORM:aaf0c10d46fcd5660533079f,液剤,,6,217
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,JP,JP:FORM:cfc756d0bedf394461f3952e,粒剤,,4,309
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,JP,JP:FORM:e703070d906ed18296f0249d,水溶剤,,4,985
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,JP,JP:FORM:f006aa65cfa0b1c8b046766a,水和剤,,3,70
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,JP,JP:FORM:5120148dc922de459ae8842a,農薬肥料,,2,15
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,JP,JP:FORM:8c9b8dd5b6d492f76e88671c,くん煙剤,,1,31
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:8ebf5f70714dcd4edff322c9,수화제,,8,1944
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:8da6da3ecaa8e52ecaa1ee5c,액제,,8,57
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:8f3afb794eca64fcd82db32f,입상수용제,,3,39
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:f5d75756d0c93123826431a2,입상수화제,,3,84
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:1069ca8002841f8c4ed65b77,훈연제,,2,6
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:4868ac0ae0d651a09fa658fa,입제,,1,24
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:7aba8fb019934971f4b27756,분산성액제,,1,20
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:ac2594e688d13f8323679f51,수용제,,1,10
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:d675478c4d4774b1f1e1d9a4,미탁제,,1,37
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:5df78b43e89362186e68ea2b,직접살포액제,,1,4
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,KR,KR:FORM:8c748c6360ad504303ab5cd7,과립훈연제,,1,18
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:728977b4437220b9c39f93ec,Ready-to-Use Solution,Ready-to-Use Solution,22,22
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:06c9421fa50b37f9aa81025c,Soluble Concentrate,Soluble Concentrate,12,12
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:1779c328c72f885ea194cc20,Impregnated Materials,Impregnated Materials,12,12
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:0029b4170c1478fa2085f509,Wettable Powder,Wettable Powder,11,11
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:ec3a7dae6e58e9b3f5fbde37,Emulsifiable Concentrate,Emulsifiable Concentrate,10,10
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:46856be5c5779399c61d291c,Water Dispersible Granule,Water Dispersible Granule,4,4
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:d91d1149da19042184cc92bc,Flowable Concentrate,Flowable Concentrate,3,3
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:3e71a36e333a209a62e0154e,Water Soluble Packaging,Water Soluble Packaging,3,3
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:9279ad68dcb050abaacc0322,Technical Chemical,Technical Chemical,2,2
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:e88f41edeb329fba11b42808,Formulation Intermediate,Formulation Intermediate,1,1
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:d1297d0462c9bc695c3ec377,Pelleted/Tableted,Pelleted/Tableted,1,1
+SHARED:AI:b22aaed213e313188e85,Acetamiprid,9,US,US:FORM:9eaf85bf4f6f0966d4b39ed4,Granular,Granular,1,1
+CHEBI:70721,CLETHODIM,9,AU,AU:FORM:ec3a7dae6e58e9b3f5fbde37,EMULSIFIABLE CONCENTRATE,EMULSIFIABLE CONCENTRATE,92,92
+CHEBI:70721,CLETHODIM,9,AU,AU:FORM:38c5b609cea286618049a780,OTHER LIQUIDS TO BE APPLIED UNDILUTED,OTHER LIQUIDS TO BE APPLIED UNDILUTED,1,1
+CHEBI:70721,CLETHODIM,9,NZ,NZ:FORM:140aa6cd6f50d14aca814c04,Herbicide,Herbicide,18,144
+CHEBI:70721,CLETHODIM,9,TW,TW:FORM:ccd8123415021166b05271a8,EC 乳劑,,13,25
+CHEBI:81841,CYAZOFAMID,9,AU,AU:FORM:8384ab716757d8d5b587fe63,SUSPENSION CONCENTRATE,SUSPENSION CONCENTRATE,4,4
+CHEBI:81841,CYAZOFAMID,9,TW,TW:FORM:ecb10ebbeef3ec6f6ba845f3,SC 水懸劑,,18,720
+CHEBI:70721,Clethodim,9,JP,JP:FORM:f09a679c2f92de1acb6ed070,乳剤,,1,32
+CHEBI:70721,Clethodim,9,KR,KR:FORM:cb10da9faa404da7a622c0e7,유제,,1,10
+CHEBI:70721,Clethodim,9,US,US:FORM:ec3a7dae6e58e9b3f5fbde37,Emulsifiable Concentrate,Emulsifiable Concentrate,40,40
+CHEBI:70721,Clethodim,9,US,US:FORM:e88f41edeb329fba11b42808,Formulation Intermediate,Formulation Intermediate,16,16
+CHEBI:70721,Clethodim,9,US,US:FORM:06c9421fa50b37f9aa81025c,Soluble Concentrate,Soluble Concentrate,11,11
+CHEBI:70721,Clethodim,9,US,US:FORM:9279ad68dcb050abaacc0322,Technical Chemical,Technical Chemical,7,7
+CHEBI:70721,Clethodim,9,US,US:FORM:d91d1149da19042184cc92bc,Flowable Concentrate,Flowable Concentrate,1,1
+CHEBI:70721,Clethodim,9,US,US:FORM:2e5716cf14375a607875e189,Formulation Intermediate | Technical Chemical,Formulation Intermediate | Technical Chemical,1,1
+CHEBI:70721,Clethodim,9,US,US:FORM:728977b4437220b9c39f93ec,Ready-to-Use Solution,Ready-to-Use Solution,1,1
+CHEBI:81841,Cyazofamid,9,KR,KR:FORM:54ae44e23006631d4083d60b,액상수화제,,13,892
+CHEBI:81841,Cyazofamid,9,NZ,NZ:FORM:a635c7a6838aead9198896c5,Fungicide,Fungicide,2,18
+CHEBI:81841,Cyazofamid,9,US,US:FORM:ec3a7dae6e58e9b3f5fbde37,Emulsifiable Concentrate,Emulsifiable Concentrate,4,4
+CHEBI:81841,Cyazofamid,9,US,US:FORM:06c9421fa50b37f9aa81025c,Soluble Concentrate,Soluble Concentrate,3,3
+CHEBI:81841,Cyazofamid,9,US,US:FORM:d91d1149da19042184cc92bc,Flowable Concentrate,Flowable Concentrate,2,2
+CHEBI:81841,Cyazofamid,9,US,US:FORM:9279ad68dcb050abaacc0322,Technical Chemical,Technical Chemical,1,1
+CHEBI:81760,DIFENOCONAZOLE,9,AU,AU:FORM:ec3a7dae6e58e9b3f5fbde37,EMULSIFIABLE CONCENTRATE,EMULSIFIABLE CONCENTRATE,10,10
+CHEBI:81760,DIFENOCONAZOLE,9,AU,AU:FORM:38c5b609cea286618049a780,OTHER LIQUIDS TO BE APPLIED UNDILUTED,OTHER LIQUIDS TO BE APPLIED UNDILUTED,3,3
+CHEBI:81760,DIFENOCONAZOLE,9,AU,AU:FORM:8384ab716757d8d5b587fe63,SUSPENSION CONCENTRATE,SUSPENSION CONCENTRATE,3,3
+CHEBI:81760,DIFENOCONAZOLE,9,AU,AU:FORM:e66073887b24c30dd6bff055,Suspension concentrates for seed treatment (FS),Suspension concentrates for seed treatment (FS),2,2
+CHEBI:81760,DIFENOCONAZOLE,9,AU,AU:FORM:b971fbb301efe32aff34d014,EMULSION - OIL IN WATER,EMULSION - OIL IN WATER,1,1
+CHEBI:81760,DIFENOCONAZOLE,9,AU,AU:FORM:46856be5c5779399c61d291c,WATER DISPERSIBLE GRANULE,WATER DISPERSIBLE GRANULE,1,1
+CHEBI:81760,DIFENOCONAZOLE,9,NZ,NZ:FORM:a635c7a6838aead9198896c5,Fungicide,Fungicide,12,108
+CHEBI:81760,DIFENOCONAZOLE,9,TW,TW:FORM:ccd8123415021166b05271a8,EC 乳劑,,44,2911
+CHEBI:81760,DIFENOCONAZOLE,9,TW,TW:FORM:ecb10ebbeef3ec6f6ba845f3,SC 水懸劑,,30,1980
+CHEBI:81760,DIFENOCONAZOLE,9,TW,TW:FORM:8167f294466f9cc99a1bb7c7,WG 水分散性粒劑,,11,715
+CHEBI:81760,DIFENOCONAZOLE,9,TW,TW:FORM:d5f2edafd3920d9d89a53c2f,WP 可溼性粉劑,,3,3
+CHEBI:81760,Difenoconazole,9,JP,JP:FORM:f006aa65cfa0b1c8b046766a,水和剤,,4,93
+CHEBI:81760,Difenoconazole,9,JP,JP:FORM:aaf0c10d46fcd5660533079f,液剤,,2,78
+CHEBI:81760,Difenoconazole,9,JP,JP:FORM:f09a679c2f92de1acb6ed070,乳剤,,2,10
+CHEBI:81760,Difenoconazole,9,JP,JP:FORM:e703070d906ed18296f0249d,水溶剤,,1,19
+CHEBI:81760,Difenoconazole,9,KR,KR:FORM:8ebf5f70714dcd4edff322c9,수화제,,15,1043
+CHEBI:81760,Difenoconazole,9,KR,KR:FORM:cb10da9faa404da7a622c0e7,유제,,9,199
+CHEBI:81760,Difenoconazole,9,KR,KR:FORM:54ae44e23006631d4083d60b,액상수화제,,7,209
+CHEBI:81760,Difenoconazole,9,KR,KR:FORM:f5d75756d0c93123826431a2,입상수화제,,6,154
+CHEBI:81760,Difenoconazole,9,KR,KR:FORM:7aba8fb019934971f4b27756,분산성액제,,1,17
+CHEBI:81760,Difenoconazole,9,KR,KR:FORM:d675478c4d4774b1f1e1d9a4,미탁제,,1,2
+CHEBI:81760,Difenoconazole,9,KR,KR:FORM:f87f6eba64988204f3ad68bd,유탁제,,1,10
+CHEBI:81760,Difenoconazole,9,US,US:FORM:d91d1149da19042184cc92bc,Flowable Concentrate,Flowable Concentrate,20,20
+CHEBI:81760,Difenoconazole,9,US,US:FORM:ec3a7dae6e58e9b3f5fbde37,Emulsifiable Concentrate,Emulsifiable Concentrate,16,16
+CHEBI:81760,Difenoconazole,9,US,US:FORM:06c9421fa50b37f9aa81025c,Soluble Concentrate,Soluble Concentrate,10,10
+CHEBI:81760,Difenoconazole,9,US,US:FORM:b12b2d22b8d0c73944b2078d,Emulsifiable Concentrate | Flowable Concentrate,Emulsifiable Concentrate | Flowable Concentrate,2,2
+CHEBI:81760,Difenoconazole,9,US,US:FORM:9279ad68dcb050abaacc0322,Technical Chemical,Technical Chemical,2,2
+CHEBI:81760,Difenoconazole,9,US,US:FORM:728977b4437220b9c39f93ec,Ready-to-Use Solution,Ready-to-Use Solution,2,2
+CHEBI:81760,Difenoconazole,9,US,US:FORM:46856be5c5779399c61d291c,Water Dispersible Granule,Water Dispersible Granule,1,1
+CHEBI:81760,Difenoconazole,9,US,US:FORM:9cd91e5cf5f69309d0ba9e54,Soluble Concentrate | Flowable Concentrate,Soluble Concentrate | Flowable Concentrate,1,1
+CHEBI:81760,Difenoconazole,9,US,US:FORM:e88f41edeb329fba11b42808,Formulation Intermediate,Formulation Intermediate,1,1
+CHEBI:81749,FLAZASULFURON,9,AU,AU:FORM:46856be5c5779399c61d291c,WATER DISPERSIBLE GRANULE,WATER DISPERSIBLE GRANULE,1,1
+CHEBI:81749,FLAZASULFURON,9,TW,TW:FORM:8167f294466f9cc99a1bb7c7,WG 水分散性粒劑,,4,8
+CHEBI:81749,FLAZASULFURON,9,TW,TW:FORM:d5f2edafd3920d9d89a53c2f,WP 可溼性粉劑,,2,6
+CHEBI:81749,Flazasulfuron,9,JP,JP:FORM:f006aa65cfa0b1c8b046766a,水和剤,,4,56
+CHEBI:81749,Flazasulfuron,9,JP,JP:FORM:cfc756d0bedf394461f3952e,粒剤,,1,3
+CHEBI:81749,Flazasulfuron,9,KR,KR:FORM:f5d75756d0c93123826431a2,입상수화제,,4,4
+CHEBI:81749,Flazasulfuron,9,KR,KR:FORM:8ebf5f70714dcd4edff322c9,수화제,,2,2
+CHEBI:81749,Flazasulfuron,9,KR,KR:FORM:4868ac0ae0d651a09fa658fa,입제,,1,2
+CHEBI:81749,Flazasulfuron,9,US,US:FORM:46856be5c5779399c61d291c,Water Dispersible Granule,Water Dispersible Granule,4,4
+CHEBI:81749,Flazasulfuron,9,US,US:FORM:9279ad68dcb050abaacc0322,Technical Chemical,Technical Chemical,1,1
+CHEBI:81777,PENTHIOPYRAD,9,AU,AU:FORM:8384ab716757d8d5b587fe63,SUSPENSION CONCENTRATE,SUSPENSION CONCENTRATE,1,1
+CHEBI:81777,PENTHIOPYRAD,9,AU,AU:FORM:46856be5c5779399c61d291c,WATER DISPERSIBLE GRANULE,WATER DISPERSIBLE GRANULE,1,1
+CHEBI:81777,PENTHIOPYRAD,9,TW,TW:FORM:ecb10ebbeef3ec6f6ba845f3,SC 水懸劑,,1,3
+CHEBI:78780,PYRACLOSTROBIN,9,AU,AU:FORM:ec3a7dae6e58e9b3f5fbde37,EMULSIFIABLE CONCENTRATE,EMULSIFIABLE CONCENTRATE,12,12
+CHEBI:78780,PYRACLOSTROBIN,9,AU,AU:FORM:46856be5c5779399c61d291c,WATER DISPERSIBLE GRANULE,WATER DISPERSIBLE GRANULE,10,10
+CHEBI:78780,PYRACLOSTROBIN,9,AU,AU:FORM:8384ab716757d8d5b587fe63,SUSPENSION CONCENTRATE,SUSPENSION CONCENTRATE,4,4
+CHEBI:78780,PYRACLOSTROBIN,9,AU,AU:FORM:3481a8081106ab3960bab5e2,SUSPOEMULSION,SUSPOEMULSION,3,3
+CHEBI:78780,PYRACLOSTROBIN,9,AU,AU:FORM:e66073887b24c30dd6bff055,Suspension concentrates for seed treatment (FS),Suspension concentrates for seed treatment (FS),1,1
+CHEBI:78780,PYRACLOSTROBIN,9,NZ,NZ:FORM:a635c7a6838aead9198896c5,Fungicide,Fungicide,12,108
+CHEBI:78780,PYRACLOSTROBIN,9,TW,TW:FORM:ccd8123415021166b05271a8,EC 乳劑,,46,3634
+CHEBI:78780,PYRACLOSTROBIN,9,TW,TW:FORM:ecb10ebbeef3ec6f6ba845f3,SC 水懸劑,,11,759
+CHEBI:78780,PYRACLOSTROBIN,9,TW,TW:FORM:619a42cf607cca096c979fcd,CS 膠囊懸著劑,,1,1
+CHEBI:81777,Penthiopyrad,9,CN,CN:FORM:386a05d778ca6226565d39e6,悬浮剂,,7,9
+CHEBI:81777,Penthiopyrad,9,CN,CN:FORM:c86da12a03acadc18a427e01,水乳剂,,1,1
+CHEBI:81777,Penthiopyrad,9,CN,CN:FORM:7c6dd9001f32d321120694e9,原药,,1,1
+CHEBI:81777,Penthiopyrad,9,GB,GB:FORM:ec3a7dae6e58e9b3f5fbde37,Emulsifiable concentrate,Emulsifiable concentrate,3,3
+CHEBI:81777,Penthiopyrad,9,GB,GB:FORM:8384ab716757d8d5b587fe63,Suspension concentrate,Suspension concentrate,1,1
+CHEBI:81777,Penthiopyrad,9,GB-NI,GB-NI:FORM:ec3a7dae6e58e9b3f5fbde37,Emulsifiable concentrate,Emulsifiable concentrate,4,4
+CHEBI:81777,Penthiopyrad,9,GB-NI,GB-NI:FORM:8384ab716757d8d5b587fe63,Suspension concentrate,Suspension concentrate,1,1
+CHEBI:81777,Penthiopyrad,9,JP,JP:FORM:f006aa65cfa0b1c8b046766a,水和剤,,13,773
+CHEBI:81777,Penthiopyrad,9,KR,KR:FORM:54ae44e23006631d4083d60b,액상수화제,,1,43
+CHEBI:81777,Penthiopyrad,9,KR,KR:FORM:cb10da9faa404da7a622c0e7,유제,,1,139
+CHEBI:81777,Penthiopyrad,9,KR,KR:FORM:f5d75756d0c93123826431a2,입상수화제,,1,4
+CHEBI:81777,Penthiopyrad,9,US,US:FORM:728977b4437220b9c39f93ec,Ready-to-Use Solution,Ready-to-Use Solution,2,2
+CHEBI:81777,Penthiopyrad,9,US,US:FORM:46856be5c5779399c61d291c,Water Dispersible Granule,Water Dispersible Granule,1,1
+CHEBI:81777,Penthiopyrad,9,US,US:FORM:06c9421fa50b37f9aa81025c,Soluble Concentrate,Soluble Concentrate,1,1
+CHEBI:81777,Penthiopyrad,9,US,US:FORM:9279ad68dcb050abaacc0322,Technical Chemical,Technical Chemical,1,1
+CHEBI:81777,Penthiopyrad,9,US,US:FORM:ec3a7dae6e58e9b3f5fbde37,Emulsifiable Concentrate,Emulsifiable Concentrate,1,1
+CHEBI:81777,Penthiopyrad,9,US,US:FORM:d91d1149da19042184cc92bc,Flowable Concentrate,Flowable Concentrate,1,1
+CHEBI:81777,Penthiopyrad,9,US,US:FORM:0f5b72ccc0c8a00c8bd9f8fb,Pressurized Liquid,Pressurized Liquid,1,1
+CHEBI:78780,Pyraclostrobin,9,JP,JP:FORM:f006aa65cfa0b1c8b046766a,水和剤,,5,239
+CHEBI:78780,Pyraclostrobin,9,JP,JP:FORM:f09a679c2f92de1acb6ed070,乳剤,,3,7
+CHEBI:78780,Pyraclostrobin,9,KR,KR:FORM:f5d75756d0c93123826431a2,입상수화제,,30,4027
+CHEBI:78780,Pyraclostrobin,9,KR,KR:FORM:cb10da9faa404da7a622c0e7,유제,,14,1825
+CHEBI:78780,Pyraclostrobin,9,KR,KR:FORM:54ae44e23006631d4083d60b,액상수화제,,2,165
+CHEBI:78780,Pyraclostrobin,9,US,US:FORM:06c9421fa50b37f9aa81025c,Soluble Concentrate,Soluble Concentrate,12,12
+CHEBI:78780,Pyraclostrobin,9,US,US:FORM:ec3a7dae6e58e9b3f5fbde37,Emulsifiable Concentrate,Emulsifiable Concentrate,9,9
+CHEBI:78780,Pyraclostrobin,9,US,US:FORM:d91d1149da19042184cc92bc,Flowable Concentrate,Flowable Concentrate,8,8
+CHEBI:78780,Pyraclostrobin,9,US,US:FORM:46856be5c5779399c61d291c,Water Dispersible Granule,Water Dispersible Granule,5,5
+CHEBI:78780,Pyraclostrobin,9,US,US:FORM:e88f41edeb329fba11b42808,Formulation Intermediate,Formulation Intermediate,2,2
+CHEBI:78780,Pyraclostrobin,9,US,US:FORM:9279ad68dcb050abaacc0322,Technical Chemical,Technical Chemical,2,2
+CHEBI:78780,Pyraclostrobin,9,US,US:FORM:9eaf85bf4f6f0966d4b39ed4,Granular,Granular,1,1
+CHEBI:78780,Pyraclostrobin,9,US,US:FORM:ca408a02c92fc80eec58c412,Soluble Concentrate | Emulsifiable Concentrate,Soluble Concentrate | Emulsifiable Concentrate,1,1
+CHEBI:78780,Pyraclostrobin,9,US,US:FORM:728977b4437220b9c39f93ec,Ready-to-Use Solution,Ready-to-Use Solution,1,1
+CHEBI:81833,TRIFLOXYSTROBIN,9,AU,AU:FORM:8384ab716757d8d5b587fe63,SUSPENSION CONCENTRATE,SUSPENSION CONCENTRATE,6,6
+CHEBI:81833,TRIFLOXYSTROBIN,9,AU,AU:FORM:46856be5c5779399c61d291c,WATER DISPERSIBLE GRANULE,WATER DISPERSIBLE GRANULE,3,3
+CHEBI:81833,TRIFLOXYSTROBIN,9,AU,AU:FORM:e66073887b24c30dd6bff055,Suspension concentrates for seed treatment (FS),Suspension concentrates for seed treatment (FS),1,1
+CHEBI:81833,TRIFLOXYSTROBIN,9,TW,TW:FORM:ecb10ebbeef3ec6f6ba845f3,SC 水懸劑,,19,1311
+CHEBI:81833,TRIFLOXYSTROBIN,9,TW,TW:FORM:8167f294466f9cc99a1bb7c7,WG 水分散性粒劑,,11,737
+CHEBI:81817,TRINEXAPAC-ETHYL,9,AU,AU:FORM:ec3a7dae6e58e9b3f5fbde37,EMULSIFIABLE CONCENTRATE,EMULSIFIABLE CONCENTRATE,12,12
+CHEBI:81817,TRINEXAPAC-ETHYL,9,AU,AU:FORM:1304952488c6bbca3cf04962,MICRO EMULSION,MICRO EMULSION,8,8
+CHEBI:81817,TRINEXAPAC-ETHYL,9,AU,AU:FORM:65ae8915820da5e2b5c6daf9,DISPERSIBLE CONCENTRATE,DISPERSIBLE CONCENTRATE,1,1
+CHEBI:81817,TRINEXAPAC-ETHYL,9,AU,AU:FORM:a120fd6cf77a9977d99ce3fe,EMULSION,EMULSION,1,1
+CHEBI:81817,TRINEXAPAC-ETHYL,9,AU,AU:FORM:06c9421fa50b37f9aa81025c,SOLUBLE CONCENTRATE,SOLUBLE CONCENTRATE,1,1
+CHEBI:81817,TRINEXAPAC-ETHYL,9,AU,AU:FORM:0357e2b61f8cd3172359923b,Mosquito Coils,Mosquito Coils,1,1
+CHEBI:81817,TRINEXAPAC-ETHYL,9,NZ,NZ:FORM:91c8319db4a0170f1f687bd3,Plant growth regulator,Plant growth regulator,9,73
+CHEBI:81817,TRINEXAPAC-ETHYL,9,TW,TW:FORM:62325b7e7a8e86abe14b6c15,SL 溶液,,1,1
+CHEBI:81833,Trifloxystrobin,9,JP,JP:FORM:f006aa65cfa0b1c8b046766a,水和剤,,5,133
+CHEBI:81833,Trifloxystrobin,9,KR,KR:FORM:54ae44e23006631d4083d60b,액상수화제,,13,1474
+CHEBI:81833,Trifloxystrobin,9,KR,KR:FORM:8ebf5f70714dcd4edff322c9,수화제,,1,4
+CHEBI:81833,Trifloxystrobin,9,KR,KR:FORM:f5d75756d0c93123826431a2,입상수화제,,1,118
+CHEBI:81833,Trifloxystrobin,9,US,US:FORM:06c9421fa50b37f9aa81025c,Soluble Concentrate,Soluble Concentrate,9,9
+CHEBI:81833,Trifloxystrobin,9,US,US:FORM:d91d1149da19042184cc92bc,Flowable Concentrate,Flowable Concentrate,6,6
+CHEBI:81833,Trifloxystrobin,9,US,US:FORM:ec3a7dae6e58e9b3f5fbde37,Emulsifiable Concentrate,Emulsifiable Concentrate,5,5
+CHEBI:81833,Trifloxystrobin,9,US,US:FORM:728977b4437220b9c39f93ec,Ready-to-Use Solution,Ready-to-Use Solution,2,2
+CHEBI:81833,Trifloxystrobin,9,US,US:FORM:46856be5c5779399c61d291c,Water Dispersible Granule,Water Dispersible Granule,1,1
+CHEBI:81833,Trifloxystrobin,9,US,US:FORM:b12b2d22b8d0c73944b2078d,Emulsifiable Concentrate | Flowable Concentrate,Emulsifiable Concentrate | Flowable Concentrate,1,1
+CHEBI:81833,Trifloxystrobin,9,US,US:FORM:c889aae9da57d002f0d47518,Water Dispersible Granule | Emulsifiable Concentrate,Water Dispersible Granule | Emulsifiable Concentrate,1,1
+CHEBI:81817,Trinexapac-ethyl,9,JP,JP:FORM:aaf0c10d46fcd5660533079f,液剤,,2,16
+CHEBI:81817,Trinexapac-ethyl,9,JP,JP:FORM:f09a679c2f92de1acb6ed070,乳剤,,1,7
+CHEBI:81817,Trinexapac-ethyl,9,KR,KR:FORM:d675478c4d4774b1f1e1d9a4,미탁제,,3,3
+CHEBI:81817,Trinexapac-ethyl,9,KR,KR:FORM:8da6da3ecaa8e52ecaa1ee5c,액제,,3,9
+CHEBI:81817,Trinexapac-ethyl,9,US,US:FORM:ec3a7dae6e58e9b3f5fbde37,Emulsifiable Concentrate,Emulsifiable Concentrate,14,14
+CHEBI:81817,Trinexapac-ethyl,9,US,US:FORM:9eaf85bf4f6f0966d4b39ed4,Granular,Granular,2,2
+CHEBI:81817,Trinexapac-ethyl,9,US,US:FORM:9279ad68dcb050abaacc0322,Technical Chemical,Technical Chemical,2,2
+CHEBI:81817,Trinexapac-ethyl,9,US,US:FORM:b60f8b26d1b81a172250afb0,Emulsifiable Concentrate | Technical Chemical,Emulsifiable Concentrate | Technical Chemical,1,1
+CHEBI:81817,Trinexapac-ethyl,9,US,US:FORM:06c9421fa50b37f9aa81025c,Soluble Concentrate,Soluble Concentrate,1,1
+CHEBI:81817,Trinexapac-ethyl,9,US,US:FORM:0f7c38d9c59181e61c7f3a17,Microencapsulated,Microencapsulated,1,1
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:c0761f7bb70b09bf92d285da,乳油,,266,467
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:eea105b29bf09d2092b83ff3,可湿性粉剂,,126,143
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:a54fb2926ea00fec2a9d835d,水分散粒剂,,121,157
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:c0f5aa4f4d97c8253a475aac,微乳剂,,111,131
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:0032d3c303b90a08fe9357a2,可溶粉剂,,72,81
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:7c6dd9001f32d321120694e9,原药,,49,49
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:2aa1e1cacffe9ddcac0d7ad8,可溶液剂,,48,65
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:386a05d778ca6226565d39e6,悬浮剂,,11,11
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:c06de8332bdc40ed250397ce,可分散油悬浮剂,,10,13
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:6d2f3b0070700d487a8d3bad,饵剂,,9,9
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:c86da12a03acadc18a427e01,水乳剂,,6,6
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:fff0803c3f6d9fd79e12b117,可溶粒剂,,2,2
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:8e054dc1abadd80130d80fb3,泡腾片剂,,1,1
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:f9a180e75deeacfcb3333fe6,烟剂,,1,1
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:af3573b596b9d3c2383ed02f,粉剂,,1,1
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:ce16c40e65f2dd41842185ec,油悬浮剂,,1,1
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,CN,CN:FORM:7466017113b7e4ad945f1876,可溶性粉剂,,1,1
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,GB,GB:FORM:06c9421fa50b37f9aa81025c,Soluble concentrate,Soluble concentrate,1,1
+SHARED:AI:b22aaed213e313188e85,acetamiprid,9,GB,GB:FORM:389180b97efc7865d57cdc71,Water soluble granule,Water soluble granule,1,1

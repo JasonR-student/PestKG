@@ -1,0 +1,120 @@
+name: pestkg-portal
+
+services:
+  caddy:
+    image: ${CADDY_IMAGE:-caddy:2.11.4-alpine}
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-http://localhost}
+    ports:
+      - "${PESTKG_HTTP_PORT:-80}:80"
+      - "${PESTKG_HTTPS_PORT:-443}:443"
+      - "${PESTKG_HTTPS_PORT:-443}:443/udp"
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://127.0.0.1:2019/config/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  web:
+    image: ${PESTKG_IMAGE_NAMESPACE:-pestkg}/web:${PESTKG_IMAGE_TAG:-local}
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmjs.org}
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+        VCS_REF: ${VCS_REF:-unknown}
+        VERSION: ${PESTKG_IMAGE_TAG:-local}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://127.0.0.1/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    image: ${PESTKG_IMAGE_NAMESPACE:-pestkg}/api:${PESTKG_IMAGE_TAG:-local}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      args:
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+        VCS_REF: ${VCS_REF:-unknown}
+        VERSION: ${PESTKG_IMAGE_TAG:-local}
+    restart: unless-stopped
+    environment:
+      PESTKG_RELEASE_ID: ${PESTKG_RELEASE_ID:-2026.08.3_federated}
+      PESTKG_DATA_DIR: /data/releases
+      PESTKG_STATE_DIR: /data/state
+      PESTKG_NEO4J_URI: ${PESTKG_NEO4J_URI:-}
+      PESTKG_NEO4J_USER: ${PESTKG_NEO4J_USER:-neo4j}
+      PESTKG_NEO4J_PASSWORD: ${PESTKG_NEO4J_PASSWORD:-}
+      PESTKG_CORS_ORIGINS: ${PESTKG_CORS_ORIGINS:-http://localhost}
+    volumes:
+      - ${PESTKG_RELEASE_ROOT:-./data/releases}:/data/releases:ro
+      - ${PESTKG_STATE_ROOT:-./data/state}:/data/state
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  neo4j:
+    image: ${NEO4J_IMAGE:-neo4j:2026.02.2}
+    profiles: ["full"]
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH:-neo4j/change-me}
+      NEO4J_server_memory_heap_initial__size: 4G
+      NEO4J_server_memory_heap_max__size: 8G
+      NEO4J_server_memory_pagecache_size: 12G
+      NEO4J_server_bolt_advertised__address: :7687
+    ports:
+      - "127.0.0.1:${NEO4J_HTTP_PORT:-7474}:7474"
+      - "127.0.0.1:${NEO4J_BOLT_PORT:-7687}:7687"
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - ${PESTKG_RELEASE_ROOT:-./data/releases}/${PESTKG_RELEASE_ID:-2026.08.3_federated}/06_neo4j_import:/import:ro
+      - ./infra/neo4j:/opt/pestkg:ro
+    healthcheck:
+      test: ["CMD-SHELL", "auth=$${NEO4J_AUTH}; cypher-shell -a bolt://localhost:7687 -u \"$${auth%%/*}\" -p \"$${auth#*/}\" 'RETURN 1' >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  neo4j-init:
+    image: ${NEO4J_IMAGE:-neo4j:2026.02.2}
+    profiles: ["full"]
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH:-neo4j/change-me}
+    volumes:
+      - ./infra/neo4j:/opt/pestkg:ro
+    entrypoint: ["/bin/sh", "/opt/pestkg/apply-indexes.sh"]
+    restart: "no"
+
+volumes:
+  caddy_data:
+  caddy_config:
+  neo4j_data:
+    name: pestkg-neo4j-${PESTKG_RELEASE_ID:-2026.08.3_federated}
+  neo4j_logs:
+    name: pestkg-neo4j-logs-${PESTKG_RELEASE_ID:-2026.08.3_federated}

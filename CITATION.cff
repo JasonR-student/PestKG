@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software or its derived dataset, please cite it using this metadata."
+title: "Multicountry Pesticide Registration Knowledge Graph Portal"
+type: software
+version: 1.0.0
+date-released: 2026-08-28
+license: MIT
+repository-code: "https://github.com/OWNER/multicountry-pesticide-kg-portal"
+keywords:
+  - pesticide registration
+  - knowledge graph
+  - regulatory data
+  - cross-jurisdiction comparison

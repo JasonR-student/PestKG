@@ -1,0 +1,69 @@
+{
+  "release_id": "2026.08.3_federated",
+  "license": "CC BY 4.0 for project-derived data",
+  "excluded_pending_license_audit": [
+    "raw official source snapshots",
+    "BCPC",
+    "ChEBI",
+    "AGROVOC",
+    "FRAC",
+    "HRAC",
+    "IRAC"
+  ],
+  "artifacts": [
+    {
+      "path": "metadata/countries.json",
+      "url": "/downloads/2026.08.3_federated/metadata/countries.json",
+      "category": "metadata",
+      "format": "json",
+      "media_type": "application/json",
+      "bytes": 16446,
+      "sha256": "37b006d3b697954d0112b6a22beddb12b52f7c594df9c9a73ee57e2901940077"
+    },
+    {
+      "path": "metadata/release.json",
+      "url": "/downloads/2026.08.3_federated/metadata/release.json",
+      "category": "metadata",
+      "format": "json",
+      "media_type": "application/json",
+      "bytes": 8923,
+      "sha256": "f76a8d09c7dfdebfda118e615a6f07f9b3f64f5da70fef6fbbc3e19d53558d0a"
+    },
+    {
+      "path": "metadata/schema.json",
+      "url": "/downloads/2026.08.3_federated/metadata/schema.json",
+      "category": "metadata",
+      "format": "json",
+      "media_type": "application/json",
+      "bytes": 1378,
+      "sha256": "881501857d21097d28744f47be30b80b27bb4f4f3370d417f220ad570c417f84"
+    },
+    {
+      "path": "README.md",
+      "url": "/downloads/2026.08.3_federated/README.md",
+      "category": "release",
+      "format": "md",
+      "media_type": "application/octet-stream",
+      "bytes": 491,
+      "sha256": "d6d8eb6cd1335ec70f46fe518f70ce785a39139d55c6162225e9952b4cea4a8c"
+    },
+    {
+      "path": "samples/pestkg-sample.graphml",
+      "url": "/downloads/2026.08.3_federated/samples/pestkg-sample.graphml",
+      "category": "samples",
+      "format": "graphml",
+      "media_type": "application/octet-stream",
+      "bytes": 200624,
+      "sha256": "f7210c03f3bff80db3da4c8dea5aeed53c3203b3fd968764d50ee50fa9f7fc2a"
+    },
+    {
+      "path": "samples/pestkg-sample.jsonld",
+      "url": "/downloads/2026.08.3_federated/samples/pestkg-sample.jsonld",
+      "category": "samples",
+      "format": "jsonld",
+      "media_type": "application/octet-stream",
+      "bytes": 259580,
+      "sha256": "e7a8ce1ae15ae11ffa17209c094018e89f9ec1d5f6e9ebc6769e749ee5903534"
+    }
+  ]
+}

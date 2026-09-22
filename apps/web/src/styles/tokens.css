@@ -1,0 +1,22 @@
+:root {
+  font-family: "Segoe UI Variable", "Noto Sans SC", "Segoe UI", Arial, sans-serif;
+  color: #17201d;
+  background: #f4f6f5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --bg: #f3f5f4;
+  --surface: #ffffff;
+  --surface-subtle: #f8faf9;
+  --ink: #17201d;
+  --muted: #64716b;
+  --faint: #87938d;
+  --border: #d6ddd9;
+  --border-strong: #b8c3bd;
+  --green: #1f6254;
+  --green-soft: #e7f0ed;
+  --coral: #b9583d;
+  --coral-soft: #f6e9e4;
+  --blue: #3c6e97;
+  --amber: #a87c2c;
+  --shadow: 0 14px 38px rgba(23, 32, 29, 0.11);
+}

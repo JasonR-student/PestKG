@@ -1,0 +1,201 @@
+﻿crop_shared_id,crop_label_en,crop_country_count,active_shared_id,active_ingredient_label_en,active_country_count,jurisdiction,crop_local_labels,active_ingredient_local_labels,product_count,registration_use_count,source_record_count,pairing_status
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:52492,MANCOZEB,6,TW,香蕉,鋅錳乃浦,102,524,524,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:4388,DELTAMETHRIN,7,TW,香蕉,第滅寧,127,254,254,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:34631,CHLORPYRIFOS,4,TW,香蕉,陶斯松,104,208,208,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:45979,THIABENDAZOLE,4,TW,香蕉,腐絕,33,198,198,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:20e29d2d8281b7d6c30b,propiconazol,1,CN,香蕉,丙环唑,190,191,191,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:3390,CARBARYL,5,TW,香蕉,加保利,87,174,174,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81760,DIFENOCONAZOLE,8,TW,香蕉,待克利,85,170,170,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:78780,pyraclostrobin,8,CN,香蕉 | 香蕉(果实),吡唑醚菌酯,147,164,164,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81760,difenoconazole,8,CN,香蕉,苯醚甲环唑,146,150,150,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:40909,AZOXYSTROBIN,7,TW,香蕉,亞托敏,75,150,150,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:8489,PROPICONAZOLE,5,TW,香蕉,普克利,36,144,144,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:35014,THIOPHANATE-METHYL,6,TW,香蕉,甲基多保淨,81,139,139,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:5870,IMIDACLOPRID,6,TW,香蕉,益達胺,114,114,114,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:78780,PYRACLOSTROBIN,8,TW,香蕉,百克敏,57,114,114,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:8434,prochloraz,6,CN,香蕉 | 香蕉(果实),咪鲜胺,103,109,109,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:f630763a28907362f936,GLUFOSINATE-AMMONIUM,4,TW,香蕉,固殺草,101,101,101,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:bb96e2e24d67e15b7d1e,GLYPHOSATE IPA,1,TW,香蕉,嘉磷塞異丙胺鹽,95,95,95,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:cf5919c24d02a1be694c,LAMBDA-CYHALOTHRIN,7,TW,香蕉,賽洛寧,94,94,94,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:3015,BENOMYL,4,TW,香蕉,免賴得,46,92,92,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:ac5491a5b2e8d3d96f65,PETROLEUM OIL,4,TW,香蕉,礦物油,30,90,90,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:34757,FENITROTHION,5,TW,香蕉,撲滅松,89,89,89,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:34611,CARBOFURAN,2,TW,香蕉,加保扶,42,84,84,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:4811,epoxiconazole,3,CN,香蕉,氟环唑,68,69,69,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81781,tebuconazole,6,CN,香蕉,戊唑醇,62,66,66,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38476,CARBOSULFAN,4,TW,香蕉,丁基加保扶,65,65,65,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:b22aaed213e313188e85,ACETAMIPRID,8,TW,香蕉,亞滅培,53,53,53,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:39233,Emamectin benzoate,5,KR,바나나,Emamectin benzoate,44,44,44,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:34682,DIAZINON,6,TW,香蕉,大利松,44,44,44,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:34761,FENTHION,3,TW,香蕉,芬殺松,43,43,43,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:40909,azoxystrobin,7,CN,香蕉,嘧菌酯,41,41,41,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:3639,CHLOROTHALONIL,6,TW,香蕉,四氯異苯腈,40,40,40,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81755,PROPINEB,4,TW,香蕉,甲基鋅乃浦,39,39,39,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38639,SPIRODICLOFEN,5,TW,香蕉,賜派芬,37,37,37,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:3093,BIFENTHRIN,6,TW,香蕉,畢芬寧,36,36,36,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:887a8b7b6b325bd523ce,AZOXYSTROBIN + DIFENOCONAZOLE,1,TW,香蕉,亞托待克利,34,34,34,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:9665,TRIADIMEFON,5,TW,香蕉,三泰芬,17,34,34,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38960,TERBUFOS,4,TW,香蕉,托福松,33,33,33,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:39183,DINOTEFURAN,6,TW,香蕉,達特南,32,32,32,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:28909,iprodione,6,CN,香蕉,异菌脲,28,31,31,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81833,TRIFLOXYSTROBIN,8,TW,香蕉,三氟敏,30,30,30,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:39185,THIAMETHOXAM,6,TW,香蕉,賽速安,30,30,30,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:52497,MANEB,2,TW,香蕉,錳乃浦,29,29,29,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:52741,ethephon,8,CN,香蕉,乙烯利,27,27,27,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81781,TEBUCONAZOLE,6,TW,香蕉,得克利,27,27,27,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81822,BOSCALID,7,TW,香蕉,白克列,26,26,26,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81975,SPIROTETRAMAT,7,TW,香蕉,賜派滅,26,26,26,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81833,trifloxystrobin,8,CN,香蕉,肟菌酯,16,18,18,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:5ef9f64737cc38cc6989,DELTAMETHRIN + IMIDACLOPRID,1,TW,香蕉,第滅達胺,17,17,17,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:39291,FLONICAMID,6,TW,香蕉,氟尼胺,17,17,17,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:83197,picoxystrobin,4,CN,香蕉,啶氧菌酯,15,16,16,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38963,TRIAZOPHOS,2,TW,香蕉,三落松,8,16,16,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:75281,myclobutanil,6,CN,香蕉,腈菌唑,15,15,15,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:40c74854f3cb2921dc4a,FENITROTHION + MALATHION,1,TW,香蕉,撲馬松,15,15,15,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:51aee17b020d6b285f86,CLOTHIANIDIN,6,TW,香蕉,可尼丁,14,14,14,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:82088,BUFENCARB,1,TW,香蕉,必克蝨,12,12,12,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:83070,fluopyram,5,CN,香蕉,氟吡菌酰胺,9,11,11,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:52492,mancozeb,6,CN,香蕉,代森锰锌,11,11,11,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81848,dimethomorph,7,CN,香蕉,烯酰吗啉,10,10,10,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:5db0b0f879d3386aa7e9,dimethomoph,1,CN,香蕉,烯酰吗啉,10,10,10,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:8121,PHOSALONE,2,TW,香蕉,裕必松,10,10,10,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:6bf6968f6262477c7cbe,CYPRODINIL + FLUDIOXONIL,1,TW,香蕉,賽普護汰寧,10,10,10,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:3130,BITERTANOL,4,TW,香蕉,比多農,5,10,10,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:45979,thiabendazole,4,CN,香蕉 | 香蕉(果实),噻菌灵,9,9,9,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:cf5919c24d02a1be694c,lambda-cyhalothrin,7,CN,香蕉,高效氯氟氰菊酯,7,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:52342,Ethyl formate,3,KR,바나나,Ethyl formate,7,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81758,CYPROCONAZOLE,5,TW,香蕉,環克座,7,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38692,fosthiazate,5,CN,香蕉,噻唑膦,6,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:87569,pydiflumetofen,6,CN,香蕉,氟唑菌酰羟胺,3,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:2962,kresoxim-methyl,7,CN,香蕉,醚菌酯,6,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81972,PYRIFENOX,1,TW,香蕉,比芬諾,6,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:b22aaed213e313188e85,acetamiprid,8,CN,香蕉,啶虫脒,5,5,5,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:83113,fluxapyroxad,7,CN,香蕉,氟唑菌酰胺,5,5,5,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38990,VAMIDOTHION,1,TW,香蕉,繁米松,5,5,5,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:b336a174cd1fad055d03,暂无,1,CN,香蕉,"22,23,24-表芸苔素内酯 | 22、23、24-表芸苔素内酯 | 噻唑锌 | 萜烯醇",4,4,4,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81927,imazalil,4,CN,香蕉,抑霉唑,4,4,4,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:2962,Kresoxim-methyl,7,JP,バナナ,クレソキシムメチル,4,4,4,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:132592,1-Methylcyclopropene,5,KR,바나나(캐번디시),1-Methylcyclopropene,4,4,4,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81539,METIRAM,4,TW,香蕉,免得爛,4,4,4,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:3639,chlorothalonil,6,CN,香蕉,百菌清,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:ac5491a5b2e8d3d96f65,petroleum oil,4,CN,香蕉,矿物油,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:39214,abamectin,6,CN,香蕉,阿维菌素,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:3392,carbendazim,5,CN,香蕉,多菌灵,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81975,spirotetramat,7,CN,香蕉,螺虫乙酯,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:39175,thiacloprid,5,CN,香蕉,噻虫啉,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:132592,1-Methylcyclopropene,5,JP,バナナ,1-メチルシクロプロペン,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38495,Aluminium phosphide,4,KR,바나나,Aluminium phosphide,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:83070,Fluopyram,5,TW,香蕉,氟派瑞,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38640,SPIROMESIFEN,5,TW,香蕉,賜滅芬,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81773,METCONAZOLE,6,TW,香蕉,滅特座,3,3,3,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:9666,triadimenol,3,CN,香蕉,三唑醇,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81922,flusilazole,2,CN,香蕉,氟硅唑,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:16664,albendazole,2,CN,香蕉,丙硫唑,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:201452,24-epibrassinolide,2,CN,香蕉,24-表芸苔素内酯,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:35014,thiophanate-methyl,6,CN,香蕉,甲基硫菌灵,1,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:8674,pyrimethanil,7,CN,香蕉,嘧霉胺,1,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:144514,Mefentrifluconazole,6,CN,香蕉,氯氟醚菌唑,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:83126,isopyrazam,5,CN,香蕉,吡唑萘菌胺,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:87569,PYDIFLUMETOFEN,6,TW,香蕉,派滅芬,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:82041,SPINETORAM,5,TW,香蕉,賜諾特,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:39353,FENPROPATHRIN,5,TW,香蕉,芬普寧,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:133305,SULFOXAFLOR,6,TW,香蕉,速殺氟,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:9422,TEBUFENPYRAD,5,TW,香蕉,得芬瑞,2,2,2,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:2d772527f91f8cc6895d,sodium 4-CPA,1,CN,香蕉,对氯苯氧乙酸钠,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81977,thidiazuron,4,CN,香蕉,噻苯隆,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:83220,fenaminstrobin,1,CN,香蕉,烯肟菌胺,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:a704f24e75c5c35f49fc,ningnanmycin,1,CN,香蕉,宁南霉素,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:156472,cyclobutrifluram,4,CN,香蕉,三氟吡啶胺,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38000,uniconazole,1,CN,香蕉,烯效唑,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:5ab71c375f22e4833788,zinc thiazole,1,CN,香蕉,噻唑锌,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:35bd51336fa95ef6b517,trichoderma SP,1,CN,香蕉,木霉菌,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:6047,isoprothiolane,4,CN,香蕉,稻瘟灵,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81822,boscalid,7,CN,香蕉,啶酰菌胺,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81913,diniconazole,2,CN,香蕉,烯唑醇,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:868a4b2402126bede0d9,bacillus subtilis,2,CN,香蕉,枯草芽孢杆菌,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:5870,imidacloprid,6,CN,香蕉,吡虫啉,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:9495,thiram,6,CN,香蕉,福美双,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81762,fenbuconazole,4,CN,香蕉,腈苯唑,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81755,propineb,4,CN,香蕉,丙森锌,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:398ec8d9933bc0e37d98,imazalil sulfate,1,CN,香蕉,抑霉唑硫酸盐,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81794,thifluzamide,3,CN,香蕉,噻呋酰胺,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:e942401a46bdc5e6b8c0,gibberellic acid,4,CN,香蕉,赤霉酸,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:3015,benomyl,4,CN,香蕉,苯菌灵,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:40909,Azoxystrobin,7,JP,バナナ,アゾキシストロビン,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:39185,Thiamethoxam,6,JP,バナナ,チアメトキサム,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38449,Methoxyfenozide,6,KR,바나나,Methoxyfenozide,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:2321d32c7a5e7eadcb78,B.T. subsp. Aizawai,1,KR,바나나,B.T. subsp. Aizawai,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:ec61456118fdcad66f5c,EPOXICONAZOLE+FLUXAPYROXAD,1,TW,香蕉,依普氟殺,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:45f52efdf57c44b87619,FAMOXADONE + FLUSILAZOLE,1,TW,香蕉,凡殺護矽得,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:e0dc106eb6c050f50d1d,FLUOPYRAM+TRIFLOXYSTROBIN,2,TW,香蕉,三氟派瑞,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:f4033498eaea81f4a32c,IMINOCTADINE TRIS(ALBESILATE),4,TW,香蕉,克熱淨(烷苯磺酸鹽),1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:38592,ACEQUINOCYL,5,TW,香蕉,亞醌蟎,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,SHARED:AI:6abcd36bac8ffc94f270,EPOXICONAZOLE+PYRACLOSTROBIN,1,TW,香蕉,依普克敏,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_806,bananas,4,CHEBI:81820,CYENOPYRAFEN,4,TW,香蕉,賽派芬,1,1,1,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39233,Emamectin benzoate,5,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Emamectin benzoate,44,393,393,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39214,Abamectin,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Abamectin,51,102,102,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:34682,Diazinon,6,JP,カリフラワー,ダイアジノン,18,76,76,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:4388,Deltamethrin,7,KR,"꽃양배추(브로콜리, 콜리플라워 포함) | 꽃양배추(잎)",Deltamethrin,15,75,75,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39347,Chlorfenapyr,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함) | 꽃양배추(잎)",Chlorfenapyr,34,68,68,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:5870,IMIDACLOPRID,6,TW,花椰菜,益達胺,66,66,66,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39384,Lufenuron,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Lufenuron,21,61,61,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:38630,Indoxacarb,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Indoxacarb,23,61,61,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39291,Flonicamid,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Flonicamid,23,45,45,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:6651,Malathion,4,JP,カリフラワー,マラソン,10,38,38,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:67113,Chlorantraniliprole,5,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Chlorantraniliprole,10,37,37,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:3093,BIFENTHRIN,6,TW,花椰菜,畢芬寧,36,36,36,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,SHARED:AI:b22aaed213e313188e85,Acetamiprid,8,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Acetamiprid,11,35,35,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,SHARED:AI:4d868888b4dbb19d9fa6,BUPROFEZIN,6,TW,花椰菜,布芬淨,35,35,35,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:2533,ALACHLOR,4,TW,花椰菜,拉草,35,35,35,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:38960,Terbufos,4,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Terbufos,8,32,32,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:138856,Oxolinic acid,2,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Oxolinic acid,29,30,30,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:28909,Iprodione,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Iprodione,14,28,28,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:38665,Ethoprophos,2,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Ethoprophos,7,28,28,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:3093,Bifenthrin,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Bifenthrin,22,27,27,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:81841,Cyazofamid,8,KR,"꽃양배추(브로콜리, 콜리플라워 포함) | 꽃양배추(잎)",Cyazofamid,13,27,27,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:132300,Cyantraniliprole,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Cyantraniliprole,5,26,26,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,SHARED:AI:eb6523f45557032cb3a8,Chlorantoraniliprole,1,JP,カリフラワー,クロラントラニリプロール,4,24,24,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:34917,Phenthoate,4,JP,カリフラワー,PAP,4,24,24,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:81975,Spirotetramat,7,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Spirotetramat,12,24,24,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39348,Etofenprox,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Etofenprox,9,23,23,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:34911,Permethrin,5,JP,カリフラワー,ペルメトリン,12,20,20,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:4042,Cypermethrin,7,KR,"꽃양배추(브로콜리, 콜리플라워 포함) | 꽃양배추(잎)",Cypermethrin,10,20,20,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:5870,Imidacloprid,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Imidacloprid,18,18,18,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39311,Pymetrozine,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Pymetrozine,9,18,18,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,SHARED:AI:b22aaed213e313188e85,Acetamiprid,8,JP,カリフラワー,アセタミプリド,6,17,17,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:35014,Thiophanate-methyl,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Thiophanate-methyl,17,17,17,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:132300,Cyantraniliprole,6,JP,カリフラワー,シアントラニリプロール,6,16,16,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:82041,Spinetoram,5,JP,カリフラワー,スピネトラム,3,15,15,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:81760,Difenoconazole,8,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Difenoconazole,15,15,15,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,SHARED:AI:7af0c459c2ded95279b6,Cartap hydrochloride,1,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Cartap hydrochloride,3,15,15,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:78780,Pyraclostrobin,8,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Pyraclostrobin,14,15,15,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:81848,dimethomorph,7,CN,花椰菜,烯酰吗啉,13,13,13,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,SHARED:AI:5db0b0f879d3386aa7e9,dimethomoph,1,CN,花椰菜,烯酰吗啉,13,13,13,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:3639,Chlorothalonil,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Chlorothalonil,13,13,13,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:81848,Dimethomorph,7,KR,"꽃양배추(브로콜리, 콜리플라워 포함) | 꽃양배추(잎)",Dimethomorph,11,13,13,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:29703,Validamycin A,3,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Validamycin A,13,13,13,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:6700,matrine,2,CN,花椰菜,苦参碱,12,12,12,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:149441,Cyclaniliprole,4,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Cyclaniliprole,3,12,12,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,SHARED:AI:cf5919c24d02a1be694c,Lambda-cyhalothrin,7,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Lambda-cyhalothrin,11,11,11,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:81803,Metaflumizone,5,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Metaflumizone,4,11,11,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:67113,chlorantraniliprole,5,CN,花椰菜 | 花椰菜(保护地),氯虫苯甲酰胺,10,10,10,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,SHARED:AI:7c58312ed02f8080bbb3,Nitenpyram,3,JP,カリフラワー,ニテンピラム,4,10,10,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39331,Alpha-cypermethrin,5,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Alpha-cypermethrin,5,10,10,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:82041,Spinetoram,5,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Spinetoram,2,10,10,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:38692,Fosthiazate,5,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Fosthiazate,9,9,9,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:38812,Phoxim,2,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Phoxim,3,9,9,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39370,Chlorfluazuron,5,KR,"꽃양배추 | 꽃양배추(브로콜리, 콜리플라워 포함) | 꽃양배추(잎)",Chlorfluazuron,4,8,8,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39382,Flufenoxuron,4,KR,"꽃양배추(브로콜리, 콜리플라워 포함) | 꽃양배추(잎)",Flufenoxuron,2,8,8,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:39385,Novaluron,6,KR,"꽃양배추(브로콜리, 콜리플라워 포함)",Novaluron,2,8,8,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:81843,Fluazinam,7,JP,カリフラワー,フルアジナム,5,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:34520,Acephate,6,JP,カリフラワー,アセフェート,7,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:34757,Fenitrothion,5,KR,꽃양배추,Fenitrothion,7,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:38449,Methoxyfenozide,6,KR,"꽃양배추 | 꽃양배추(브로콜리, 콜리플라워 포함) | 꽃양배추(잎)",Methoxyfenozide,2,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:81846,Amisulbrom,4,KR,"꽃양배추(브로콜리, 콜리플라워 포함) | 꽃양배추(잎)",Amisulbrom,4,7,7,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:82033,propamocarb,1,CN,花椰菜,霜霉威,6,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:81735,propamocarb hydrochloride,5,CN,花椰菜,霜霉威盐酸盐,6,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,SHARED:AI:8130a6032f37f71e9ddb,abamectin-aminomethyl,1,CN,花椰菜,甲氨基阿维菌素,6,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:75212,Dazomet,6,JP,カリフラワー,ダゾメット,2,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:3639,Chlorothalonil,6,JP,カリフラワー,TPN,6,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,SHARED:AI:d9722c7574f3c4f8a04c,Flometoquin,2,JP,カリフラワー,フロメトキン,2,6,6,official_pair_asserted
+http://aims.fao.org/aos/agrovoc/c_1394,cauliflowers,4,CHEBI:38798,Flubendiamide,5,JP,カリフラワー,フルベンジアミド,2,6,6,official_pair_asserted

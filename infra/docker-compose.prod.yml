@@ -1,0 +1,34 @@
+services:
+  caddy:
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  web:
+    build: !reset null
+    pull_policy: always
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+
+  api:
+    build: !reset null
+    pull_policy: always
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+
+  neo4j:
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 1024

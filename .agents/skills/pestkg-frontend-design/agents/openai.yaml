@@ -1,0 +1,8 @@
+interface:
+  display_name: "PestKG Frontend Design"
+  short_description: "Preserve and extend the PestKG research workspace design system."
+  brand_color: "#1F6254"
+  default_prompt: "Use $pestkg-frontend-design to implement this PestKG interface change with the project design system and quality gates."
+
+policy:
+  allow_implicit_invocation: true

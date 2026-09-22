@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "node_fields": [
+    "id",
+    "type",
+    "label_original",
+    "label_en",
+    "jurisdiction",
+    "source_record_id",
+    "source_url",
+    "properties_json"
+  ],
+  "edge_fields": [
+    "id",
+    "start_id",
+    "predicate",
+    "end_id",
+    "jurisdiction",
+    "source_record_id",
+    "source_url",
+    "properties_json"
+  ],
+  "node_types": {
+    "ActiveIngredientLocal": 10380,
+    "CountryJurisdiction": 12,
+    "CropLocal": 29878,
+    "FormulationLocal": 568,
+    "PesticideProduct": 163297,
+    "Registration": 163208,
+    "RegistrationUse": 820231,
+    "RegulatoryAgency": 12,
+    "TargetLocal": 17387
+  },
+  "relation_types": {
+    "containsActiveIngredient": 842180,
+    "hasActiveIngredient": 842180,
+    "hasFormulation": 760753,
+    "hasProduct": 820231,
+    "hasRegistration": 820231,
+    "hasRegistrationUse": 820231,
+    "registeredForCrop": 2268251,
+    "registeredForTarget": 1745518,
+    "regulatesIn": 12,
+    "usesProduct": 820231
+  },
+  "federation_predicates": {
+    "lexicalAlignment": 44672,
+    "exactMatch": 4049
+  },
+  "rules": {
+    "country_local_identity": "Local regulatory entities are never merged across jurisdictions.",
+    "cross_country_alignment": "Cross-country traversal uses exactMatch or lexicalAlignment.",
+    "formal_crop_target_pair": "Formal comparison defaults to official_pair_asserted."
+  }
+}
