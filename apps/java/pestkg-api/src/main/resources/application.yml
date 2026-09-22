@@ -1,0 +1,24 @@
+server:
+  port: ${PORT:8081}
+
+pestkg:
+  data-dir: ${PESTKG_DATA_DIR:data/releases}
+  state-dir: ${PESTKG_STATE_DIR:data/state}
+  export-dir: ${PESTKG_EXPORT_DIR:runtime/java-exports}
+  default-release: ${PESTKG_RELEASE_ID:2026.08.3_federated}
+  graph-node-limit: ${PESTKG_GRAPH_NODE_LIMIT:1000}
+  graph-edge-limit: ${PESTKG_GRAPH_EDGE_LIMIT:2000}
+
+spring:
+  application:
+    name: pestkg-java-api
+  servlet:
+    multipart:
+      max-file-size: 512MB
+      max-request-size: 512MB
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

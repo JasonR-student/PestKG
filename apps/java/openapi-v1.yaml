@@ -1,0 +1,101 @@
+openapi: 3.1.0
+info:
+  title: PestKG Java API
+  version: '1.0'
+servers:
+  - url: /
+paths:
+  /health/live:
+    get:
+      operationId: liveness
+      responses:
+        '200': {description: OK}
+  /health/ready:
+    get:
+      operationId: readiness
+      responses:
+        '200': {description: Ready}
+  /api/v1/releases:
+    get:
+      operationId: listReleases
+      responses:
+        '200': {description: Release catalog}
+  /api/v1/releases/{releaseId}:
+    get:
+      operationId: releaseDetail
+      parameters:
+        - {$ref: '#/components/parameters/ReleaseId'}
+      responses:
+        '200': {description: Release metadata}
+  /api/v1/datasets/overview:
+    get:
+      operationId: datasetOverview
+      parameters: [{$ref: '#/components/parameters/ReleaseQuery'}, {$ref: '#/components/parameters/ReleaseHeader'}]
+      responses:
+        '200': {description: Dataset overview}
+  /api/v1/datasets/coverage:
+    get:
+      operationId: datasetCoverage
+      parameters: [{$ref: '#/components/parameters/ReleaseQuery'}, {$ref: '#/components/parameters/ReleaseHeader'}]
+      responses:
+        '200': {description: Jurisdiction coverage}
+  /api/v1/entities/search:
+    get:
+      operationId: searchEntities
+      parameters: [{$ref: '#/components/parameters/ReleaseQuery'}, {$ref: '#/components/parameters/ReleaseHeader'}]
+      responses:
+        '200': {description: Entity results}
+  /api/v1/entities/{entityId}:
+    get:
+      operationId: entityDetail
+      parameters:
+        - {$ref: '#/components/parameters/EntityId'}
+        - {$ref: '#/components/parameters/ReleaseQuery'}
+        - {$ref: '#/components/parameters/ReleaseHeader'}
+      responses:
+        '200': {description: Entity}
+  /api/v1/registration-uses/query:
+    post:
+      operationId: queryRegistrationUses
+      parameters: [{$ref: '#/components/parameters/ReleaseQuery'}, {$ref: '#/components/parameters/ReleaseHeader'}]
+      responses:
+        '200': {description: Paged registration uses}
+  /api/v1/graph/neighborhood:
+    get:
+      operationId: graphNeighborhood
+      parameters: [{$ref: '#/components/parameters/ReleaseQuery'}, {$ref: '#/components/parameters/ReleaseHeader'}]
+      responses:
+        '200': {description: Bounded neighborhood}
+  /api/v1/graph/path:
+    get:
+      operationId: graphPath
+      parameters: [{$ref: '#/components/parameters/ReleaseQuery'}, {$ref: '#/components/parameters/ReleaseHeader'}]
+      responses:
+        '200': {description: Bounded path}
+  /api/v1/comparisons/{question}:
+    get:
+      operationId: comparison
+      parameters:
+        - {$ref: '#/components/parameters/Question'}
+        - {$ref: '#/components/parameters/ReleaseQuery'}
+        - {$ref: '#/components/parameters/ReleaseHeader'}
+      responses:
+        '200': {description: Comparison rows}
+  /api/v1/exports:
+    post:
+      operationId: createExport
+      parameters: [{$ref: '#/components/parameters/ReleaseQuery'}, {$ref: '#/components/parameters/ReleaseHeader'}]
+      responses:
+        '200': {description: Export job}
+  /api/v1/jobs/{jobId}:
+    get:
+      operationId: exportJob
+      responses:
+        '200': {description: Export status}
+components:
+  parameters:
+    ReleaseQuery: {name: release, in: query, required: false, schema: {type: string}}
+    ReleaseHeader: {name: X-PestKG-Release, in: header, required: false, schema: {type: string}}
+    ReleaseId: {name: releaseId, in: path, required: true, schema: {type: string}}
+    EntityId: {name: entityId, in: path, required: true, schema: {type: string}}
+    Question: {name: question, in: path, required: true, schema: {type: string, pattern: '^q[1-5]$'}}

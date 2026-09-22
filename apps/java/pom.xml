@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>org.pestkg</groupId>
+    <artifactId>pestkg-java-v1</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>PestKG Java research portal</name>
+    <description>Java 21 foundation for the release-aware PestKG research portal</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <vaadin.version>24.8.4</vaadin.version>
+        <springdoc.version>2.8.13</springdoc.version>
+        <commons-csv.version>1.11.0</commons-csv.version>
+    </properties>
+
+    <modules>
+        <module>pestkg-domain</module>
+        <module>pestkg-release</module>
+        <module>pestkg-graph</module>
+        <module>pestkg-ingest</module>
+        <module>pestkg-presentation</module>
+        <module>pestkg-admin</module>
+        <module>pestkg-api</module>
+        <module>pestkg-ui</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-bom</artifactId>
+                <version>${vaadin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

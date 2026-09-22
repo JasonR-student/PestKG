@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PestKG presentation dataset manifest",
+  "type": "object",
+  "required": ["release_id", "schema_version", "query_id", "query_hash", "generated_at", "artifacts"],
+  "properties": {
+    "release_id": {"type": "string"},
+    "schema_version": {"type": "string"},
+    "query_id": {"type": "string"},
+    "query_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "source_snapshot_id": {"type": ["string", "null"]},
+    "evidence_count": {"type": "integer", "minimum": 0},
+    "coverage_status": {"type": "string"},
+    "missingness_note": {"type": "string"},
+    "artifacts": {"type": "array", "items": {"$ref": "#/$defs/artifact"}}
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "required": ["path", "format", "sha256"],
+      "properties": {
+        "path": {"type": "string"},
+        "format": {"type": "string", "enum": ["parquet", "csv", "json", "jsonld", "graphml"]},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "rows": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

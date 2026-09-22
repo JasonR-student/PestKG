@@ -55,6 +55,9 @@ pipeline intentionally stops before publishing. See
 
 - `apps/web`: React, TypeScript, ECharts and Cytoscape research interface.
 - `apps/api`: FastAPI, DuckDB and optional Neo4j query service.
+- `apps/java`: Java 21, Spring Boot 3, Vaadin 24 and the first release-aware
+  Java API/UI foundation. It runs against the tracked sample while the current
+  data package remains blocked for public distribution.
 - `packages/api-contract`: versioned OpenAPI snapshot and generated contract tooling.
 - `tools/release-pipeline`: release extraction, validation, sampling and Parquet conversion.
 - `research/figures`: reproducible research-figure source and tests.
@@ -63,6 +66,14 @@ pipeline intentionally stops before publishing. See
 - `docs`: architecture, API, design, operations and release documentation.
 - `artifacts`: ignored generated deliveries, images and migration evidence.
 - `runtime`: ignored mutable service state and caches.
+
+The Java v1 migration contract and temporal schema are documented in
+`docs/architecture/JAVA_V1_MIGRATION.md` and
+`docs/api/API_CONTRACT_V1.md`. Run it from the repository root with Maven:
+
+```powershell
+mvn -f apps/java/pom.xml spring-boot:run -pl pestkg-api -am
+```
 
 ## Licensing
 

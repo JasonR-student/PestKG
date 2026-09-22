@@ -1,0 +1,24 @@
+services:
+  pestkg-java-api:
+    build:
+      context: apps/java/pestkg-api
+      dockerfile: Dockerfile
+    environment:
+      PESTKG_DATA_DIR: /data/releases
+      PESTKG_STATE_DIR: /data/state
+      PESTKG_RELEASE_ID: ${PESTKG_RELEASE_ID:-2026.08.3_federated}
+      PESTKG_EXPORT_DIR: /data/exports
+    ports:
+      - "${PESTKG_JAVA_PORT:-8081}:8081"
+    volumes:
+      - ${PESTKG_RELEASE_ROOT:-./data/releases}:/data/releases:ro
+      - ${PESTKG_STATE_ROOT:-./data/state}:/data/state:ro
+      - java_exports:/data/exports
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  java_exports:
