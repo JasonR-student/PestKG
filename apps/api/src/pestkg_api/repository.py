@@ -23,6 +23,16 @@ NODE_COLUMNS = (
     "properties_json",
 )
 
+COMPARISON_QUESTIONS = ("q1", "q2", "q3", "q4", "q5")
+
+_COMPARISON_FILES = {
+    "q1": "Q1_crop_active_ingredients_cross_country.csv.gz",
+    "q2": "Q2_same_target_products_cross_country.csv.gz",
+    "q3": "Q3_shared_crop_target_combinations.csv.gz",
+    "q4": "Q4_active_ingredient_formulations.csv.gz",
+    "q5": "Q5_active_ingredient_country_use_profiles.csv.gz",
+}
+
 
 class DataRepository:
     def __init__(self, release_dir: Path) -> None:
@@ -109,8 +119,30 @@ class DataRepository:
                 "CREATE VIEW registration_uses AS SELECT * "
                 f"FROM read_csv_auto('{self._path_literal(self.uses_source)}', header=true, all_varchar=true)"
             )
+        self._register_comparison_views(connection)
         self._local.connection = connection
         return connection
+
+    def _register_comparison_views(
+        self, connection: duckdb.DuckDBPyConnection
+    ) -> None:
+        """Pre-register competency-question CSVs as views.
+
+        Avoids repeated ``read_csv_auto`` schema inference on every
+        ``/api/v1/compare/{question}`` request.
+        """
+        for question, filename in _COMPARISON_FILES.items():
+            path = self._comparison_path(question, filename)
+            if path.exists():
+                connection.execute(
+                    f"CREATE VIEW comparison_{question} AS SELECT * "
+                    f"FROM read_csv_auto('{self._path_literal(path)}', header=true, all_varchar=true)"
+                )
+
+    def _comparison_path(self, question: str, full_filename: str) -> Path:
+        sample_path = self.release_dir / "sample" / "comparisons" / f"{question}.csv"
+        full_path = self.release_dir / "06_competency_questions" / full_filename
+        return full_path if self.mode == "full" and full_path.exists() else sample_path
 
     @staticmethod
     def _records(cursor: duckdb.DuckDBPyConnection) -> list[dict[str, Any]]:
@@ -189,18 +221,9 @@ class DataRepository:
         self, question: str, query: str | None, jurisdiction: str | None, limit: int
     ) -> list[dict[str, Any]]:
         question = question.lower()
-        if question not in {"q1", "q2", "q3", "q4", "q5"}:
+        if question not in COMPARISON_QUESTIONS:
             raise ValueError("Unknown competency question")
-        sample_path = self.release_dir / "sample" / "comparisons" / f"{question}.csv"
-        full_names = {
-            "q1": "Q1_crop_active_ingredients_cross_country.csv.gz",
-            "q2": "Q2_same_target_products_cross_country.csv.gz",
-            "q3": "Q3_shared_crop_target_combinations.csv.gz",
-            "q4": "Q4_active_ingredient_formulations.csv.gz",
-            "q5": "Q5_active_ingredient_country_use_profiles.csv.gz",
-        }
-        full_path = self.release_dir / "06_competency_questions" / full_names[question]
-        path = full_path if self.mode == "full" and full_path.exists() else sample_path
+        path = self._comparison_path(question, _COMPARISON_FILES[question])
         if not path.exists():
             return []
         clauses: list[str] = []
@@ -227,10 +250,11 @@ class DataRepository:
             clauses.append("countries ILIKE ?")
             params.append(f"%{jurisdiction.upper()}%")
         where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        # Query the pre-registered view instead of re-reading the CSV on
+        # every request.  The view is created once per connection in
+        # _register_comparison_views.
         cursor = self._connection().execute(
-            "SELECT * "
-            f"FROM read_csv_auto('{self._path_literal(path)}', header=true, all_varchar=true) "
-            f"{where} LIMIT ?",
+            f"SELECT * FROM comparison_{question} {where} LIMIT ?",
             [*params, limit],
         )
         return self._records(cursor)
@@ -247,19 +271,32 @@ class DataRepository:
     ) -> tuple[list[dict[str, Any]], int]:
         where, params = self._use_filter_sql(filters)
         connection = self._connection()
-        total = connection.execute(
-            f"SELECT count(*) FROM registration_uses {where}", params
-        ).fetchone()[0]
+        # Combine count and page into a single query using a window
+        # function.  count(*) OVER() is computed before LIMIT/OFFSET so
+        # it yields the filtered total.  When the page is empty we fall
+        # back to an explicit count (only needed for the 0-row edge case).
         cursor = connection.execute(
             f"""
-            SELECT * FROM registration_uses
+            SELECT *, count(*) OVER() AS _total_count
+            FROM registration_uses
             {where}
             ORDER BY jurisdiction, product_label_en, use_id
             LIMIT ? OFFSET ?
             """,
             [*params, limit, offset],
         )
-        return [self._normalize_use(row) for row in self._records(cursor)], int(total)
+        records = self._records(cursor)
+        if records:
+            total = int(records[0]["_total_count"])
+            for row in records:
+                row.pop("_total_count", None)
+        else:
+            total = int(
+                connection.execute(
+                    f"SELECT count(*) FROM registration_uses {where}", params
+                ).fetchone()[0]
+            )
+        return [self._normalize_use(row) for row in records], total
 
     def iter_registration_uses(
         self, filters: RegistrationUseFilters, limit: int
@@ -299,10 +336,11 @@ class DataRepository:
         self, node_id: str, depth: int, node_limit: int, edge_limit: int
     ) -> dict[str, Any]:
         connection = self._connection()
-        root = self.entity(node_id)
-        if root is None:
-            return {"nodes": [], "edges": []}
-
+        # Previously this issued a separate entity() lookup for the root
+        # node before starting BFS.  That round-trip is redundant because
+        # the root is always part of the final node fetch.  If the node
+        # does not exist, BFS finds no edges and the final fetch returns
+        # an empty list, producing the same {"nodes": [], "edges": []}.
         visited = {node_id}
         frontier = {node_id}
         edge_records: dict[str, dict[str, Any]] = {}
@@ -343,36 +381,76 @@ class DataRepository:
             return {"nodes": [node] if node else [], "edges": []}
 
         connection = self._connection()
-        queue: list[tuple[str, list[str], list[dict[str, Any]]]] = [(start_id, [start_id], [])]
+        # Batched BFS with parent pointers.
+        # Previous implementation issued one SQL query per visited node
+        # (N+1 queries) and used list.pop(0) (O(n)) plus per-step list
+        # copies for the path.  We now issue one query per BFS level,
+        # use a parent map to reconstruct the path, and stop as soon as
+        # the target is reached.
+        parent: dict[str, tuple[str, dict[str, Any]]] = {}
         visited = {start_id}
-        while queue:
-            current, path_nodes, path_edges = queue.pop(0)
-            if len(path_edges) >= max_depth:
-                continue
+        frontier = {start_id}
+        for _ in range(max_depth):
+            if not frontier:
+                break
+            ids = sorted(frontier)
+            placeholders = ",".join("?" for _ in ids)
             cursor = connection.execute(
-                "SELECT * FROM edges WHERE start_id = ? OR end_id = ? LIMIT 2000",
-                [current, current],
+                f"""
+                SELECT * FROM edges
+                WHERE start_id IN ({placeholders}) OR end_id IN ({placeholders})
+                """,
+                [*ids, *ids],
             )
+            next_frontier: set[str] = set()
+            found = False
             for row in self._records(cursor):
-                neighbor = row["end_id"] if row["start_id"] == current else row["start_id"]
-                edge = self._normalize_edge(row)
+                start = row["start_id"]
+                end = row["end_id"]
+                if start in frontier:
+                    neighbor, anchor = end, start
+                elif end in frontier:
+                    neighbor, anchor = start, end
+                else:
+                    continue
+                if neighbor in visited:
+                    continue
+                visited.add(neighbor)
+                parent[neighbor] = (anchor, self._normalize_edge(row))
                 if neighbor == end_id:
-                    ids = [*path_nodes, neighbor]
-                    placeholders = ",".join("?" for _ in ids)
-                    nodes = self._records(
-                        connection.execute(
-                            f"SELECT * FROM nodes WHERE id IN ({placeholders})", ids
-                        )
-                    )
-                    node_map = {row["id"]: self._normalize_node(row) for row in nodes}
-                    return {
-                        "nodes": [node_map[node] for node in ids if node in node_map],
-                        "edges": [*path_edges, edge],
-                    }
-                if neighbor not in visited:
-                    visited.add(neighbor)
-                    queue.append((neighbor, [*path_nodes, neighbor], [*path_edges, edge]))
-        return {"nodes": [], "edges": []}
+                    found = True
+                    break
+                next_frontier.add(neighbor)
+            if found:
+                break
+            frontier = next_frontier
+
+        if end_id not in parent:
+            return {"nodes": [], "edges": []}
+
+        # Reconstruct path from parent pointers.
+        path_nodes: list[str] = [end_id]
+        path_edges: list[dict[str, Any]] = []
+        current = end_id
+        while current != start_id:
+            anchor, edge = parent[current]
+            path_nodes.append(anchor)
+            path_edges.append(edge)
+            current = anchor
+        path_nodes.reverse()
+        path_edges.reverse()
+
+        placeholders = ",".join("?" for _ in path_nodes)
+        nodes = self._records(
+            connection.execute(
+                f"SELECT * FROM nodes WHERE id IN ({placeholders})", path_nodes
+            )
+        )
+        node_map = {row["id"]: self._normalize_node(row) for row in nodes}
+        return {
+            "nodes": [node_map[node] for node in path_nodes if node in node_map],
+            "edges": path_edges,
+        }
 
     @staticmethod
     def _use_filter_sql(filters: RegistrationUseFilters) -> tuple[str, list[Any]]:
