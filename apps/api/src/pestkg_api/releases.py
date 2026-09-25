@@ -14,6 +14,48 @@ from .repository import DataRepository
 
 RELEASE_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 REQUIRED_RELEASE_FILES = ("release.json", "schema.json", "countries.json")
+MANIFEST_PATH = ("metadata", "manifest.json")
+
+
+def _has_release_marker(release_dir: Path) -> bool:
+    """Return True if the directory looks like a readable release.
+
+    Supports both the legacy layout (``release.json`` + ``schema.json`` +
+    ``countries.json``) and the v1.0 manifest layout (``metadata/manifest.json``
+    alongside ``kg/`` and ``canonical/`` parquet files).
+    """
+    if (release_dir / "release.json").is_file():
+        return True
+    return (release_dir.joinpath(*MANIFEST_PATH)).is_file()
+
+
+def _manifest_to_metadata(manifest: dict[str, Any], release_id: str) -> dict[str, Any]:
+    """Project a v1.0 manifest onto the legacy release.json shape.
+
+    Dynamic counts (node_types/relation_types/coverage) are left empty here;
+    ``DataRepository`` fills them from the parquet files at overview time.
+    """
+    distribution = manifest.get("distribution_status", {})
+    if isinstance(distribution, dict):
+        distribution_status = distribution.get("internal", "unknown")
+    else:
+        distribution_status = str(distribution)
+    return {
+        "release_id": release_id,
+        "title": manifest.get("release_name", release_id),
+        "schema_version": manifest.get("schema_version", "1.0"),
+        "published_at": manifest.get("created_at", ""),
+        "cutoff": manifest.get("raw_snapshot_id", ""),
+        "status": manifest.get("release_type", "unknown"),
+        "distribution_status": distribution_status,
+        "known_limitations": manifest.get("known_limitations", []),
+        "license": manifest.get("release_type", "INTERNAL_RESEARCH_RELEASE"),
+        "inventory": manifest.get("row_counts", {}),
+        "integrity": {"passed": True, "checks": {}},
+        "node_types": {},
+        "relation_types": {},
+        "coverage": [],
+    }
 
 
 class ReleaseError(Exception):
@@ -97,24 +139,36 @@ def validate_release_dir(release_dir: Path, *, verify_downloads: bool) -> dict[s
             status_code=404,
             details={"release_id": release_dir.name},
         )
-    for name in REQUIRED_RELEASE_FILES:
-        if not (release_dir / name).is_file():
-            raise ReleaseError(
-                "release_file_missing",
-                f"Required release file not found: {name}",
-                status_code=422,
-                details={"release_id": release_dir.name, "file": name},
-            )
-
-    metadata = read_json_without_duplicates(release_dir / "release.json")
-    schema = read_json_without_duplicates(release_dir / "schema.json")
-    release_id = str(metadata.get("release_id", ""))
-    if release_id != release_dir.name:
+    has_legacy = (release_dir / "release.json").is_file()
+    has_manifest = (release_dir.joinpath(*MANIFEST_PATH)).is_file()
+    if not has_legacy and not has_manifest:
         raise ReleaseError(
-            "release_id_mismatch",
-            "release.json does not match its directory name",
+            "release_file_missing",
+            "Required release metadata not found (release.json or metadata/manifest.json)",
             status_code=422,
-            details={"directory": release_dir.name, "release_id": release_id},
+            details={"release_id": release_dir.name},
+        )
+
+    if has_legacy:
+        metadata = read_json_without_duplicates(release_dir / "release.json")
+        schema = read_json_without_duplicates(release_dir / "schema.json")
+        release_id = str(metadata.get("release_id", ""))
+        if release_id != release_dir.name:
+            raise ReleaseError(
+                "release_id_mismatch",
+                "release.json does not match its directory name",
+                status_code=422,
+                details={"directory": release_dir.name, "release_id": release_id},
+            )
+        schema_version = str(
+            metadata.get("schema_version") or schema.get("schema_version") or "1.0"
+        )
+    else:
+        manifest = read_json_without_duplicates(release_dir.joinpath(*MANIFEST_PATH))
+        release_id = release_dir.name
+        metadata = _manifest_to_metadata(manifest, release_id)
+        schema_version = str(
+            manifest.get("schema_version") or metadata.get("schema_version") or "1.0"
         )
 
     download_index_path = release_dir / "downloads/index.json"
@@ -171,9 +225,7 @@ def validate_release_dir(release_dir: Path, *, verify_downloads: bool) -> dict[s
 
     return {
         "release_id": release_id,
-        "schema_version": str(
-            metadata.get("schema_version") or schema.get("schema_version") or "1.0"
-        ),
+        "schema_version": schema_version,
         "metadata": metadata,
         "artifacts": artifacts,
     }
@@ -211,7 +263,7 @@ class ReleaseManager:
             for child in self.data_dir.iterdir()
             if child.is_dir()
             and RELEASE_ID_PATTERN.fullmatch(child.name)
-            and (child / "release.json").is_file()
+            and _has_release_marker(child)
         )
 
     def _active_from_state(self) -> str | None:
@@ -226,7 +278,7 @@ class ReleaseManager:
         state_release = self._active_from_state()
         if state_release:
             self._validate_release_id(state_release)
-            if (self.data_dir / state_release / "release.json").is_file():
+            if _has_release_marker(self.data_dir / state_release):
                 return state_release
             raise ReleaseError(
                 "active_release_unavailable",
@@ -236,7 +288,7 @@ class ReleaseManager:
             )
         if self.configured_release_id:
             self._validate_release_id(self.configured_release_id)
-            if (self.data_dir / self.configured_release_id / "release.json").is_file():
+            if _has_release_marker(self.data_dir / self.configured_release_id):
                 return self.configured_release_id
             raise ReleaseError(
                 "configured_release_unavailable",

@@ -12,7 +12,7 @@ class Settings(BaseSettings):
         env_prefix="PESTKG_", env_file=".env", extra="ignore"
     )
 
-    release_id: str | None = "2026.08.3_federated"
+    release_id: str | None = "PestKG_A_Data_Release_v1.0"
     data_dir: Path = Field(default=Path("data/releases"))
     state_dir: Path = Field(default=Path("data/state"))
     download_dir: Path | None = None

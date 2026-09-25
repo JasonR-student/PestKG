@@ -1,0 +1,94 @@
+{
+  "release_name": "PestKG A-Line Data Release v1.0",
+  "release_version": "1.0",
+  "release_type": "INTERNAL_RESEARCH_RELEASE",
+  "raw_snapshot_id": "PESTKG_RAW_SNAPSHOT_2026-09-23",
+  "raw_snapshot_manifest_hash": "af64a1f6feb4cad418bbf81b51105035acb2b9bc5e215430d04a58e2e36cfd0b",
+  "schema_version": "PESTKG_CANONICAL_DATA_MODEL_v0.2",
+  "kg_schema_version": "PESTKG_KG_SCHEMA_v0.2",
+  "pipeline_version": "a-line-canonical-v1.0.0 + a-line-kg-v1.0.0",
+  "canonical_registry_version": "1.0.0",
+  "created_at": "2026-09-24T06:04:28.367432+00:00",
+  "files": [
+    {
+      "path": "canonical/entities.parquet",
+      "size_bytes": 97113835,
+      "sha256": "521737762ffbe69c446786536650abad8280751b26e2122c2d0027b8084dfc68",
+      "row_count": 1103238
+    },
+    {
+      "path": "canonical/identifiers.parquet",
+      "size_bytes": 8121472,
+      "sha256": "9544fa127df832eaec48af23d9f9fa2acc09e6d4eea769914613ed20ddb570e2",
+      "row_count": 106771
+    },
+    {
+      "path": "canonical/names.parquet",
+      "size_bytes": 38420790,
+      "sha256": "490681a77a9a9366884aa593b1c83ef52456cabe45f569a60f8ac3580351a018",
+      "row_count": 212108
+    },
+    {
+      "path": "canonical/registration_uses.parquet",
+      "size_bytes": 155121088,
+      "sha256": "3a20eaeb387af8b6d608432677339e6abf8d74c2a7bc47b2acb2c860c8af1d15",
+      "row_count": 726840
+    },
+    {
+      "path": "canonical/registrations.parquet",
+      "size_bytes": 12663502,
+      "sha256": "2c3da09c2c826d71e8734a93f499cf2661f97fed5bc6d8e7b60e458503bb77e4",
+      "row_count": 164249
+    },
+    {
+      "path": "docs/DATA_DICTIONARY.md",
+      "size_bytes": 10326,
+      "sha256": "1f9e53a827fa8eaf1cea4610ca3a20c01ee8ae14f4c71610034a573a4fef57ce"
+    },
+    {
+      "path": "docs/KG_SCHEMA.md",
+      "size_bytes": 2405,
+      "sha256": "76dcd57ac5da80042e3302c7663b241558ee26a9a2df5037cb0d8f5243963932"
+    },
+    {
+      "path": "docs/QUALITY_REPORT.md",
+      "size_bytes": 1173,
+      "sha256": "14da80dd05a0af554a28b3fc286e1bcfcb95547532c29c6d10f28a1efdb884ff"
+    },
+    {
+      "path": "kg/edges.parquet",
+      "size_bytes": 531739003,
+      "sha256": "f9742511d0b3d3d527bf3cf7c5b9f33395950d09c78e6e258eecb4fa250f3589",
+      "row_count": 6030734
+    },
+    {
+      "path": "kg/nodes.parquet",
+      "size_bytes": 74266139,
+      "sha256": "1882cd059fbbd11e4fd47e95b23e0911b6361aec24ff922f89f1a7c9d4f2980b",
+      "row_count": 1103238
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 1479,
+      "sha256": "913b5a395911354ea3ba72bd3cb00df6165256d562e05f12c39ec1b294c25a12"
+    }
+  ],
+  "row_counts": {
+    "canonical_entities": 1103238,
+    "global_chemicals": 0,
+    "registrations": 164249,
+    "registration_uses": 726840,
+    "kg_nodes": 1103238,
+    "kg_edges": 6030734
+  },
+  "known_limitations": [
+    "No GlobalChemical/exact identity without approved evidence.",
+    "Uncertain component rows remain in engineering quarantine.",
+    "Legacy upstream completeness unproven.",
+    "Public redistribution rights unverified."
+  ],
+  "distribution_status": {
+    "internal": "ALLOWED_DEC_002",
+    "public": "BLOCKED_BY_RIGHTS_REVIEW"
+  }
+}

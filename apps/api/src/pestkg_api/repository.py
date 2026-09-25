@@ -33,10 +33,40 @@ _COMPARISON_FILES = {
     "q5": "Q5_active_ingredient_country_use_profiles.csv.gz",
 }
 
+_EMPTY_COVERAGE = {
+    "jurisdiction": "",
+    "source_language": "",
+    "records": "",
+    "crop_source": "",
+    "target_source": "",
+    "active_source": "",
+    "formulation_source": "",
+    "crop_english": "",
+    "target_english": "",
+    "active_english": "",
+    "formulation_english": "",
+    "crop_english_given_source": "",
+    "target_english_given_source": "",
+    "active_english_given_source": "",
+    "formulation_english_given_source": "",
+}
+
 
 class DataRepository:
     def __init__(self, release_dir: Path) -> None:
         self.release_dir = release_dir
+        self._local = threading.local()
+
+        manifest_path = release_dir / "metadata" / "manifest.json"
+        if manifest_path.is_file() and (release_dir / "kg" / "nodes.parquet").is_file():
+            self.layout = "v1_manifest"
+            self._init_v1_manifest(manifest_path)
+        else:
+            self.layout = "legacy"
+            self._init_legacy()
+
+    def _init_legacy(self) -> None:
+        release_dir = self.release_dir
         self.metadata = self._read_json("release.json")
         download_index = release_dir / "downloads/index.json"
         if download_index.exists():
@@ -46,7 +76,6 @@ class DataRepository:
             self.metadata = {**self.metadata, "artifacts": []}
         self.schema = self._read_json("schema.json")
         self.countries = self._read_json("countries.json")
-        self._local = threading.local()
 
         analytics_dir = release_dir / "analytics"
         sample_dir = release_dir / "sample"
@@ -74,6 +103,70 @@ class DataRepository:
             if not source.exists():
                 raise FileNotFoundError(f"Required data file not found: {source}")
 
+    def _init_v1_manifest(self, manifest_path: Path) -> None:
+        """Initialise from a v1.0 manifest layout (kg/ + canonical/ parquet)."""
+        release_dir = self.release_dir
+        with manifest_path.open("r", encoding="utf-8") as handle:
+            manifest = json.load(handle)
+        release_id = release_dir.name
+        distribution = manifest.get("distribution_status", {})
+        if isinstance(distribution, dict):
+            dist_status = distribution.get("internal", "unknown")
+        else:
+            dist_status = str(distribution)
+        self._manifest = manifest
+        self.metadata = {
+            "release_id": release_id,
+            "title": manifest.get("release_name", release_id),
+            "schema_version": manifest.get("schema_version", "1.0"),
+            "published_at": manifest.get("created_at", ""),
+            "cutoff": manifest.get("raw_snapshot_id", ""),
+            "status": manifest.get("release_type", "unknown"),
+            "distribution_status": dist_status,
+            "known_limitations": manifest.get("known_limitations", []),
+            "license": manifest.get("release_type", "INTERNAL_RESEARCH_RELEASE"),
+            "inventory": {
+                "jurisdictions": 0,
+                "source_records": manifest.get("row_counts", {}).get("canonical_entities", 0),
+                "country_nodes": 0,
+                "country_edges": 0,
+                "shared_nodes": 0,
+                "alignment_edges": 0,
+            },
+            "integrity": {"passed": True, "checks": {}},
+            "node_types": {},
+            "relation_types": {},
+            "coverage": [],
+            "artifacts": [],
+        }
+        self.schema = {
+            "schema_version": manifest.get(
+                "kg_schema_version", manifest.get("schema_version", "PESTKG_KG_SCHEMA_v0.2")
+            ),
+            "node_fields": list(NODE_COLUMNS),
+            "edge_fields": [
+                "id", "start_id", "predicate", "end_id",
+                "jurisdiction", "source_record_id", "source_url", "properties_json",
+            ],
+            "node_types": {},
+            "relation_types": {},
+            "federation_predicates": {},
+            "rules": {},
+        }
+        self.countries = []  # derived lazily once the duckdb connection is built
+        self.mode = "full"
+        self.source_format = "parquet"
+        self.nodes_source = release_dir / "kg" / "nodes.parquet"
+        self.edges_source = release_dir / "kg" / "edges.parquet"
+        self.uses_source = release_dir / "canonical" / "registration_uses.parquet"
+        self._v1_derived = False
+        for source in (self.nodes_source, self.edges_source, self.uses_source):
+            if not source.exists():
+                raise FileNotFoundError(f"Required data file not found: {source}")
+        # Eagerly build the connection so node_types/relation_types/countries
+        # are derived and the overview/countries endpoints see populated data.
+        self._connection()
+
     def _read_json(self, name: str) -> Any:
         path = self.release_dir / name
         with path.open("r", encoding="utf-8") as handle:
@@ -93,7 +186,9 @@ class DataRepository:
             return connection
 
         connection = duckdb.connect(database=":memory:")
-        if self.source_format == "parquet":
+        if self.layout == "v1_manifest":
+            self._create_v1_views(connection)
+        elif self.source_format == "parquet":
             connection.execute(
                 "CREATE VIEW nodes AS SELECT * FROM "
                 f"read_parquet('{self._parquet_source(self.nodes_source)}', hive_partitioning=true)"
@@ -121,6 +216,9 @@ class DataRepository:
             )
         self._register_comparison_views(connection)
         self._local.connection = connection
+        if self.layout == "v1_manifest" and not self._v1_derived:
+            self._derive_v1_dynamic(connection)
+            self._v1_derived = True
         return connection
 
     def _register_comparison_views(
@@ -138,6 +236,340 @@ class DataRepository:
                     f"CREATE VIEW comparison_{question} AS SELECT * "
                     f"FROM read_csv_auto('{self._path_literal(path)}', header=true, all_varchar=true)"
                 )
+
+    def _create_v1_views(self, connection: duckdb.DuckDBPyConnection) -> None:
+        """Create column-mapping views over the v1.0 parquet layout.
+
+        The v1.0 schema (node_id/node_type/...) is projected onto the legacy
+        contract (id/type/label_original/...) so the rest of the repository
+        code is unchanged.
+        """
+        nodes_src = self._parquet_source(self.nodes_source)
+        edges_src = self._parquet_source(self.edges_source)
+        uses_src = self._parquet_source(self.uses_source)
+        connection.execute(
+            f"""
+            CREATE VIEW nodes AS SELECT
+                node_id AS id,
+                node_type AS type,
+                display_label AS label_original,
+                display_label AS label_en,
+                jurisdiction_id AS jurisdiction,
+                '' AS source_record_id,
+                '' AS source_url,
+                extension_properties AS properties_json
+            FROM read_parquet('{nodes_src}', hive_partitioning=true)
+            """
+        )
+        connection.execute(
+            f"""
+            CREATE VIEW edges AS SELECT
+                edge_id AS id,
+                source_id AS start_id,
+                predicate,
+                target_id AS end_id,
+                '' AS jurisdiction,
+                source_record_id,
+                '' AS source_url,
+                json_object(
+                    'assertion_status', assertion_status,
+                    'evidence_id', evidence_id,
+                    'source_snapshot_id', source_snapshot_id,
+                    'origin_kind', origin_kind,
+                    'derivation_rule_id', derivation_rule_id,
+                    'pipeline_version', pipeline_version,
+                    'display_priority', display_priority,
+                    'default_hidden', default_hidden
+                ) AS properties_json
+            FROM read_parquet('{edges_src}', hive_partitioning=true)
+            """
+        )
+        registrations_path = self.release_dir / "canonical" / "registrations.parquet"
+        if registrations_path.exists():
+            reg_src = self._parquet_source(registrations_path)
+            connection.execute(
+                f"""
+                CREATE VIEW registration_uses AS SELECT
+                    u.registration_use_id AS use_id,
+                    u.jurisdiction_id AS jurisdiction,
+                    u.product_id,
+                    '' AS product_label_original,
+                    '' AS product_label_en,
+                    '' AS product_label_search,
+                    '' AS active_ingredients_search,
+                    u.crop_original AS crops_search,
+                    u.target_original AS targets_search,
+                    u.formulation_original AS formulations_search,
+                    '[]' AS active_ingredients_json,
+                    '[]' AS crops_json,
+                    '[]' AS targets_json,
+                    '[]' AS formulations_json,
+                    coalesce(r.original_status, '') AS registration_status,
+                    u.pairing_status,
+                    coalesce(r.registration_date_normalized, '') AS registration_date,
+                    coalesce(r.expiry_date_normalized, '') AS expiry_date,
+                    u.source_record_id,
+                    '' AS source_url
+                FROM read_parquet('{uses_src}', hive_partitioning=true) u
+                LEFT JOIN read_parquet('{reg_src}', hive_partitioning=true) r
+                    ON u.registration_id = r.registration_id
+                """
+            )
+        else:
+            connection.execute(
+                f"""
+                CREATE VIEW registration_uses AS SELECT
+                    registration_use_id AS use_id,
+                    jurisdiction_id AS jurisdiction,
+                    product_id,
+                    '' AS product_label_original,
+                    '' AS product_label_en,
+                    '' AS product_label_search,
+                    '' AS active_ingredients_search,
+                    crop_original AS crops_search,
+                    target_original AS targets_search,
+                    formulation_original AS formulations_search,
+                    '[]' AS active_ingredients_json,
+                    '[]' AS crops_json,
+                    '[]' AS targets_json,
+                    '[]' AS formulations_json,
+                    '' AS registration_status,
+                    pairing_status,
+                    '' AS registration_date,
+                    '' AS expiry_date,
+                    source_record_id,
+                    '' AS source_url
+                FROM read_parquet('{uses_src}', hive_partitioning=true)
+                """
+            )
+
+    def _derive_v1_dynamic(self, connection: duckdb.DuckDBPyConnection) -> None:
+        """Fill node_types/relation_types/countries from the parquet data."""
+        node_types = dict(
+            connection.execute("SELECT type, count(*) FROM nodes GROUP BY type").fetchall()
+        )
+        relation_types = dict(
+            connection.execute(
+                "SELECT predicate, count(*) FROM edges GROUP BY predicate"
+            ).fetchall()
+        )
+        self.metadata["node_types"] = node_types
+        self.metadata["relation_types"] = relation_types
+        self.metadata["inventory"]["jurisdictions"] = node_types.get("Jurisdiction", 0)
+        self.metadata["inventory"]["country_nodes"] = node_types.get("CountryOrTerritory", 0)
+        self.schema["node_types"] = node_types
+        self.schema["relation_types"] = relation_types
+        self.countries = self._derive_countries(connection)
+
+    def _derive_countries(self, connection: duckdb.DuckDBPyConnection) -> list[dict[str, Any]]:
+        """Project Jurisdiction/CountryOrTerritory nodes onto CountryData records."""
+        rows = connection.execute(
+            """
+            SELECT id, type, label_original, jurisdiction
+            FROM nodes
+            WHERE type IN ('Jurisdiction', 'CountryOrTerritory')
+            """
+        ).fetchall()
+        jurisdiction_names: dict[str, str] = {}
+        for node_id, node_type, label, _jurisdiction_id in rows:
+            if node_type == "Jurisdiction":
+                jurisdiction_names[node_id] = label or ""
+        countries: list[dict[str, Any]] = []
+        for node_id, node_type, label, jurisdiction_id in rows:
+            if node_type != "CountryOrTerritory":
+                continue
+            countries.append(
+                {
+                    "jurisdiction": jurisdiction_id or "",
+                    "jurisdiction_name": jurisdiction_names.get(
+                        jurisdiction_id or "", jurisdiction_id or ""
+                    ),
+                    "sovereign_country": label or "",
+                    "site_id": "",
+                    "official_url": "",
+                    "source_file": "",
+                    "source_sha256": "",
+                    "source_snapshot_eligible": False,
+                    "source_rows": 0,
+                    "skipped_rows": 0,
+                    "nodes": 0,
+                    "edges": 0,
+                    "broken_edges": 0,
+                    "graph_scope": "v1_manifest",
+                    "language": "und",
+                    "iso3": "",
+                    "map_id": node_id,
+                    "coverage": dict(_EMPTY_COVERAGE),
+                }
+            )
+        return countries
+
+    def _create_v1_views(self, connection: duckdb.DuckDBPyConnection) -> None:
+        """Create column-mapping views over the v1.0 parquet layout.
+
+        The v1.0 schema (node_id/node_type/...) is projected onto the legacy
+        contract (id/type/label_original/...) so the rest of the repository
+        code is unchanged.
+        """
+        nodes_src = self._parquet_source(self.nodes_source)
+        edges_src = self._parquet_source(self.edges_source)
+        uses_src = self._parquet_source(self.uses_source)
+        connection.execute(
+            f"""
+            CREATE VIEW nodes AS SELECT
+                node_id AS id,
+                node_type AS type,
+                display_label AS label_original,
+                display_label AS label_en,
+                jurisdiction_id AS jurisdiction,
+                '' AS source_record_id,
+                '' AS source_url,
+                extension_properties AS properties_json
+            FROM read_parquet('{nodes_src}', hive_partitioning=true)
+            """
+        )
+        connection.execute(
+            f"""
+            CREATE VIEW edges AS SELECT
+                edge_id AS id,
+                source_id AS start_id,
+                predicate,
+                target_id AS end_id,
+                '' AS jurisdiction,
+                source_record_id,
+                '' AS source_url,
+                json_object(
+                    'assertion_status', assertion_status,
+                    'evidence_id', evidence_id,
+                    'source_snapshot_id', source_snapshot_id,
+                    'origin_kind', origin_kind,
+                    'derivation_rule_id', derivation_rule_id,
+                    'pipeline_version', pipeline_version,
+                    'display_priority', display_priority,
+                    'default_hidden', default_hidden
+                ) AS properties_json
+            FROM read_parquet('{edges_src}', hive_partitioning=true)
+            """
+        )
+        registrations_path = self.release_dir / "canonical" / "registrations.parquet"
+        if registrations_path.exists():
+            reg_src = self._parquet_source(registrations_path)
+            connection.execute(
+                f"""
+                CREATE VIEW registration_uses AS SELECT
+                    u.registration_use_id AS use_id,
+                    u.jurisdiction_id AS jurisdiction,
+                    u.product_id,
+                    '' AS product_label_original,
+                    '' AS product_label_en,
+                    '' AS product_label_search,
+                    '' AS active_ingredients_search,
+                    u.crop_original AS crops_search,
+                    u.target_original AS targets_search,
+                    u.formulation_original AS formulations_search,
+                    '[]' AS active_ingredients_json,
+                    '[]' AS crops_json,
+                    '[]' AS targets_json,
+                    '[]' AS formulations_json,
+                    coalesce(r.original_status, '') AS registration_status,
+                    u.pairing_status,
+                    coalesce(r.registration_date_normalized, '') AS registration_date,
+                    coalesce(r.expiry_date_normalized, '') AS expiry_date,
+                    u.source_record_id,
+                    '' AS source_url
+                FROM read_parquet('{uses_src}', hive_partitioning=true) u
+                LEFT JOIN read_parquet('{reg_src}', hive_partitioning=true) r
+                    ON u.registration_id = r.registration_id
+                """
+            )
+        else:
+            connection.execute(
+                f"""
+                CREATE VIEW registration_uses AS SELECT
+                    registration_use_id AS use_id,
+                    jurisdiction_id AS jurisdiction,
+                    product_id,
+                    '' AS product_label_original,
+                    '' AS product_label_en,
+                    '' AS product_label_search,
+                    '' AS active_ingredients_search,
+                    crop_original AS crops_search,
+                    target_original AS targets_search,
+                    formulation_original AS formulations_search,
+                    '[]' AS active_ingredients_json,
+                    '[]' AS crops_json,
+                    '[]' AS targets_json,
+                    '[]' AS formulations_json,
+                    '' AS registration_status,
+                    pairing_status,
+                    '' AS registration_date,
+                    '' AS expiry_date,
+                    source_record_id,
+                    '' AS source_url
+                FROM read_parquet('{uses_src}', hive_partitioning=true)
+                """
+            )
+
+    def _derive_v1_dynamic(self, connection: duckdb.DuckDBPyConnection) -> None:
+        """Fill node_types/relation_types/countries from the parquet data."""
+        node_types = dict(
+            connection.execute("SELECT type, count(*) FROM nodes GROUP BY type").fetchall()
+        )
+        relation_types = dict(
+            connection.execute(
+                "SELECT predicate, count(*) FROM edges GROUP BY predicate"
+            ).fetchall()
+        )
+        self.metadata["node_types"] = node_types
+        self.metadata["relation_types"] = relation_types
+        self.metadata["inventory"]["jurisdictions"] = node_types.get("Jurisdiction", 0)
+        self.metadata["inventory"]["country_nodes"] = node_types.get("CountryOrTerritory", 0)
+        self.schema["node_types"] = node_types
+        self.schema["relation_types"] = relation_types
+        self.countries = self._derive_countries(connection)
+
+    def _derive_countries(self, connection: duckdb.DuckDBPyConnection) -> list[dict[str, Any]]:
+        """Project Jurisdiction/CountryOrTerritory nodes onto CountryData records."""
+        rows = connection.execute(
+            """
+            SELECT id, type, label_original, jurisdiction
+            FROM nodes
+            WHERE type IN ('Jurisdiction', 'CountryOrTerritory')
+            """
+        ).fetchall()
+        jurisdiction_names: dict[str, str] = {}
+        for node_id, node_type, label, _jurisdiction_id in rows:
+            if node_type == "Jurisdiction":
+                jurisdiction_names[node_id] = label or ""
+        countries: list[dict[str, Any]] = []
+        for node_id, node_type, label, jurisdiction_id in rows:
+            if node_type != "CountryOrTerritory":
+                continue
+            countries.append(
+                {
+                    "jurisdiction": jurisdiction_id or "",
+                    "jurisdiction_name": jurisdiction_names.get(
+                        jurisdiction_id or "", jurisdiction_id or ""
+                    ),
+                    "sovereign_country": label or "",
+                    "site_id": "",
+                    "official_url": "",
+                    "source_file": "",
+                    "source_sha256": "",
+                    "source_snapshot_eligible": False,
+                    "source_rows": 0,
+                    "skipped_rows": 0,
+                    "nodes": 0,
+                    "edges": 0,
+                    "broken_edges": 0,
+                    "graph_scope": "v1_manifest",
+                    "language": "und",
+                    "iso3": "",
+                    "map_id": node_id,
+                    "coverage": dict(_EMPTY_COVERAGE),
+                }
+            )
+        return countries
 
     def _comparison_path(self, question: str, full_filename: str) -> Path:
         sample_path = self.release_dir / "sample" / "comparisons" / f"{question}.csv"

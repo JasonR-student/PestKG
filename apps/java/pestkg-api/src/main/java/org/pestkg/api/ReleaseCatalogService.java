@@ -55,13 +55,16 @@ public class ReleaseCatalogService {
         if (!dir.startsWith(properties.getDataDir().normalize()) || !Files.isDirectory(dir)) {
             throw new ReleaseException("release_not_found", "Release directory not found", 404, Map.of("release_id", releaseId));
         }
-        for (String required : List.of("release.json", "schema.json", "countries.json")) {
-            if (!Files.isRegularFile(dir.resolve(required))) {
-                throw new ReleaseException("release_file_missing", "Required release file is missing", 422,
-                        Map.of("release_id", releaseId, "file", required));
-            }
+        if (!hasReleaseMarker(dir)) {
+            throw new ReleaseException("release_file_missing", "Required release metadata is missing (release.json or metadata/manifest.json)", 422,
+                    Map.of("release_id", releaseId));
         }
         return dir;
+    }
+
+    private static boolean hasReleaseMarker(Path dir) {
+        return Files.isRegularFile(dir.resolve("release.json"))
+                || Files.isRegularFile(dir.resolve("metadata/manifest.json"));
     }
 
     public List<ReleaseSummary> list() {
@@ -70,7 +73,7 @@ public class ReleaseCatalogService {
             List<ReleaseSummary> result = new ArrayList<>();
             try (var stream = Files.list(properties.getDataDir())) {
                 stream.filter(Files::isDirectory)
-                        .filter(path -> Files.isRegularFile(path.resolve("release.json")))
+                        .filter(ReleaseCatalogService::hasReleaseMarker)
                         .map(path -> summary(path.getFileName().toString()))
                         .sorted(Comparator.comparing(ReleaseSummary::releaseId).reversed())
                         .forEach(result::add);

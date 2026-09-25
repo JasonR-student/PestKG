@@ -1,0 +1,51 @@
+{
+  "schema_version": "PESTKG_KG_SCHEMA_v0.2",
+  "node_fields": [
+    "id",
+    "type",
+    "label_original",
+    "label_en",
+    "jurisdiction",
+    "source_record_id",
+    "source_url",
+    "properties_json"
+  ],
+  "edge_fields": [
+    "id",
+    "start_id",
+    "predicate",
+    "end_id",
+    "jurisdiction",
+    "source_record_id",
+    "source_url",
+    "properties_json"
+  ],
+  "node_types": {
+    "CountryOrTerritory": 5,
+    "FormulationTerm": 518,
+    "SourceSnapshot": 12,
+    "Jurisdiction": 12,
+    "LocalActiveIngredient": 10064,
+    "Source": 12,
+    "Registration": 164249,
+    "RegulatoryOrganization": 6,
+    "TargetTerm": 19591,
+    "PesticideProduct": 163441,
+    "RegistrationUse": 726840,
+    "CropTerm": 18488
+  },
+  "relation_types": {
+    "HAS_SNAPSHOT": 12,
+    "REGULATES": 385541,
+    "REGISTERS_PRODUCT": 819087,
+    "FOR_CROP": 703273,
+    "HAS_USE": 726840,
+    "USES_PRODUCT": 726593,
+    "FOR_TARGET": 700495,
+    "HAS_REGISTRATION": 819895,
+    "CONTAINS_ACTIVE_INGREDIENT": 779319,
+    "IN_TERRITORY": 369679
+  },
+  "federation_predicates": {},
+  "rules": {}
+}

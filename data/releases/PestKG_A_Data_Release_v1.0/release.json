@@ -1,0 +1,55 @@
+{
+  "release_id": "PestKG_A_Data_Release_v1.0",
+  "schema_version": "PESTKG_CANONICAL_DATA_MODEL_v0.2",
+  "title": "PestKG A-Line Data Release v1.0",
+  "published_at": "2026-09-24T06:04:28.367432+00:00",
+  "cutoff": "PESTKG_RAW_SNAPSHOT_2026-09-23",
+  "status": "INTERNAL_RESEARCH_RELEASE",
+  "distribution_status": "ALLOWED_DEC_002",
+  "known_limitations": [
+    "No GlobalChemical/exact identity without approved evidence.",
+    "Uncertain component rows remain in engineering quarantine.",
+    "Legacy upstream completeness unproven.",
+    "Public redistribution rights unverified."
+  ],
+  "license": "INTERNAL_RESEARCH_RELEASE",
+  "inventory": {
+    "canonical_entities": 1103238,
+    "global_chemicals": 0,
+    "registrations": 164249,
+    "registration_uses": 726840,
+    "kg_nodes": 1103238,
+    "kg_edges": 6030734
+  },
+  "integrity": {
+    "passed": true,
+    "checks": {}
+  },
+  "node_types": {
+    "CountryOrTerritory": 5,
+    "FormulationTerm": 518,
+    "SourceSnapshot": 12,
+    "Jurisdiction": 12,
+    "LocalActiveIngredient": 10064,
+    "Source": 12,
+    "Registration": 164249,
+    "RegulatoryOrganization": 6,
+    "TargetTerm": 19591,
+    "PesticideProduct": 163441,
+    "RegistrationUse": 726840,
+    "CropTerm": 18488
+  },
+  "relation_types": {
+    "HAS_SNAPSHOT": 12,
+    "REGULATES": 385541,
+    "REGISTERS_PRODUCT": 819087,
+    "FOR_CROP": 703273,
+    "HAS_USE": 726840,
+    "USES_PRODUCT": 726593,
+    "FOR_TARGET": 700495,
+    "HAS_REGISTRATION": 819895,
+    "CONTAINS_ACTIVE_INGREDIENT": 779319,
+    "IN_TERRITORY": 369679
+  },
+  "coverage": []
+}
