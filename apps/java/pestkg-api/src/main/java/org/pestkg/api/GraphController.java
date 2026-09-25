@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/graph")
 public class GraphController {
     private final ReleaseCatalogService catalog;
-    private final CsvDataStore store;
+    private final DuckDbDataStore store;
     private final PestKgProperties properties;
     private final ApiEnvelopeFactory envelopes;
 
-    public GraphController(ReleaseCatalogService catalog, CsvDataStore store, PestKgProperties properties, ApiEnvelopeFactory envelopes) {
+    public GraphController(ReleaseCatalogService catalog, DuckDbDataStore store, PestKgProperties properties, ApiEnvelopeFactory envelopes) {
         this.catalog = catalog;
         this.store = store;
         this.properties = properties;

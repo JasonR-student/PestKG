@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/registration-uses")
 public class RegistrationUseController {
     private final ReleaseCatalogService catalog;
-    private final CsvDataStore store;
+    private final DuckDbDataStore store;
     private final CursorService cursors;
     private final ApiEnvelopeFactory envelopes;
 
-    public RegistrationUseController(ReleaseCatalogService catalog, CsvDataStore store, CursorService cursors, ApiEnvelopeFactory envelopes) {
+    public RegistrationUseController(ReleaseCatalogService catalog, DuckDbDataStore store, CursorService cursors, ApiEnvelopeFactory envelopes) {
         this.catalog = catalog;
         this.store = store;
         this.cursors = cursors;
@@ -34,19 +34,18 @@ public class RegistrationUseController {
         CsvDataStore.UseQuery filter = safe.toUseQuery();
         String fingerprint = cursors.fingerprint(filter);
         int offset = cursors.decode(safe.cursor(), context.releaseId(), fingerprint);
-        List<RegistrationUseData> all = store.queryUses(context, filter);
         int pageSize = Math.max(1, Math.min(safe.pageSize() == null ? 50 : safe.pageSize(), 200));
-        List<RegistrationUseData> rows = all.subList(Math.min(offset, all.size()), Math.min(offset + pageSize, all.size()));
-        String next = offset + rows.size() < all.size() ? cursors.encode(offset + rows.size(), context.releaseId(), fingerprint) : null;
-        ApiEnvelope<List<RegistrationUseData>> result = envelopes.wrap(context, rows);
-        result.meta().put("total", all.size());
+        DuckDbDataStore.UsesPage page = store.queryUses(context, filter, offset, pageSize);
+        String next = offset + page.rows().size() < page.total() ? cursors.encode(offset + page.rows().size(), context.releaseId(), fingerprint) : null;
+        ApiEnvelope<List<RegistrationUseData>> result = envelopes.wrap(context, page.rows());
+        result.meta().put("total", page.total());
         result.meta().put("page_size", pageSize);
         if (next != null) result.meta().put("next_cursor", next);
         return result;
     }
 
     public record RegistrationUseQueryRequest(Filters filters, String cursor, Integer pageSize) {
-        private CsvDataStore.UseQuery toUseQuery() {
+        public CsvDataStore.UseQuery toUseQuery() {
             Filters value = filters == null ? new Filters(null, null, null, null, null, null, null, null, null) : filters;
             return new CsvDataStore.UseQuery(value.jurisdictions(), value.query(), value.product(), value.activeIngredient(),
                     value.crop(), value.target(), value.formulation(), value.registrationStatus(), value.pairingStatus());

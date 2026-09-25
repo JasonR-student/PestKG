@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/entities")
 public class EntityController {
     private final ReleaseCatalogService catalog;
-    private final CsvDataStore store;
+    private final DuckDbDataStore store;
     private final ApiEnvelopeFactory envelopes;
 
-    public EntityController(ReleaseCatalogService catalog, CsvDataStore store, ApiEnvelopeFactory envelopes) {
+    public EntityController(ReleaseCatalogService catalog, DuckDbDataStore store, ApiEnvelopeFactory envelopes) {
         this.catalog = catalog;
         this.store = store;
         this.envelopes = envelopes;
@@ -53,7 +53,7 @@ public class EntityController {
         ReleaseContext context = catalog.resolve(release, header);
         if (store.entity(context, entityId) == null) throw new ReleaseException("entity_not_found", "Entity not found", 404, Map.of("entity_id", entityId));
         EntityData entity = store.entity(context, entityId);
-        String snapshotDate = catalog.overview(context).cutoff();
+        String snapshotDate = store.overview(context).cutoff();
         Map<String, Object> version = new LinkedHashMap<>();
         version.put("version_no", 1);
         version.put("operation", "asserted");

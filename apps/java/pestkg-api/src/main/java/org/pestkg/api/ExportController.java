@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class ExportController {
     private final ReleaseCatalogService catalog;
-    private final CsvDataStore store;
+    private final DuckDbDataStore store;
     private final ExportJobService jobs;
     private final ApiEnvelopeFactory envelopes;
 
-    public ExportController(ReleaseCatalogService catalog, CsvDataStore store, ExportJobService jobs, ApiEnvelopeFactory envelopes) {
+    public ExportController(ReleaseCatalogService catalog, DuckDbDataStore store, ExportJobService jobs, ApiEnvelopeFactory envelopes) {
         this.catalog = catalog;
         this.store = store;
         this.jobs = jobs;
@@ -39,7 +39,7 @@ public class ExportController {
         RegistrationUseController.RegistrationUseQueryRequest safe = request == null
                 ? new RegistrationUseController.RegistrationUseQueryRequest(null, null, 200)
                 : request;
-        var job = jobs.create(context, store.queryUses(context, safe.toUseQuery()));
+        var job = jobs.create(context, store.queryUses(context, safe.toUseQuery(), 0, 200_000).rows());
         return envelopes.wrap(context, Map.of("job_id", job.jobId(), "status", job.status(), "rows", job.rows(),
                 "download_url", "/api/v1/artifacts/" + job.jobId() + "/download"));
     }

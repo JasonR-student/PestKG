@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/datasets")
 public class DatasetController {
     private final ReleaseCatalogService catalog;
+    private final DuckDbDataStore store;
     private final ApiEnvelopeFactory envelopes;
 
-    public DatasetController(ReleaseCatalogService catalog, ApiEnvelopeFactory envelopes) {
+    public DatasetController(ReleaseCatalogService catalog, DuckDbDataStore store, ApiEnvelopeFactory envelopes) {
         this.catalog = catalog;
+        this.store = store;
         this.envelopes = envelopes;
     }
 
@@ -25,14 +27,14 @@ public class DatasetController {
     public ApiEnvelope<OverviewData> overview(@RequestParam(required = false) String release,
                                                @RequestHeader(name = "X-PestKG-Release", required = false) String header) {
         ReleaseContext context = catalog.resolve(release, header);
-        return envelopes.wrap(context, catalog.overview(context));
+        return envelopes.wrap(context, store.overview(context));
     }
 
     @GetMapping("/coverage")
     public ApiEnvelope<List<Map<String, Object>>> coverage(@RequestParam(required = false) String release,
                                                             @RequestHeader(name = "X-PestKG-Release", required = false) String header) {
         ReleaseContext context = catalog.resolve(release, header);
-        return envelopes.wrap(context, catalog.readCountries(context));
+        return envelopes.wrap(context, store.countries(context));
     }
 
     @GetMapping("/schema")
