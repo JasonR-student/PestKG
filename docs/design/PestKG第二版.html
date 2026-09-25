@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PestKG · 多国农药登记知识图谱（第二版）</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2334e0a1'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='%230a1310'/%3E%3Ccircle cx='16' cy='16' r='5' fill='url(%23g)'/%3E%3Cg stroke='url(%23g)' stroke-width='1.6' opacity='.9'%3E%3Cpath d='M16 5v4M16 23v4M5 16h4M23 16h4M8.5 8.5l2.8 2.8M20.7 20.7l2.8 2.8M23.5 8.5l-2.8 2.8M11.3 20.7l-2.8 2.8'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+/* ============================================================
+   PestKG v2 —— 暗夜实验室 · 发光的知识网络
+   ============================================================ */
+:root{
+  --bg:#070d0b; --bg-2:#0a1310; --bg-3:#0d1814;
+  --surface:rgba(255,255,255,.035);
+  --surface-2:rgba(255,255,255,.06);
+  --surface-3:rgba(255,255,255,.09);
+  --border:rgba(255,255,255,.09);
+  --border-2:rgba(255,255,255,.16);
+  --ink:#e9f2ee; --muted:#93a79f; --faint:#61736b;
+  --green:#34e0a1; --teal:#2dd4bf; --cyan:#22d3ee;
+  --violet:#8b9cf7; --purple:#c084fc; --amber:#fbbf24;
+  --pink:#f472b6; --coral:#fb7a5c; --lime:#a3e635;
+  --grad:linear-gradient(135deg,#34e0a1 0%,#22d3ee 100%);
+  --grad-warm:linear-gradient(135deg,#fbbf24,#fb7a5c);
+  --grad-pink:linear-gradient(135deg,#f472b6,#8b9cf7);
+  --glow:0 0 28px rgba(52,224,161,.30);
+  --glow-cyan:0 0 28px rgba(34,211,238,.28);
+  --r-lg:18px; --r-md:13px; --r-sm:9px;
+  --sidebar:256px;
+  --font-d:'Space Grotesk', 'Manrope', system-ui, sans-serif;
+  --font:'Manrope', system-ui, 'Segoe UI', sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font); background:var(--bg); color:var(--ink);
+  line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  min-height:100vh;
+}
+::selection{background:rgba(52,224,161,.28); color:#fff}
+a{color:inherit; text-decoration:none}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit}
+input,select{font-family:inherit}
+h1,h2,h3,h4{font-family:var(--font-d); font-weight:600; line-height:1.2; letter-spacing:-.01em}
+.mono{font-family:var(--mono)}
+
+/* ---------- Aurora 氛围背景 ---------- */
+.aurora{position:fixed; inset:0; z-index:-2; overflow:hidden; background:
+  radial-gradient(1200px 700px at 78% -10%, rgba(34,211,238,.10), transparent 60%),
+  radial-gradient(1000px 800px at 8% 4%, rgba(52,224,161,.10), transparent 55%),
+  linear-gradient(180deg,var(--bg-2),var(--bg) 60%)}
+.aurora span{position:absolute; border-radius:50%; filter:blur(90px); opacity:.5}
+.aurora .a1{width:560px;height:560px;left:-160px;top:-120px;background:radial-gradient(circle,rgba(52,224,161,.20),transparent 70%);animation:drift1 26s ease-in-out infinite}
+.aurora .a2{width:620px;height:620px;right:-200px;top:10%;background:radial-gradient(circle,rgba(34,211,238,.18),transparent 70%);animation:drift2 32s ease-in-out infinite}
+.aurora .a3{width:520px;height:520px;left:30%;bottom:-260px;background:radial-gradient(circle,rgba(139,156,247,.12),transparent 70%);animation:drift3 38s ease-in-out infinite}
+@keyframes drift1{50%{transform:translate(70px,50px) scale(1.08)}}
+@keyframes drift2{50%{transform:translate(-80px,60px) scale(1.05)}}
+@keyframes drift3{50%{transform:translate(40px,-60px) scale(1.1)}}
+/* ---------- Grain 噪点 ---------- */
+.grain{position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.05; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ---------- 布局 ---------- */
+.sidebar{position:fixed; left:0; top:0; bottom:0; width:var(--sidebar); z-index:40;
+  background:linear-gradient(180deg,rgba(13,24,20,.85),rgba(8,15,12,.92));
+  border-right:1px solid var(--border); backdrop-filter:blur(18px);
+  display:flex; flex-direction:column; padding:22px 16px; transition:transform .35s var(--ease)}
+.main{margin-left:var(--sidebar); min-height:100vh}
+.topbar{position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:14px;
+  padding:14px 30px; background:rgba(8,15,12,.72); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border)}
+.content{padding:30px; max-width:1580px; margin:0 auto}
+
+/* ---------- Sidebar 内容 ---------- */
+.brand{display:flex; align-items:center; gap:11px; padding:2px 8px 20px}
+.brand .logo{width:40px;height:40px;border-radius:11px;flex:none;display:grid;place-items:center;
+  background:var(--bg-3); border:1px solid var(--border-2)}
+.brand h1{font-size:16px; line-height:1.1}
+.brand small{color:var(--muted); font-size:10.5px; font-weight:500; letter-spacing:.04em}
+.nav{display:flex; flex-direction:column; gap:3px; margin-top:4px}
+.nav-item{display:flex; align-items:center; gap:12px; padding:11px 13px; border-radius:var(--r-sm);
+  color:var(--muted); font-weight:600; font-size:13.5px; position:relative; transition:.2s}
+.nav-item svg{width:18px;height:18px;flex:none}
+.nav-item:hover{color:var(--ink); background:var(--surface-2)}
+.nav-item.active{color:#06120e; background:var(--grad); box-shadow:var(--glow)}
+.nav-item .en{margin-left:auto; font-size:9px; opacity:.55; font-family:var(--mono)}
+.side-foot{margin-top:auto; padding:13px; border-radius:var(--r-md); background:var(--surface); border:1px solid var(--border)}
+.side-foot .lbl{font-size:10px; color:var(--faint); text-transform:uppercase; letter-spacing:.08em}
+.side-foot .ver{font-family:var(--mono); font-size:11.5px; color:var(--green); margin-top:3px; word-break:break-all}
+.dot-live{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:10.5px;color:var(--muted)}
+.dot-live i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.4}}
+
+/* ---------- Topbar ---------- */
+.searchbox{flex:1; max-width:520px; display:flex; align-items:center; gap:9px;
+  background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:9px 13px; transition:.2s}
+.searchbox:focus-within{border-color:rgba(52,224,161,.5); box-shadow:0 0 0 3px rgba(52,224,161,.10)}
+.searchbox svg{width:16px;height:16px;color:var(--faint);flex:none}
+.searchbox input{flex:1;background:none;border:none;outline:none;color:var(--ink);font-size:13px}
+.searchbox input::placeholder{color:var(--faint)}
+.tb-actions{margin-left:auto;display:flex;align-items:center;gap:9px}
+.iconbtn{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
+  background:var(--surface); border:1px solid var(--border); color:var(--muted); transition:.2s}
+.iconbtn:hover{color:var(--ink); border-color:var(--border-2)}
+.iconbtn svg{width:17px;height:17px}
+.langseg{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px}
+.langseg button{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:700;color:var(--muted)}
+.langseg button.on{background:var(--surface-3);color:var(--ink)}
+.burger{display:none}
+
+/* ---------- 通用组件 ---------- */
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:22px;
+  position:relative; overflow:hidden; transition:transform .25s var(--ease), border-color .25s}
+.card:hover{border-color:var(--border-2)}
+.card .card-h{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.card .card-h h3{font-size:14.5px}
+.card .card-h .sub{font-size:11px;color:var(--faint);margin-left:auto;font-weight:500}
+.grid{display:grid;gap:18px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.section-t{display:flex;align-items:baseline;gap:13px;margin:34px 0 18px}
+.section-t h2{font-size:19px}
+.section-t .hint{font-size:12px;color:var(--faint)}
+.section-t .more{margin-left:auto;font-size:12px;color:var(--green);font-weight:600}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;font-weight:700;font-size:13px;
+  background:var(--surface-2);border:1px solid var(--border-2);color:var(--ink);transition:.2s}
+.btn:hover{background:var(--surface-3)}
+.btn-primary{background:var(--grad);color:#05120d;border:none;box-shadow:var(--glow)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 30px rgba(52,224,161,.4)}
+.btn svg{width:15px;height:15px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:11px;font-weight:600;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--muted)}
+.chip .d{width:7px;height:7px;border-radius:50%}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:7px;font-size:10.5px;font-weight:700;
+  font-family:var(--mono);letter-spacing:.02em}
+.badge.green{background:rgba(52,224,161,.13);color:var(--green)}
+.badge.amber{background:rgba(251,191,36,.13);color:var(--amber)}
+.badge.coral{background:rgba(251,122,92,.14);color:var(--coral)}
+
+/* ---------- KPI ---------- */
+.kpi{padding:20px;overflow:hidden}
+.kpi .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.kpi .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center}
+.kpi .ic svg{width:21px;height:21px}
+.kpi .val{font-family:var(--font-d);font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.kpi .val small{font-size:15px;font-weight:600;color:var(--muted)}
+.kpi .lab{font-size:12px;color:var(--muted);margin-top:5px;font-weight:600}
+.kpi .spark{position:absolute;right:0;bottom:0;left:0;opacity:.5;pointer-events:none}
+.kpi .shine{position:absolute;top:0;right:0;width:120px;height:120px;border-radius:50%;filter:blur(40px);opacity:.5}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;border-radius:22px;overflow:hidden;margin-bottom:8px;
+  background:linear-gradient(135deg,rgba(13,24,20,.9),rgba(9,18,15,.7));border:1px solid var(--border-2)}
+.hero .inner{position:relative;z-index:2;padding:40px 42px;max-width:62%}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--green);margin-bottom:16px}
+.hero h1{font-size:clamp(26px,3.2vw,40px);line-height:1.12;letter-spacing:-.02em}
+.hero h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--muted);margin-top:14px;font-size:14px;max-width:520px}
+.hero .acts{display:flex;gap:11px;margin-top:24px;flex-wrap:wrap}
+.hero .hero-graph{position:absolute;right:0;top:0;bottom:0;width:46%;z-index:1}
+.hero .meta{display:flex;gap:26px;margin-top:26px;flex-wrap:wrap}
+.hero .meta .m .n{font-family:var(--font-d);font-size:21px;font-weight:700}
+.hero .meta .m .l{font-size:11px;color:var(--faint)}
+
+/* ---------- 表格 ---------- */
+.tablewrap{overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border)}
+table.data{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px}
+table.data th{text-align:left;padding:12px 15px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--faint);font-weight:700;background:var(--surface-2);white-space:nowrap}
+table.data td{padding:12px 15px;border-top:1px solid var(--border);vertical-align:middle}
+table.data tbody tr{transition:.15s}
+table.data tbody tr:hover{background:var(--surface-2)}
+table.data tr.sel{background:rgba(52,224,161,.07)}
+table.data tr.sel td:first-child{box-shadow:inset 2px 0 0 var(--green)}
+.num{font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:12px;text-align:right}
+.flag{display:inline-flex;align-items:center;gap:7px;font-weight:700}
+.flag i{font-style:normal;font-family:var(--mono);font-size:10px;background:var(--surface-3);padding:2px 7px;border-radius:6px}
+
+/* ---------- 图谱 ---------- */
+.graph-box{position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);
+  background:radial-gradient(700px 400px at 50% 0%,rgba(52,224,161,.06),transparent 60%),var(--bg-2)}
+.graph-box canvas{display:block;width:100%;height:100%}
+.graph-tools{position:absolute;top:13px;right:13px;display:flex;gap:7px;z-index:5}
+.graph-tools .iconbtn{width:34px;height:34px;background:rgba(10,19,16,.7)}
+.legend{position:absolute;left:13px;bottom:13px;display:flex;flex-direction:column;gap:6px;z-index:5;
+  background:rgba(8,15,12,.78);border:1px solid var(--border);border-radius:11px;padding:11px 13px;backdrop-filter:blur(10px)}
+.legend .lg{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:600;cursor:pointer}
+.legend .lg i{width:9px;height:9px;border-radius:50%}
+.legend .lg.off{opacity:.35}
+.graph-info{position:absolute;right:13px;bottom:13px;z-index:5;font-size:10.5px;color:var(--faint);font-family:var(--mono);
+  background:rgba(8,15,12,.78);padding:6px 10px;border-radius:8px;border:1px solid var(--border)}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:3px}
+.seg button{padding:6px 13px;border-radius:6px;font-size:11.5px;font-weight:700;color:var(--muted)}
+.seg button.on{background:var(--grad);color:#05120d}
+
+/* ---------- Tabs ---------- */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.tabs button{padding:11px 16px;font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;position:relative}
+.tabs button.on{color:var(--ink)}
+.tabs button.on::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:var(--grad);border-radius:2px}
+
+/* ---------- 表单 ---------- */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.03em}
+.input,.select{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--ink);font-size:13px;outline:none;transition:.2s;width:100%}
+.input:focus,.select:focus{border-color:rgba(52,224,161,.5);box-shadow:0 0 0 3px rgba(52,224,161,.1)}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2393a79f' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.select option{background:var(--bg-3);color:var(--ink)}
+
+/* ---------- 进度/环形 ---------- */
+.ring-wrap{display:flex;align-items:center;gap:18px}
+.ring{position:relative;width:120px;height:120px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring .rv{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .rv b{font-family:var(--font-d);font-size:24px}
+.ring .rv small{display:block;font-size:10px;color:var(--faint)}
+
+/* ---------- 入场动效 ---------- */
+.view{animation:viewin .5s var(--ease)}
+@keyframes viewin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.rise{opacity:0;animation:rise .6s var(--ease) forwards}
+@keyframes rise{to{opacity:1}}
+.rise:nth-child(1){animation-delay:.03s}.rise:nth-child(2){animation-delay:.08s}.rise:nth-child(3){animation-delay:.13s}.rise:nth-child(4){animation-delay:.18s}
+
+/* ---------- Toast / 灯箱 ---------- */
+.toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);z-index:90;
+  background:var(--bg-3);border:1px solid var(--border-2);border-radius:12px;padding:12px 20px;font-size:13px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.3s var(--ease);display:flex;align-items:center;gap:9px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.lightbox{position:fixed;inset:0;z-index:80;background:rgba(4,9,7,.85);backdrop-filter:blur(8px);display:none;place-items:center;padding:40px}
+.lightbox.show{display:grid}
+.lightbox .lb-inner{max-width:1000px;width:100%;position:relative}
+.lightbox .lb-close{position:absolute;top:-44px;right:0}
+
+/* ---------- 响应式 ---------- */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:35}
+@media (max-width:1080px){
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .grid-3{grid-template-columns:repeat(2,1fr)}
+  .hero .inner{max-width:100%;padding:32px 26px}
+  .hero .hero-graph{display:none}
+}
+@media (max-width:860px){
+  .sidebar{transform:translateX(-105%)}
+  .sidebar.open{transform:none;box-shadow:0 0 60px rgba(0,0,0,.6)}
+  .overlay.show{display:block}
+  .main{margin-left:0}
+  .burger{display:grid}
+  .content{padding:20px 16px}
+  .topbar{padding:12px 16px;gap:10px}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .langseg{display:none}
+}
+@media (max-width:560px){
+  .grid-4{grid-template-columns:1fr}
+}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .aurora span{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+<div class="grain"></div>
+<div class="overlay" id="overlay"></div>
+<!-- ===== 侧边导航 ===== -->
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="logo">
+      <svg width="24" height="24" viewBox="0 0 32 32"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34e0a1"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+        <circle cx="16" cy="16" r="5" fill="url(#lg1)"/>
+        <g stroke="url(#lg1)" stroke-width="1.7" opacity=".9"><path d="M16 5v4M16 23v4M5 16h4M23 16h4M8.5 8.5l2.8 2.8M20.7 20.7l2.8 2.8M23.5 8.5l-2.8 2.8M11.3 20.7l-2.8 2.8"/></g></svg>
+    </div>
+    <div><h1>PestKG</h1><small>农药登记知识图谱</small></div>
+  </div>
+  <nav class="nav" id="nav">
+    <a class="nav-item" data-route="overview">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+      研究概览<span class="en">Overview</span></a>
+    <a class="nav-item" data-route="explore">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+      数据探索<span class="en">Explore</span></a>
+    <a class="nav-item" data-route="compare">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="11"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+      对比分析<span class="en">Compare</span></a>
+    <a class="nav-item" data-route="entity">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 13h6M9 17h6M9 9h1"/></svg>
+      实体档案<span class="en">Entity</span></a>
+    <a class="nav-item" data-route="downloads">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      数据下载<span class="en">Download</span></a>
+    <a class="nav-item" data-route="methods">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>
+      方法架构<span class="en">Methods</span></a>
+  </nav>
+  <div class="side-foot">
+    <div class="lbl">当前数据版本</div>
+    <div class="ver" id="sideVer">2026.08.3_federated</div>
+    <div class="dot-live"><i></i>API v1.1 · 样本模式</div>
+  </div>
+</aside>
+
+<!-- ===== 主区域 ===== -->
+<div class="main">
+  <header class="topbar">
+    <button class="iconbtn burger" id="burger" aria-label="菜单">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <div class="searchbox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="globalSearch" placeholder="搜索产品、有效成分、作物、登记号…" autocomplete="off">
+    </div>
+    <div class="tb-actions">
+      <div class="langseg" id="langseg"><button class="on" data-lang="zh">中</button><button data-lang="en">EN</button></div>
+      <a class="iconbtn" href="https://github.com/WangRain-rt/MyPestKg" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.5.2 2.7.1 3 .8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg></a>
+    </div>
+  </header>
+  <main class="content" id="view"></main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34e0a1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span id="toastMsg"></span></div>
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox"><div class="lb-inner"><button class="iconbtn lb-close" id="lbClose" aria-label="关闭"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><div id="lbBody"></div></div></div>
+<script>
+/* ============================================================
+   数据（由真实样本聚合，构建时注入）
+   ============================================================ */
+const DATA = {"release":{"title":"Federated multicountry pesticide registration knowledge graphs","version":"2026.08.3_federated","published_at":"2026-08-24","cutoff":"2026-08-20","status":"release_ready","distribution_status":"blocked_pending_manifest_rebuild","known_limitations":["The supplied RAR preserves the expected Neo4j and Q1-Q5 machine-data hashes, but multiple text files do not match the top-level manifest_sha256.csv. Rebuild the archive and manifest before public distribution.","Full JSON-LD and GraphML exports are intentionally omitted; only bounded browsing samples are published in those formats.","Third-party external source files remain excluded until redistribution rights are audited."],"inventory":{"jurisdictions":12,"source_records":821183,"country_nodes":1204973,"country_edges":9739818,"shared_nodes":44645,"alignment_edges":48721},"node_types":{"ActiveIngredientLocal":10380,"CountryJurisdiction":12,"CropLocal":29878,"FormulationLocal":568,"PesticideProduct":163297,"Registration":163208,"RegistrationUse":820231,"RegulatoryAgency":12,"TargetLocal":17387},"relation_types":{"containsActiveIngredient":842180,"hasActiveIngredient":842180,"hasFormulation":760753,"hasProduct":820231,"hasRegistration":820231,"hasRegistrationUse":820231,"registeredForCrop":2268251,"registeredForTarget":1745518,"regulatesIn":12,"usesProduct":820231},"coverage":[{"jurisdiction":"CN","source_language":"zh","records":"86978","crop_source":"0.924176","target_source":"0.924176","active_source":"1.0","formulation_source":"1.0","crop_english":"0.568017","target_english":"0.447377","active_english":"0.998747","formulation_english":"0.0","crop_english_given_source":"0.61462","target_english_given_source":"0.484082","active_english_given_source":"0.998747","formulation_english_given_source":"0.0"},{"jurisdiction":"TW","source_language":"zh","records":"291185","crop_source":"0.986225","target_source":"0.986225","active_source":"0.999849","formulation_source":"0.993901","crop_english":"0.340653","target_english":"0.145955","active_english":"0.99545","formulation_english":"0.0","crop_english_given_source":"0.345411","target_english_given_source":"0.147994","active_english_given_source":"0.9956","formulation_english_given_source":"0.0"},{"jurisdiction":"JP","source_language":"ja","records":"142010","crop_source":"1.0","target_source":"0.975952","active_source":"1.0","formulation_source":"1.0","crop_english":"0.131237","target_english":"0.32021","active_english":"0.982656","formulation_english":"0.0","crop_english_given_source":"0.131237","target_english_given_source":"0.3281","active_english_given_source":"0.982656","formulation_english_given_source":"0.0"},{"jurisdiction":"KR","source_language":"ko","records":"144050","crop_source":"1.0","target_source":"1.0","active_source":"1.0","formulation_source":"1.0","crop_english":"0.502867","target_english":"0.247976","active_english":"1.0","formulation_english":"0.0","crop_english_given_source":"0.502867","target_english_given_source":"0.247976","active_english_given_source":"1.0","formulation_english_given_source":"0.0"},{"jurisdiction":"US","source_language":"en","records":"57782","crop_source":"0.372659","target_source":"0.371794","active_source":"0.491779","formulation_source":"0.290229","crop_english":"0.372659","target_english":"0.371794","active_english":"0.491779","formulation_english":"0.290229","crop_english_given_source":"1.0","target_english_given_source":"1.0","active_english_given_source":"1.0","formulation_english_given_source":"1.0"},{"jurisdiction":"AU","source_language":"en","records":"18555","crop_source":"0.676044","target_source":"0.676044","active_source":"0.999784","formulation_source":"1.0","crop_english":"0.676044","target_english":"0.676044","active_english":"0.999784","formulation_english":"1.0","crop_english_given_source":"1.0","target_english_given_source":"1.0","active_english_given_source":"1.0","formulation_english_given_source":"1.0"},{"jurisdiction":"HU","source_language":"hu","records":"878","crop_source":"0.707289","target_source":"0.707289","active_source":"0.973804","formulation_source":"0.905467","crop_english":"0.004556","target_english":"0.025057","active_english":"0.973804","formulation_english":"0.0","crop_english_given_source":"0.006441","target_english_given_source":"0.035427","active_english_given_source":"1.0","formulation_english_given_source":"0.0"},{"jurisdiction":"IE","source_language":"en","records":"1279","crop_source":"0.792025","target_source":"0.0","active_source":"1.0","formulation_source":"1.0","crop_english":"0.792025","target_english":"0.0","active_english":"1.0","formulation_english":"1.0","crop_english_given_source":"1.0","target_english_given_source":"","active_english_given_source":"1.0","formulation_english_given_source":"1.0"},{"jurisdiction":"GB","source_language":"en","records":"909","crop_source":"1.0","target_source":"0.0","active_source":"1.0","formulation_source":"0.970297","crop_english":"1.0","target_english":"0.0","active_english":"1.0","formulation_english":"0.970297","crop_english_given_source":"1.0","target_english_given_source":"","active_english_given_source":"1.0","formulation_english_given_source":"1.0"},{"jurisdiction":"GB-NI","source_language":"en","records":"731","crop_source":"1.0","target_source":"0.0","active_source":"0.991792","formulation_source":"0.794802","crop_english":"1.0","target_english":"0.0","active_english":"0.991792","formulation_english":"0.794802","crop_english_given_source":"1.0","target_english_given_source":"","active_english_given_source":"1.0","formulation_english_given_source":"1.0"},{"jurisdiction":"NZ","source_language":"en","records":"59695","crop_source":"0.0","target_source":"0.0","active_source":"1.0","formulation_source":"1.0","crop_english":"0.0","target_english":"0.0","active_english":"1.0","formulation_english":"1.0","crop_english_given_source":"","target_english_given_source":"","active_english_given_source":"1.0","formulation_english_given_source":"1.0"},{"jurisdiction":"NL","source_language":"nl","records":"17131","crop_source":"0.728095","target_source":"0.986808","active_source":"0.988792","formulation_source":"0.0","crop_english":"0.0","target_english":"0.0007","active_english":"0.382406","formulation_english":"0.0","crop_english_given_source":"0.0","target_english_given_source":"0.00071","active_english_given_source":"0.386741","formulation_english_given_source":""}]},"countries":[{"code":"TW","name":"China - Taiwan","source_records":291185,"nodes":319086,"edges":2610722,"url":"https://pesticide.aphia.gov.tw/","language":"zh"},{"code":"KR","name":"South Korea","source_records":144050,"nodes":154966,"edges":1296481,"url":"https://psis.rda.go.kr/","language":"ko"},{"code":"JP","name":"Japan","source_records":142010,"nodes":152790,"edges":1274676,"url":"https://www.acis.famic.go.jp/ddata/index2.htm","language":"ja"},{"code":"CN","name":"China","source_records":86978,"nodes":202233,"edges":834139,"url":"http://www.chinapesticide.org.cn/","language":"zh"},{"code":"NZ","name":"New Zealand","source_records":59695,"nodes":67601,"edges":417882,"url":"https://www.epa.govt.nz/database-search/hsno-application-register/","language":"en"},{"code":"US","name":"United States","source_records":57782,"nodes":200175,"edges":2604874,"url":"https://ordspub.epa.gov/ords/pesticides/f?p=PPLS:1","language":"en"},{"code":"AU","name":"Australia","source_records":18555,"nodes":67763,"edges":532220,"url":"https://portal.apvma.gov.au/pubcris","language":"en"},{"code":"NL","name":"Netherlands","source_records":17131,"nodes":26775,"edges":131092,"url":"https://toelatingen.ctgb.nl/","language":"nl"},{"code":"IE","name":"Ireland","source_records":1279,"nodes":4797,"edges":17651,"url":"https://www.pcs.agriculture.gov.ie/products/","language":"en"},{"code":"GB","name":"United Kingdom - Great Britain","source_records":909,"nodes":3153,"edges":7246,"url":"https://secure.pesticides.gov.uk/pestreg/","language":"en"},{"code":"HU","name":"Hungary","source_records":878,"nodes":3120,"edges":7148,"url":"https://novenyvedoszer.nebih.gov.hu/Engedelykereso/kereso","language":"hu"},{"code":"GB-NI","name":"United Kingdom - Northern Ireland","source_records":731,"nodes":2514,"edges":5687,"url":"https://secure.pesticides.gov.uk/pestreg/","language":"en"}],"nodeTypes":[{"type":"CropLocal","count":75},{"type":"RegistrationUse","count":42},{"type":"PesticideProduct","count":24},{"type":"ActiveIngredientLocal","count":19},{"type":"Registration","count":14},{"type":"CountryJurisdiction","count":12},{"type":"RegulatoryAgency","count":12},{"type":"TargetLocal","count":4}],"englishStatus":[{"status":"unknown","count":104},{"status":"official_source_language_en","count":71},{"status":"official_english_field","count":17},{"status":"unresolved","count":8},{"status":"missing_or_requires_alignment","count":2}],"usesByJurisdiction":[{"jurisdiction":"AU","count":2},{"jurisdiction":"CN","count":2},{"jurisdiction":"TW","count":2},{"jurisdiction":"GB","count":2},{"jurisdiction":"GB-NI","count":2},{"jurisdiction":"HU","count":2},{"jurisdiction":"IE","count":2},{"jurisdiction":"JP","count":2},{"jurisdiction":"KR","count":2},{"jurisdiction":"NL","count":2},{"jurisdiction":"NZ","count":2},{"jurisdiction":"US","count":2}],"exploreRows":[{"use_id":"AU:USE:36eb10d52505b1259844b48b","jurisdiction":"AU","product":"Fortin Herbicide","ai":["GLYPHOSATE"],"crops":["CUSTARD APPLE OVER 3 YEARS OLD","BUILDINGS - AROUND"],"targets":[],"status":"Registered - Current","registration_date":"2022-07-01","expiry_date":"2027-06-30","source_url":"https://portal.apvma.gov.au/pubcris"},{"use_id":"AU:USE:8803afccafb95aae90e4e967","jurisdiction":"AU","product":"COMBAT ORAL DRENCH FOR SHEEP AND LAMBS","ai":["NAPHTHALOPHOS"],"crops":["SHEEP","LAMB"],"targets":[],"status":"Registered - Current","registration_date":"2026-07-01","expiry_date":"2027-06-30","source_url":"https://portal.apvma.gov.au/pubcris"},{"use_id":"CN:USE:d9edf31b8f455d8c7749f362","jurisdiction":"CN","product":"毒死蜱","ai":["chlorpyrifos"],"crops":[],"targets":[],"status":"","registration_date":"","expiry_date":"","source_url":"http://www.chinapesticide.org.cn/"},{"use_id":"CN:USE:def2df6ded587a21ff0de445","jurisdiction":"CN","product":"噻苯隆","ai":["thidiazuron"],"crops":[],"targets":[],"status":"","registration_date":"","expiry_date":"","source_url":"http://www.chinapesticide.org.cn/"},{"use_id":"TW:USE:1f7095e021d7f95b0196c18c","jurisdiction":"TW","product":"得來速","ai":[],"crops":[],"targets":[],"status":"","registration_date":"","expiry_date":"","source_url":"https://pesticide.aphia.gov.tw/information/Query/RegisterContent/?permno=AGD00010063960&regtid=10"},{"use_id":"TW:USE:aefacb9ab257934120776685","jurisdiction":"TW","product":"新戰車","ai":[],"crops":[],"targets":[],"status":"","registration_date":"","expiry_date":"","source_url":"https://pesticide.aphia.gov.tw/information/Query/RegisterContent/?permno=AGD00010044783&regtid=10"},{"use_id":"GB:USE:7d35fd78fbd820f9d46956a3","jurisdiction":"GB","product":"Iconic","ai":["flufenacet"],"crops":["barley (winter), wheat (winter)"],"targets":[],"status":"Valid","registration_date":"29/05/2025","expiry_date":"31/03/2030","source_url":"https://secure.pesticides.gov.uk/pestreg/getfullproduct.asp?productid=45559&pageno=1&origin=prodsearch"},{"use_id":"GB:USE:e3951f958f49e4d558c3ac6b","jurisdiction":"GB","product":"Job Done General Purpose Weedkiller Sachets","ai":["glyphosate"],"crops":["areas not intended to bear vegetation, unwanted vegetation"],"targets":[],"status":"Valid","registration_date":"12/06/2025","expiry_date":"15/06/2029","source_url":"https://secure.pesticides.gov.uk/pestreg/getfullproduct.asp?productid=46005&pageno=1&origin=prodsearch"},{"use_id":"GB-NI:USE:8effbaa11f1e6318f2fcf49f","jurisdiction":"GB-NI","product":"Roundup Tough","ai":["glyphosate"],"crops":["areas not intended to bear vegetation, unwanted vegetation"],"targets":[],"status":"Expired","registration_date":"","expiry_date":"15/06/2026","source_url":"https://secure.pesticides.gov.uk/pestreg/"},{"use_id":"GB-NI:USE:669d35c07d90c89efd99aaa6","jurisdiction":"GB-NI","product":"Roundup Vista Plus","ai":["glyphosate"],"crops":["all edible crops (before planting), all edible crops (destruction), all edible crops (stubble), all non edible crops (before planting), all non edible crops (destruction), all non edible crops (stubble), apple, barley, bulb onion, cherry, combining pea, durum wheat, enclosed waters, field bean, grassland, green cover on land not being used for crop production, land immediately adjacent to aquatic areas, leek, linseed, mustard, oats, oilseed rape, open waters, pear, plum, potato, sugar beet, swede, turnip, vining pea, wheat"],"targets":[],"status":"Valid","registration_date":"22/08/2025","expiry_date":"09/09/2099","source_url":"https://secure.pesticides.gov.uk/pestreg/getfullproduct.asp?productid=46673&pageno=1&origin=prodsearch"},{"use_id":"HU:USE:dfb2e1f113f29e24b6e64064","jurisdiction":"HU","product":"Krypt 540","ai":["glifozát"],"crops":["Alma - ULT01, Birs - ULT18, Cseresznye - ULT17, Dió - ULT08, Kajszibarack (sárgabarack) - ULT04, Körte - ULT15, kukorica(szemes), Mandula - ULT10, Meggy - ULT16, Mogyoró - ULT09, Naspolya - ULT07, Nektarin - ULT05, Őszi árpa - KAL17, Őszi búza - KAL01, Őszi káposztarepce - IND03, Őszibarack - ULT03, Ringló, Szelídgesztenye - ULT11, Szilva - ULT06, Szőlő (bor), Szőlő (csemege), Tavaszi árpa - KAL18, Tavaszi káposztarepce - IND04"],"targets":["Évelő egy- és kétszikű gyomok, magról kelő egy- és kétszikű gyomok"],"status":"alapengedély","registration_date":"2025-10-16","expiry_date":"2028-12-31","source_url":"10"},{"use_id":"HU:USE:8ec82471850d2a25eba30298","jurisdiction":"HU","product":"Powerfull","ai":["Deltametrin"],"crops":["Mustár, Őszi árpa - KAL17, Őszi búza - KAL01, Őszi káposztarepce - IND03, Rozs - KAL15, Tavaszi árpa - KAL18, Tavaszi káposztarepce - IND04, Tritikálé, Zab"],"targets":["levéltetvek, repcebecőormányos, repce-fénybogár, repceszárormányos, vetésfehérítő bogarak"],"status":"származtatott","registration_date":"2017-03-17","expiry_date":"2027-10-31","source_url":"14"},{"use_id":"IE:USE:77d0a21db54bba6062a7eac5","jurisdiction":"IE","product":"Floniki","ai":["Flonicamid - 500 g/kg"],"crops":["Apples","Oats - spring"],"targets":[],"status":"Registered (present in current PRCD database)","registration_date":"","expiry_date":"","source_url":"https://www.pcs.agriculture.gov.ie/pppd/Search/Product?productId=8158"},{"use_id":"IE:USE:37be1f3c5f841de54f20b01a","jurisdiction":"IE","product":"Serpent","ai":["Pyraclostrobin - 150 g/l","Fluxapyroxad - 75 g/l"],"crops":["Barley - spring","Rye - spring"],"targets":[],"status":"Registered (present in current PRCD database)","registration_date":"","expiry_date":"","source_url":"https://www.pcs.agriculture.gov.ie/pppd/Search/Product?productId=7854"},{"use_id":"JP:USE:50afbf30c29b41d96e4be724","jurisdiction":"JP","product":"シンゲキ1キロ粒剤","ai":[],"crops":[],"targets":[],"status":"","registration_date":"","expiry_date":"","source_url":"https://www.acis.famic.go.jp/ddata/datacsv/R0808050.zip"},{"use_id":"JP:USE:b35f521034515d23de14c4e0","jurisdiction":"JP","product":"ファーストオリゼフェルテラ粒剤","ai":[],"crops":[],"targets":[],"status":"","registration_date":"","expiry_date":"","source_url":"https://www.acis.famic.go.jp/ddata/datacsv/R0808050.zip"},{"use_id":"KR:USE:344ba9f5470600062a834fbb","jurisdiction":"KR","product":"밀리언","ai":["Tebuconazole"],"crops":[],"targets":[],"status":"","registration_date":"","expiry_date":"","source_url":"https://psis.rda.go.kr/psis/agc/res/agchmRegistStusLst.ps?menuId=PS00263"},{"use_id":"KR:USE:bc7c2473f9939f19e5203b21","jurisdiction":"KR","product":"경농캪탄","ai":[],"crops":[],"targets":[],"status":"","registration_date":"","expiry_date":"","source_url":"https://psis.rda.go.kr/psis/agc/res/agchmRegistStusLst.ps?menuId=PS00263"},{"use_id":"NL:USE:cb4e5718d6067e3b655e94e6","jurisdiction":"NL","product":"NSP Metra i-Next 500","ai":["metrafenon"],"crops":["Groenteteelt: Vruchtgroenten: Vruchtgroenten van Solanaceae: Aubergine, Tomaat"],"targets":["Schimmels: Hyphomycetes: Hyphomycetales: Oidium, Plectomycetes: Erysiphales: Leveillula taurica"],"status":"Valid","registration_date":"","expiry_date":"2027-11-01","source_url":"https://toelatingen.ctgb.nl/"},{"use_id":"NL:USE:cd1893ad78d7aa211fad18a7","jurisdiction":"NL","product":"FABULIS OD","ai":["prohexadion-calcium"],"crops":["Akkerbouwgewassen: Granen: Zomergraan: Zomerrogge"],"targets":["Groeiregulatoren: Voorkomen van legering"],"status":"Valid","registration_date":"","expiry_date":"2027-05-31","source_url":"https://toelatingen.ctgb.nl/"},{"use_id":"NZ:USE:5160b1de31ebda262e1f2085","jurisdiction":"NZ","product":"Fender 320 EC Herbicide","ai":["DESMEDIPHAM"],"crops":[],"targets":[],"status":"","registration_date":"","expiry_date":"","source_url":"https://www.epa.govt.nz/database-search/hsno-application-register/"},{"use_id":"NZ:USE:0c574f1c53628bace13ba7b7","jurisdiction":"NZ","product":"Penethaject RTU","ai":["PENETHAMATE HYDRIODIDE"],"crops":[],"targets":[],"status":"","registration_date":"","expiry_date":"","source_url":"https://www.epa.govt.nz/database-search/hsno-application-register/"},{"use_id":"US:USE:5900f3aa797bd00c897a856f","jurisdiction":"US","product":"Drexel 415 Oil Technical","ai":["Mineral oil - includes paraffin oil from 063503"],"crops":[],"targets":[],"status":"Active","registration_date":"04/04/1996","expiry_date":"","source_url":"https://ordspub.epa.gov/ords/pesticides/f?p=PPLS:8:::NO::P8_PUID,P8_RINUM:30972,19713-397"},{"use_id":"US:USE:af90372a8c526a51ce5eb185","jurisdiction":"US","product":"Axill Solutions Clethodim 2ec","ai":["Clethodim"],"crops":[],"targets":[],"status":"Active","registration_date":"02/27/2020","expiry_date":"","source_url":"https://ordspub.epa.gov/ords/pesticides/f?p=PPLS:8:::NO::P8_PUID,P8_RINUM:529336,93809-5"}],"graph":{"nodes":[{"id":"US:USE:af90372a8c526a51ce5eb185","label":"93809-5 use record","type":"RegistrationUse","jurisdiction":"US"},{"id":"NL:USE:cb4e5718d6067e3b655e94e6","label":"16521 use record","type":"RegistrationUse","jurisdiction":"NL"},{"id":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","label":"NSP Metra i-Next 500","type":"PesticideProduct","jurisdiction":"NL"},{"id":"HU:PRODUCT:2faaff790d27f6c9f0daa68f","label":"Powerfull","type":"PesticideProduct","jurisdiction":"HU"},{"id":"GB:REG:7297deed53c8b4c3e614ca53","label":"19094","type":"Registration","jurisdiction":"GB"},{"id":"GB-NI:USE:669d35c07d90c89efd99aaa6","label":"21206 use record","type":"RegistrationUse","jurisdiction":"GB-NI"},{"id":"IE:USE:37be1f3c5f841de54f20b01a","label":"06741 use record","type":"RegistrationUse","jurisdiction":"IE"},{"id":"HU:CountryJurisdiction","label":"Hungary","type":"CountryJurisdiction","jurisdiction":"HU"},{"id":"GB-NI:PRODUCT:c14f6a006c89accbab187433","label":"Roundup Vista Plus","type":"PesticideProduct","jurisdiction":"GB-NI"},{"id":"AU:USE:8803afccafb95aae90e4e967","label":"56708 use record","type":"RegistrationUse","jurisdiction":"AU"},{"id":"HU:REG:7476da24970a1a4392698708","label":"6300/3876-1/2020","type":"Registration","jurisdiction":"HU"},{"id":"HU:USE:8ec82471850d2a25eba30298","label":"04.2/164-2/2012 use record","type":"RegistrationUse","jurisdiction":"HU"},{"id":"GB:PRODUCT:0e74bafbfc40ae221f3ae6c7","label":"Job Done General Purpose Weedkiller Sachets","type":"PesticideProduct","jurisdiction":"GB"},{"id":"IE:CROP:890008c2ffe3309c698a1446","label":"Barley - spring","type":"CropLocal","jurisdiction":"IE"},{"id":"GB-NI:REG:5f4d8362ec55002c33f6ff52","label":"21206","type":"Registration","jurisdiction":"GB-NI"},{"id":"HU:PRODUCT:46b8ccc36c9523a53d7bad5d","label":"Krypt 540","type":"PesticideProduct","jurisdiction":"HU"},{"id":"NL:CountryJurisdiction","label":"Netherlands","type":"CountryJurisdiction","jurisdiction":"NL"},{"id":"US:REG:0e68db69a17ae7b81f833b0e","label":"93809-5","type":"Registration","jurisdiction":"US"},{"id":"IE:CROP:6ee8fd010236f0a875f2e718","label":"Rye - spring","type":"CropLocal","jurisdiction":"IE"},{"id":"IE:USE:77d0a21db54bba6062a7eac5","label":"06662 use record","type":"RegistrationUse","jurisdiction":"IE"},{"id":"GB-NI:REG:1c10b524478a1df3b0cf72ac","label":"18693","type":"Registration","jurisdiction":"GB-NI"},{"id":"IE:REG:087479a75860b24e952043d2","label":"06662","type":"Registration","jurisdiction":"IE"},{"id":"US:CountryJurisdiction","label":"United States","type":"CountryJurisdiction","jurisdiction":"US"},{"id":"IE:CROP:96595e3f9270137cd0c6edb4","label":"Barley - winter","type":"CropLocal","jurisdiction":"IE"},{"id":"IE:REG:1f4c086eabad648292fda68e","label":"06741","type":"Registration","jurisdiction":"IE"},{"id":"GB-NI:USE:8effbaa11f1e6318f2fcf49f","label":"18693 use record","type":"RegistrationUse","jurisdiction":"GB-NI"},{"id":"IE:CountryJurisdiction","label":"Ireland","type":"CountryJurisdiction","jurisdiction":"IE"},{"id":"US:USE:5900f3aa797bd00c897a856f","label":"19713-397 use record","type":"RegistrationUse","jurisdiction":"US"},{"id":"GB:PRODUCT:d1843b1a236dc9a168c25451","label":"Iconic","type":"PesticideProduct","jurisdiction":"GB"},{"id":"IE:CROP:df0f8315c84697e3c7f10801","label":"Oats - spring","type":"CropLocal","jurisdiction":"IE"},{"id":"GB:USE:7d35fd78fbd820f9d46956a3","label":"19094 use record","type":"RegistrationUse","jurisdiction":"GB"},{"id":"NL:USE:cd1893ad78d7aa211fad18a7","label":"15844 use record","type":"RegistrationUse","jurisdiction":"NL"},{"id":"IE:PRODUCT:3e9e4089432bbe18f82dce27","label":"Floniki","type":"PesticideProduct","jurisdiction":"IE"},{"id":"HU:REG:6b62064e4905ec4bcf05ef34","label":"04.2/164-2/2012","type":"Registration","jurisdiction":"HU"},{"id":"GB-NI:AI:d22fdad88d35b630b33716b8","label":"glyphosate","type":"ActiveIngredientLocal","jurisdiction":"GB-NI"},{"id":"AU:REG:aacbf231422dfa045957f04e","label":"56708","type":"Registration","jurisdiction":"AU"},{"id":"AU:CountryJurisdiction","label":"Australia","type":"CountryJurisdiction","jurisdiction":"AU"},{"id":"IE:CROP:c0fc00d87e7eecf57989d5c8","label":"Rye - winter","type":"CropLocal","jurisdiction":"IE"},{"id":"HU:USE:dfb2e1f113f29e24b6e64064","label":"6300/3876-1/2020 use record","type":"RegistrationUse","jurisdiction":"HU"},{"id":"US:REG:247ca6e486cc282784cb3326","label":"19713-397","type":"Registration","jurisdiction":"US"},{"id":"NL:PRODUCT:1a629ad2cac1c0d91625d092","label":"FABULIS OD","type":"PesticideProduct","jurisdiction":"NL"},{"id":"GB:USE:e3951f958f49e4d558c3ac6b","label":"18199 use record","type":"RegistrationUse","jurisdiction":"GB"},{"id":"IE:PRODUCT:6ba3bda1959ecdaa747be874","label":"Serpent","type":"PesticideProduct","jurisdiction":"IE"},{"id":"NL:REG:f1c628caab4033afe87dd9b4","label":"16521","type":"Registration","jurisdiction":"NL"},{"id":"AU:REG:63afe985339ace4aaa43e35f","label":"84962","type":"Registration","jurisdiction":"AU"},{"id":"NL:REG:e65fe83b2bd82ed100507bdd","label":"15844","type":"Registration","jurisdiction":"NL"},{"id":"GB:CountryJurisdiction","label":"United Kingdom - Great Britain","type":"CountryJurisdiction","jurisdiction":"GB"},{"id":"GB-NI:CountryJurisdiction","label":"United Kingdom - Northern Ireland","type":"CountryJurisdiction","jurisdiction":"GB-NI"},{"id":"IE:CROP:e20404a503c600e151245386","label":"Oats - winter","type":"CropLocal","jurisdiction":"IE"},{"id":"GB:REG:c4e95672bbf1e672daf2fe39","label":"18199","type":"Registration","jurisdiction":"GB"},{"id":"GB-NI:PRODUCT:5e8d9c222f9a455c946625cf","label":"Roundup Tough","type":"PesticideProduct","jurisdiction":"GB-NI"},{"id":"AU:USE:36eb10d52505b1259844b48b","label":"84962 use record","type":"RegistrationUse","jurisdiction":"AU"}],"edges":[{"s":"AU:REG:aacbf231422dfa045957f04e","t":"AU:USE:8803afccafb95aae90e4e967","p":"hasRegistrationUse"},{"s":"AU:REG:63afe985339ace4aaa43e35f","t":"AU:USE:36eb10d52505b1259844b48b","p":"hasRegistrationUse"},{"s":"AU:CountryJurisdiction","t":"AU:REG:aacbf231422dfa045957f04e","p":"hasRegistration"},{"s":"AU:CountryJurisdiction","t":"AU:REG:63afe985339ace4aaa43e35f","p":"hasRegistration"},{"s":"GB:USE:e3951f958f49e4d558c3ac6b","t":"GB:PRODUCT:0e74bafbfc40ae221f3ae6c7","p":"usesProduct"},{"s":"GB:USE:7d35fd78fbd820f9d46956a3","t":"GB:PRODUCT:d1843b1a236dc9a168c25451","p":"usesProduct"},{"s":"GB:REG:c4e95672bbf1e672daf2fe39","t":"GB:USE:e3951f958f49e4d558c3ac6b","p":"hasRegistrationUse"},{"s":"GB:REG:7297deed53c8b4c3e614ca53","t":"GB:USE:7d35fd78fbd820f9d46956a3","p":"hasRegistrationUse"},{"s":"GB:USE:e3951f958f49e4d558c3ac6b","t":"GB:PRODUCT:0e74bafbfc40ae221f3ae6c7","p":"usesProduct"},{"s":"GB:USE:7d35fd78fbd820f9d46956a3","t":"GB:PRODUCT:d1843b1a236dc9a168c25451","p":"usesProduct"},{"s":"GB:REG:7297deed53c8b4c3e614ca53","t":"GB:PRODUCT:d1843b1a236dc9a168c25451","p":"hasProduct"},{"s":"GB:REG:c4e95672bbf1e672daf2fe39","t":"GB:PRODUCT:0e74bafbfc40ae221f3ae6c7","p":"hasProduct"},{"s":"GB:CountryJurisdiction","t":"GB:REG:7297deed53c8b4c3e614ca53","p":"hasRegistration"},{"s":"GB:CountryJurisdiction","t":"GB:REG:c4e95672bbf1e672daf2fe39","p":"hasRegistration"},{"s":"GB-NI:USE:8effbaa11f1e6318f2fcf49f","t":"GB-NI:PRODUCT:5e8d9c222f9a455c946625cf","p":"usesProduct"},{"s":"GB-NI:USE:669d35c07d90c89efd99aaa6","t":"GB-NI:PRODUCT:c14f6a006c89accbab187433","p":"usesProduct"},{"s":"GB-NI:USE:8effbaa11f1e6318f2fcf49f","t":"GB-NI:AI:d22fdad88d35b630b33716b8","p":"hasActiveIngredient"},{"s":"GB-NI:USE:669d35c07d90c89efd99aaa6","t":"GB-NI:AI:d22fdad88d35b630b33716b8","p":"hasActiveIngredient"},{"s":"GB-NI:REG:1c10b524478a1df3b0cf72ac","t":"GB-NI:USE:8effbaa11f1e6318f2fcf49f","p":"hasRegistrationUse"},{"s":"GB-NI:REG:5f4d8362ec55002c33f6ff52","t":"GB-NI:USE:669d35c07d90c89efd99aaa6","p":"hasRegistrationUse"},{"s":"GB-NI:USE:8effbaa11f1e6318f2fcf49f","t":"GB-NI:PRODUCT:5e8d9c222f9a455c946625cf","p":"usesProduct"},{"s":"GB-NI:USE:669d35c07d90c89efd99aaa6","t":"GB-NI:PRODUCT:c14f6a006c89accbab187433","p":"usesProduct"},{"s":"GB-NI:REG:5f4d8362ec55002c33f6ff52","t":"GB-NI:PRODUCT:c14f6a006c89accbab187433","p":"hasProduct"},{"s":"GB-NI:REG:1c10b524478a1df3b0cf72ac","t":"GB-NI:PRODUCT:5e8d9c222f9a455c946625cf","p":"hasProduct"},{"s":"GB-NI:CountryJurisdiction","t":"GB-NI:REG:1c10b524478a1df3b0cf72ac","p":"hasRegistration"},{"s":"GB-NI:CountryJurisdiction","t":"GB-NI:REG:5f4d8362ec55002c33f6ff52","p":"hasRegistration"},{"s":"HU:USE:dfb2e1f113f29e24b6e64064","t":"HU:PRODUCT:46b8ccc36c9523a53d7bad5d","p":"usesProduct"},{"s":"HU:USE:8ec82471850d2a25eba30298","t":"HU:PRODUCT:2faaff790d27f6c9f0daa68f","p":"usesProduct"},{"s":"HU:REG:6b62064e4905ec4bcf05ef34","t":"HU:USE:8ec82471850d2a25eba30298","p":"hasRegistrationUse"},{"s":"HU:REG:7476da24970a1a4392698708","t":"HU:USE:dfb2e1f113f29e24b6e64064","p":"hasRegistrationUse"},{"s":"HU:USE:dfb2e1f113f29e24b6e64064","t":"HU:PRODUCT:46b8ccc36c9523a53d7bad5d","p":"usesProduct"},{"s":"HU:USE:8ec82471850d2a25eba30298","t":"HU:PRODUCT:2faaff790d27f6c9f0daa68f","p":"usesProduct"},{"s":"HU:REG:7476da24970a1a4392698708","t":"HU:PRODUCT:46b8ccc36c9523a53d7bad5d","p":"hasProduct"},{"s":"HU:REG:6b62064e4905ec4bcf05ef34","t":"HU:PRODUCT:2faaff790d27f6c9f0daa68f","p":"hasProduct"},{"s":"HU:CountryJurisdiction","t":"HU:REG:7476da24970a1a4392698708","p":"hasRegistration"},{"s":"HU:CountryJurisdiction","t":"HU:REG:6b62064e4905ec4bcf05ef34","p":"hasRegistration"},{"s":"IE:USE:37be1f3c5f841de54f20b01a","t":"IE:PRODUCT:6ba3bda1959ecdaa747be874","p":"usesProduct"},{"s":"IE:USE:77d0a21db54bba6062a7eac5","t":"IE:PRODUCT:3e9e4089432bbe18f82dce27","p":"usesProduct"},{"s":"IE:REG:1f4c086eabad648292fda68e","t":"IE:USE:37be1f3c5f841de54f20b01a","p":"hasRegistrationUse"},{"s":"IE:REG:087479a75860b24e952043d2","t":"IE:USE:77d0a21db54bba6062a7eac5","p":"hasRegistrationUse"},{"s":"IE:USE:37be1f3c5f841de54f20b01a","t":"IE:CROP:890008c2ffe3309c698a1446","p":"registeredForCrop"},{"s":"IE:USE:77d0a21db54bba6062a7eac5","t":"IE:CROP:df0f8315c84697e3c7f10801","p":"registeredForCrop"},{"s":"IE:USE:37be1f3c5f841de54f20b01a","t":"IE:CROP:6ee8fd010236f0a875f2e718","p":"registeredForCrop"},{"s":"IE:USE:37be1f3c5f841de54f20b01a","t":"IE:CROP:e20404a503c600e151245386","p":"registeredForCrop"},{"s":"IE:USE:77d0a21db54bba6062a7eac5","t":"IE:CROP:e20404a503c600e151245386","p":"registeredForCrop"},{"s":"IE:USE:77d0a21db54bba6062a7eac5","t":"IE:CROP:890008c2ffe3309c698a1446","p":"registeredForCrop"},{"s":"IE:USE:77d0a21db54bba6062a7eac5","t":"IE:CROP:6ee8fd010236f0a875f2e718","p":"registeredForCrop"},{"s":"IE:USE:37be1f3c5f841de54f20b01a","t":"IE:CROP:df0f8315c84697e3c7f10801","p":"registeredForCrop"},{"s":"IE:USE:77d0a21db54bba6062a7eac5","t":"IE:CROP:96595e3f9270137cd0c6edb4","p":"registeredForCrop"},{"s":"IE:USE:37be1f3c5f841de54f20b01a","t":"IE:CROP:c0fc00d87e7eecf57989d5c8","p":"registeredForCrop"},{"s":"IE:USE:77d0a21db54bba6062a7eac5","t":"IE:CROP:c0fc00d87e7eecf57989d5c8","p":"registeredForCrop"},{"s":"IE:USE:37be1f3c5f841de54f20b01a","t":"IE:CROP:96595e3f9270137cd0c6edb4","p":"registeredForCrop"},{"s":"IE:USE:37be1f3c5f841de54f20b01a","t":"IE:PRODUCT:6ba3bda1959ecdaa747be874","p":"usesProduct"},{"s":"IE:USE:77d0a21db54bba6062a7eac5","t":"IE:PRODUCT:3e9e4089432bbe18f82dce27","p":"usesProduct"},{"s":"IE:REG:1f4c086eabad648292fda68e","t":"IE:PRODUCT:6ba3bda1959ecdaa747be874","p":"hasProduct"},{"s":"IE:REG:087479a75860b24e952043d2","t":"IE:PRODUCT:3e9e4089432bbe18f82dce27","p":"hasProduct"},{"s":"IE:CountryJurisdiction","t":"IE:REG:1f4c086eabad648292fda68e","p":"hasRegistration"},{"s":"IE:CountryJurisdiction","t":"IE:REG:087479a75860b24e952043d2","p":"hasRegistration"},{"s":"NL:USE:cb4e5718d6067e3b655e94e6","t":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","p":"usesProduct"},{"s":"NL:USE:cd1893ad78d7aa211fad18a7","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"usesProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:USE:cd1893ad78d7aa211fad18a7","p":"hasRegistrationUse"},{"s":"NL:REG:f1c628caab4033afe87dd9b4","t":"NL:USE:cb4e5718d6067e3b655e94e6","p":"hasRegistrationUse"},{"s":"NL:USE:cb4e5718d6067e3b655e94e6","t":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","p":"usesProduct"},{"s":"NL:USE:cd1893ad78d7aa211fad18a7","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"usesProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:f1c628caab4033afe87dd9b4","t":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:f1c628caab4033afe87dd9b4","t":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","p":"hasProduct"},{"s":"NL:REG:f1c628caab4033afe87dd9b4","t":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","p":"hasProduct"},{"s":"NL:REG:f1c628caab4033afe87dd9b4","t":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:f1c628caab4033afe87dd9b4","t":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","p":"hasProduct"},{"s":"NL:REG:e65fe83b2bd82ed100507bdd","t":"NL:PRODUCT:1a629ad2cac1c0d91625d092","p":"hasProduct"},{"s":"NL:REG:f1c628caab4033afe87dd9b4","t":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","p":"hasProduct"},{"s":"NL:REG:f1c628caab4033afe87dd9b4","t":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","p":"hasProduct"},{"s":"NL:REG:f1c628caab4033afe87dd9b4","t":"NL:PRODUCT:d11863f4aa4d0ab9ae71eacd","p":"hasProduct"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:f1c628caab4033afe87dd9b4","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:f1c628caab4033afe87dd9b4","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:f1c628caab4033afe87dd9b4","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:f1c628caab4033afe87dd9b4","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:f1c628caab4033afe87dd9b4","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:f1c628caab4033afe87dd9b4","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:f1c628caab4033afe87dd9b4","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:e65fe83b2bd82ed100507bdd","p":"hasRegistration"},{"s":"NL:CountryJurisdiction","t":"NL:REG:f1c628caab4033afe87dd9b4","p":"hasRegistration"},{"s":"US:REG:0e68db69a17ae7b81f833b0e","t":"US:USE:af90372a8c526a51ce5eb185","p":"hasRegistrationUse"},{"s":"US:REG:247ca6e486cc282784cb3326","t":"US:USE:5900f3aa797bd00c897a856f","p":"hasRegistrationUse"},{"s":"US:CountryJurisdiction","t":"US:REG:247ca6e486cc282784cb3326","p":"hasRegistration"},{"s":"US:CountryJurisdiction","t":"US:REG:0e68db69a17ae7b81f833b0e","p":"hasRegistration"}]},"compare":{"q1":[{"ai":"MANCOZEB","uses":524,"countries":6,"crops":1},{"ai":"Emamectin benzoate","uses":437,"countries":5,"crops":2},{"ai":"DELTAMETHRIN","uses":254,"countries":7,"crops":1},{"ai":"CHLORPYRIFOS","uses":208,"countries":4,"crops":1},{"ai":"THIABENDAZOLE","uses":198,"countries":4,"crops":1},{"ai":"propiconazol","uses":191,"countries":1,"crops":1},{"ai":"IMIDACLOPRID","uses":180,"countries":6,"crops":2},{"ai":"CARBARYL","uses":174,"countries":5,"crops":1},{"ai":"DIFENOCONAZOLE","uses":170,"countries":8,"crops":1},{"ai":"pyraclostrobin","uses":164,"countries":8,"crops":1}],"q4":[{"ai":"acetamiprid","products":838,"forms":19,"countries":9},{"ai":"Acetamiprid","products":209,"forms":33,"countries":9},{"ai":"CLETHODIM","products":124,"forms":4,"countries":9},{"ai":"DIFENOCONAZOLE","products":120,"forms":11,"countries":9},{"ai":"Difenoconazole","products":104,"forms":20,"countries":9},{"ai":"PYRACLOSTROBIN","products":100,"forms":9,"countries":9},{"ai":"Pyraclostrobin","products":95,"forms":14,"countries":9},{"ai":"Clethodim","products":79,"forms":9,"countries":9},{"ai":"ACETAMIPRID","products":77,"forms":8,"countries":9},{"ai":"Trifloxystrobin","products":45,"forms":11,"countries":9}],"q5":[{"ai":"ACETAMIPRID","countries":10,"uses":9758,"products":69},{"ai":"Acetamiprid","countries":10,"uses":2243,"products":30},{"ai":"CLETHODIM","countries":10,"uses":144,"products":18},{"ai":"Clethodim","countries":10,"uses":770,"products":11},{"ai":"TRIFLOXYSTROBIN","countries":10,"uses":2056,"products":38},{"ai":"Trifloxystrobin","countries":10,"uses":1596,"products":15},{"ai":"acetamiprid","countries":10,"uses":1139,"products":836},{"ai":"clethodim","countries":10,"uses":289,"products":238},{"ai":"trifloxystrobin","countries":10,"uses":780,"products":336},{"ai":"AZOXYSTROBIN","countries":9,"uses":11807,"products":119},{"ai":"Azoxystrobin","countries":9,"uses":7965,"products":58},{"ai":"CAPTAN","countries":9,"uses":143,"products":65}],"q3":[{"crop":"strawberries","target":"powdery mildews","countries":3,"uses":423},{"crop":"cowpeas","target":"powdery mildews","countries":3,"uses":399},{"crop":"Lycium chinense","target":"powdery mildews","countries":3,"uses":196},{"crop":"Momordica charantia","target":"powdery mildews","countries":3,"uses":144},{"crop":"pumpkins","target":"powdery mildews","countries":3,"uses":143},{"crop":"watermelons","target":"powdery mildews","countries":3,"uses":136},{"crop":"cauliflowers","target":"Spodoptera litura","countries":3,"uses":115},{"crop":"cucumbers","target":"downy mildews","countries":2,"uses":1543},{"crop":"rice","target":"Chilo suppressalis","countries":2,"uses":1159},{"crop":"cucumbers","target":"powdery mildews","countries":2,"uses":787}],"radar":{"name":"ACETAMIPRID","dims":{"countries":10,"products":69,"uses":9758,"crops":33,"targets":0,"forms":2}}},"downloads":[{"name":"metadata/countries.json","bytes":16446,"format":"json","category":"metadata","checksum":"37b006d3b697954d","url":"/downloads/2026.08.3_federated/metadata/countries.json","description":""},{"name":"metadata/release.json","bytes":8923,"format":"json","category":"metadata","checksum":"f76a8d09c7dfdebf","url":"/downloads/2026.08.3_federated/metadata/release.json","description":""},{"name":"metadata/schema.json","bytes":1378,"format":"json","category":"metadata","checksum":"881501857d21097d","url":"/downloads/2026.08.3_federated/metadata/schema.json","description":""},{"name":"README.md","bytes":491,"format":"md","category":"release","checksum":"d6d8eb6cd1335ec7","url":"/downloads/2026.08.3_federated/README.md","description":""},{"name":"samples/pestkg-sample.graphml","bytes":200624,"format":"graphml","category":"samples","checksum":"f7210c03f3bff80d","url":"/downloads/2026.08.3_federated/samples/pestkg-sample.graphml","description":""},{"name":"samples/pestkg-sample.jsonld","bytes":259580,"format":"jsonld","category":"samples","checksum":"e7a8ce1ae15ae11f","url":"/downloads/2026.08.3_federated/samples/pestkg-sample.jsonld","description":""}]};
+
+/* ============================================================
+   工具 & 状态
+   ============================================================ */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const state={route:'overview',lang:'zh',selRow:null,graphHidden:new Set(),explore:{jur:'',q:'',status:''},cmpTab:'q1'};
+
+/* 节点 / 实体类型配色 */
+const TYPE_COLORS={
+  ActiveIngredientLocal:'#34e0a1', PesticideProduct:'#f472b6', RegistrationUse:'#22d3ee',
+  CropLocal:'#a3e635', TargetLocal:'#fb7a5c', FormulationLocal:'#8b9cf7',
+  Registration:'#c084fc', CountryJurisdiction:'#fbbf24', RegulatoryAgency:'#fbbf24'
+};
+const TYPE_LABEL={ActiveIngredientLocal:'有效成分',PesticideProduct:'农药产品',RegistrationUse:'登记使用',
+  CropLocal:'作物',TargetLocal:'防治对象',FormulationLocal:'剂型',Registration:'登记',
+  CountryJurisdiction:'辖区',RegulatoryAgency:'监管机构'};
+const JUR_NAME={CN:'中国',TW:'中国台湾',JP:'日本',KR:'韩国',US:'美国',AU:'澳大利亚',
+  HU:'匈牙利',IE:'爱尔兰',GB:'英国(GB)','GB-NI':'北爱尔兰',NZ:'新西兰',NL:'荷兰'};
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+/* 完整数字：千分位 */
+function fmtFull(n){return Number(n||0).toLocaleString('en-US');}
+/* 紧凑数字：中文用万，英文用 k/m */
+function fmtC(n){
+  n=Number(n||0);
+  if(state.lang==='zh'){
+    if(n>=1e8)return (n/1e8).toFixed(1).replace(/\.0$/,'')+'亿';
+    if(n>=1e4)return (n/1e4).toFixed(1).replace(/\.0$/,'')+'万';
+    return fmtFull(n);
+  }
+  if(n>=1e6)return (n/1e6).toFixed(1).replace(/\.0$/,'')+'M';
+  if(n>=1e3)return (n/1e3).toFixed(1).replace(/\.0$/,'')+'k';
+  return fmtFull(n);
+}
+function pct(x){const v=parseFloat(x);return isNaN(v)?null:v;}
+function pctLabel(x){const v=pct(x);return v===null?'—':(v*100).toFixed(0)+'%';}
+function bytesFmt(b){b=Number(b||0);if(b>=1048576)return (b/1048576).toFixed(1)+' MB';if(b>=1024)return (b/1024).toFixed(1)+' KB';return b+' B';}
+
+let toastTimer;
+function toast(msg){const t=$('#toast');$('#toastMsg').textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
+function openLB(html){$('#lbBody').innerHTML=html;$('#lightbox').classList.add('show');}
+function closeLB(){$('#lightbox').classList.remove('show');}
+
+/* 双语字典（UI 文案；数据标识符不翻译） */
+const I18N={
+  zh:{nav_overview:'研究概览',nav_explore:'数据探索',nav_compare:'对比分析',nav_entity:'实体档案',nav_downloads:'数据下载',nav_methods:'方法架构'},
+  en:{nav_overview:'Overview',nav_explore:'Explore',nav_compare:'Compare',nav_entity:'Entity',nav_downloads:'Downloads',nav_methods:'Methods'}
+};
+function t(k){return (I18N[state.lang]&&I18N[state.lang][k])||I18N.zh[k]||k;}
+
+/* ============================================================
+   路由
+   ============================================================ */
+const ROUTES=['overview','explore','compare','entity','downloads','methods'];
+const ROUTE_TITLE={overview:['研究概览','Overview'],explore:['数据探索','Explore'],compare:['对比分析','Compare'],
+  entity:['实体档案','Entity'],downloads:['数据下载','Downloads'],methods:['方法与架构','Methods']};
+function go(route){
+  if(!ROUTES.includes(route))route='overview';
+  state.route=route;
+  if(location.hash!=='#'+route)history.replaceState(null,'','#'+route);
+  $$('#nav .nav-item').forEach(a=>a.classList.toggle('active',a.dataset.route===route));
+  render();
+  $('#main')&&0;
+  window.scrollTo({top:0,behavior:REDUCED?'auto':'instant'});
+}
+function render(){
+  const v=$('#view');
+  const doRender=()=>{v.innerHTML=RENDERERS[state.route]();v.classList.remove('view');void v.offsetWidth;v.classList.add('view');afterRender[state.route]&&afterRender[state.route]();};
+  if(document.startViewTransition&&!REDUCED){document.startViewTransition(doRender);}else{doRender();}
+}
+/* ============================================================
+   图表组件（确定性 SVG / HTML）
+   ============================================================ */
+/* 水平发光条形（HTML） */
+function hBars(rows,opt={}){
+  const max=Math.max(...rows.map(r=>r.value),1);
+  return `<div style="display:flex;flex-direction:column;gap:${opt.gap||11}px">`+rows.map((r,i)=>{
+    const w=(r.value/max*100);
+    return `<div style="display:grid;grid-template-columns:${opt.labelW||'118px'} 1fr ${opt.valW||'64px'};gap:11px;align-items:center">
+      <div style="font-size:12px;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.label)}">${esc(r.label)}</div>
+      <div style="height:${opt.h||9}px;background:var(--surface);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${w}%;border-radius:99px;background:${r.grad||('linear-gradient(90deg,'+r.color+'cc,'+r.color+')')};box-shadow:0 0 12px ${r.color}66;transition:width .8s var(--ease)"></div>
+      </div>
+      <div class="num" style="color:${r.color||'var(--ink)'}">${opt.compact?fmtC(r.value):fmtFull(r.value)}${r.suffix||''}</div></div>`;
+  }).join('')+`</div>`;
+}
+/* 环形图（SVG donut） */
+function donut(rows,opt={}){
+  const size=opt.size||170,th=opt.thickness||20,r=(size-th)/2,cx=size/2,cy=size/2,C=2*Math.PI*r;
+  const total=rows.reduce((s,x)=>s+x.value,0)||1;let off=0;
+  const arcs=rows.map(x=>{const frac=x.value/total;const el=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${x.color}" stroke-width="${th}" stroke-dasharray="${frac*C} ${C}" stroke-dashoffset="${-off*C}" style="filter:drop-shadow(0 0 5px ${x.color}88)"><title>${esc(x.label)}: ${fmtFull(x.value)}</title></circle>`;off+=frac;return el;}).join('');
+  return `<div class="ring-wrap" style="justify-content:center;flex-wrap:wrap">
+    <div class="ring" style="width:${size}px;height:${size}px">
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${arcs}</svg>
+      <div class="rv"><div><b style="font-size:22px">${opt.centerFmt?opt.centerFmt(total):fmtC(total)}</b><small>${esc(opt.centerLabel||'')}</small></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px;min-width:130px">
+      ${rows.map(x=>`<div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);font-weight:600"><i style="width:9px;height:9px;border-radius:50%;background:${x.color};box-shadow:0 0 7px ${x.color};flex:none"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.label)}</span><b style="margin-left:auto;color:var(--ink);font-family:var(--mono)">${((x.value/total)*100).toFixed(0)}%</b></div>`).join('')}
+    </div></div>`;
+}
+/* 单个进度环 */
+function progressRing(value,color,opt={}){
+  const size=opt.size||92,th=opt.thickness||9,r=(size-th)/2,cx=size/2,cy=size/2,C=2*Math.PI*r;
+  const v=Math.max(0,Math.min(1,value));
+  return `<div class="ring" style="width:${size}px;height:${size}px">
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface-3)" stroke-width="${th}"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${th}" stroke-linecap="round" stroke-dasharray="${v*C} ${C}" style="filter:drop-shadow(0 0 4px ${color}aa)"/>
+    </svg>
+    <div class="rv"><b style="font-size:${opt.fs||17}px">${(v*100).toFixed(0)}<small style="font-size:11px">%</small></b></div></div>`;
+}
+/* 雷达图（SVG） */
+function radar(dims,opt={}){
+  const size=opt.size||250,c=size/2,R=c-42,n=dims.length,poly=a=>a.map((p,i)=>{const ang=-Math.PI/2+i*2*Math.PI/n;return [c+Math.cos(ang)*R*p,c+Math.sin(ang)*R*p];});
+  const rings=[.25,.5,.75,1].map(f=>{const p=poly(Array(n).fill(f));return `<polygon points="${p.map(q=>q.join(',')).join(' ')}" fill="none" stroke="var(--border)" stroke-width="1"/>`;}).join('');
+  const axes=dims.map((d,i)=>{const ang=-Math.PI/2+i*2*Math.PI/n;return `<line x1="${c}" y1="${c}" x2="${c+Math.cos(ang)*R}" y2="${c+Math.sin(ang)*R}" stroke="var(--border)"/>`;}).join('');
+  const vals=opt.values;const P=poly(vals);
+  const labels=dims.map((d,i)=>{const ang=-Math.PI/2+i*2*Math.PI/n;const lx=c+Math.cos(ang)*(R+22),ly=c+Math.sin(ang)*(R+22);return `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" fill="var(--muted)" font-size="10.5" font-weight="700">${esc(d)}</text>`;}).join('');
+  return `<svg width="100%" viewBox="0 0 ${size} ${size}" style="max-width:${size}px;margin:0 auto;display:block">
+    ${rings}${axes}
+    <polygon points="${P.map(q=>q.join(',')).join(' ')}" fill="rgba(52,224,161,.18)" stroke="#34e0a1" stroke-width="2" style="filter:drop-shadow(0 0 6px #34e0a1aa)"/>
+    ${P.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="3" fill="#22d3ee"/>`).join('')}${labels}</svg>`;
+}
+/* 迷你 sparkline（SVG） */
+function spark(vals,color,width=180,height=44){
+  const max=Math.max(...vals),min=Math.min(...vals),rx=(i)=>i/(vals.length-1)*width,ry=v=>height-3-((v-min)/(max-min||1))*(height-8);
+  const pts=vals.map((v,i)=>`${rx(i)},${ry(v)}`);
+  const id='sp'+Math.random().toString(36).slice(2,7);
+  return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="width:100%">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".35"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    <polygon points="0,${height} ${pts.join(' ')} ${width},${height}" fill="url(#${id})"/>
+    <polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="2" style="filter:drop-shadow(0 0 4px ${color})"/></svg>`;
+}
+/* 垂直柱状（SVG） */
+function vBars(rows,opt={}){
+  const w=opt.width||320,h=opt.height||180,pad=26,max=Math.max(...rows.map(r=>r.value),1),bw=(w-pad*2)/rows.length*0.62,gap=(w-pad*2)/rows.length;
+  const bars=rows.map((r,i)=>{const bh=(r.value/max)*(h-pad*2);const x=pad+i*gap+(gap-bw)/2,y=h-pad-bh;
+    return `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="4" fill="${r.color}" style="filter:drop-shadow(0 0 6px ${r.color}88)"><title>${esc(r.label)}:${fmtFull(r.value)}</title></rect>
+    <text x="${x+bw/2}" y="${h-pad+15}" text-anchor="middle" fill="var(--faint)" font-size="9.5" font-weight="700">${esc(r.label)}</text>`;}).join('');
+  return `<svg width="100%" viewBox="0 0 ${w} ${h}" style="max-width:${w}px;margin:0 auto;display:block">${bars}</svg>`;
+}
+
+/* ============================================================
+   发光力导向知识图谱（Canvas）
+   ============================================================ */
+class ForceGraph{
+  constructor(cv,opt){
+    this.cv=cv;this.ctx=cv.getContext('2d');this.opt=opt||{};
+    this.nodes=(opt.nodes||[]).map(n=>{
+      const isHub=n.type==='CountryJurisdiction'||n.type==='RegulatoryAgency';
+      return {id:n.id,label:n.label,type:n.type,jur:n.jurisdiction,
+        r:isHub?13:(n.type==='ActiveIngredientLocal'?8:n.type==='PesticideProduct'?7:5.5),
+        hub:isHub,x:0,y:0,vx:0,vy:0,deg:0};
+    });
+    this.NM=Object.fromEntries(this.nodes.map(n=>[n.id,n]));
+    this.edges=[];
+    (opt.edges||[]).forEach(e=>{const s=this.NM[e.s],t=this.NM[e.t];if(s&&t){this.edges.push({s,t,p:e.p});s.deg++;t.deg++;}});
+    this.hover=null;this.drag=null;this.mx=0;this.my=0;
+    this.alpha=1;this.alphaDecay=opt.alphaDecay||0.018;this.alphaMin=0.005;this._laid=false;
+    this._bind();this.resize();this._raf=requestAnimationFrame(()=>this.loop());
+  }
+  resize(){
+    const r=this.cv.getBoundingClientRect();this.w=r.width;this.h=r.height;
+    const dpr=Math.min(devicePixelRatio||1,2);
+    this.cv.width=this.w*dpr;this.cv.height=this.h*dpr;this.ctx.setTransform(dpr,0,0,dpr,0,0);
+    if(!this._laid&&this.w>20){
+      const R=Math.min(this.w,this.h)*0.30;
+      this.nodes.forEach(n=>{
+        const ang=Math.random()*Math.PI*2,rr=Math.sqrt(Math.random())*R;
+        n.x=this.w/2+Math.cos(ang)*rr;
+        n.y=this.h/2+Math.sin(ang)*rr*0.82;
+      });
+      this._laid=true;
+    }
+  }
+  _pos(e){const r=this.cv.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};}
+  _bind(){
+    const down=e=>{const p=this._pos(e);const n=this.hit(p.x,p.y);if(n){e.preventDefault();
+      this.drag=n;n.fx=n.x;n.fy=n.y;this.alpha=Math.max(this.alpha,0.28);}};
+    const move=e=>{const p=this._pos(e);this.mx=p.x;this.my=p.y;
+      if(this.drag){const n=this.drag;n.fx=p.x;n.fy=p.y;}else{this.hover=this.hit(p.x,p.y);this.cv.style.cursor=this.hover?'grab':'';}};
+    const up=()=>{if(this.drag){const n=this.drag;n.fx=null;n.fy=null;this.drag=null;}};
+    this.cv.addEventListener('mousedown',down);
+    window.addEventListener('mousemove',move);
+    window.addEventListener('mouseup',up);
+    this.cv.addEventListener('click',()=>{if(this.hover&&this.opt.onPick)this.opt.onPick(this.hover);});
+    this._ro=new ResizeObserver(()=>this.resize());this._ro.observe(this.cv);
+  }
+  hit(x,y){for(let i=this.nodes.length-1;i>=0;i--){const n=this.nodes[i],dx=x-n.x,dy=y-n.y;if(dx*dx+dy*dy<(n.r+4)*(n.r+4))return n;}return null;}
+  destroy(){cancelAnimationFrame(this._raf);this._ro.disconnect();}
+  physics(){
+    if(this.alpha<=this.alphaMin){this.alpha=0;return;}
+    const a=this.alpha,cx=this.w/2,cy=this.h/2;
+    const K=this.opt.charge??1150,L=this.opt.link??60;
+    for(let i=0;i<this.nodes.length;i++){const nd=this.nodes[i];
+      for(let j=i+1;j<this.nodes.length;j++){const b=this.nodes[j];
+        let dx=nd.x-b.x,dy=nd.y-b.y;let d2=dx*dx+dy*dy||.01,d=Math.sqrt(d2);
+        let f=K/d2*a;if(nd.hub||b.hub)f*=1.5;let ux=dx/d,uy=dy/d;
+        nd.vx+=ux*f;nd.vy+=uy*f;b.vx-=ux*f;b.vy-=uy*f;}}
+    for(const e of this.edges){let dx=e.t.x-e.s.x,dy=e.t.y-e.s.y;let d=Math.sqrt(dx*dx+dy*dy)||.01,ux=dx/d,uy=dy/d;
+      const f=(d-L)*0.06*a;e.s.vx+=ux*f;e.s.vy+=uy*f;e.t.vx-=ux*f;e.t.vy-=uy*f;}
+    for(const n of this.nodes){
+      if(n.fx!=null){n.x=n.fx;n.y=n.fy;n.vx=0;n.vy=0;continue;}
+      n.vx+=(cx-n.x)*0.009*a;n.vy+=(cy-n.y)*0.009*a;
+      n.vx*=0.82;n.vy*=0.82;n.x+=n.vx;n.y+=n.vy;
+      const pad=n.r+6;
+      if(n.x<pad){n.x=pad;n.vx*=-0.4;}if(n.x>this.w-pad){n.x=this.w-pad;n.vx*=-0.4;}
+      if(n.y<pad){n.y=pad;n.vy*=-0.4;}if(n.y>this.h-pad){n.y=this.h-pad;n.vy*=-0.4;}
+    }
+    this.alpha-=this.alphaDecay;
+  }
+  loop(){
+    this.physics();
+    const ctx=this.ctx;ctx.clearRect(0,0,this.w,this.h);
+    const hv=this.hover;
+    const linked=new Set();
+    if(hv){this.edges.forEach(e=>{if(e.s===hv||e.t===hv){linked.add(e.s);linked.add(e.t);}});linked.add(hv);}
+    ctx.globalCompositeOperation='lighter';
+    for(const e of this.edges){
+      const hot=hv&&(e.s===hv||e.t===hv);
+      const col=TYPE_COLORS[e.s.type]||'#34e0a1';
+      ctx.beginPath();
+      const mx=(e.s.x+e.t.x)/2,my=(e.s.y+e.t.y)/2-6;
+      ctx.moveTo(e.s.x,e.s.y);ctx.quadraticCurveTo(mx,my,e.t.x,e.t.y);
+      ctx.globalAlpha=hot?0.6:(hv?0.05:0.17);ctx.lineWidth=hot?1.7:0.8;ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+    for(const n of this.nodes){
+      const col=TYPE_COLORS[n.type]||'#34e0a1';
+      const dim=hv&&!linked.has(n);
+      const r=n.r*(n===hv?1.25:1);
+      const glowR=r*(n.hub?5:3.4);
+      const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,glowR);
+      g.addColorStop(0,col+(dim?'20':(n.hub?'cc':'99')));g.addColorStop(1,col+'00');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(n.x,n.y,glowR,0,7);ctx.fill();
+      ctx.fillStyle=dim?'#16241f':col;ctx.beginPath();ctx.arc(n.x,n.y,r,0,7);ctx.fill();
+      ctx.fillStyle=dim?'#33443d':'#06120d';ctx.beginPath();ctx.arc(n.x,n.y,r*0.42,0,7);ctx.fill();
+      if(n.hub){ctx.strokeStyle=col+'66';ctx.lineWidth=1;ctx.beginPath();ctx.arc(n.x,n.y,r+5+Math.sin(performance.now()/700)*1.5,0,7);ctx.stroke();}
+    }
+    ctx.globalCompositeOperation='source-over';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    for(const n of this.nodes){
+      const show=n.hub||n===hv||(linked.has(n)&&hv);
+      if(!show)continue;
+      const col=TYPE_COLORS[n.type];
+      let label=n.label;if(label.length>22)label=label.slice(0,21)+'…';
+      ctx.font=(n.hub?'600 11px':'600 10.5px')+" 'Space Grotesk',sans-serif";
+      const tw=ctx.measureText(label).width;
+      ctx.fillStyle='rgba(6,12,10,.82)';ctx.fillRect(n.x-tw/2-5,n.y+n.r+7,tw+10,16);
+      ctx.fillStyle=n.hub?col:'#e9f2ee';ctx.fillText(label,n.x,n.y+n.r+15);
+    }
+    if(hv){
+      const lines=[hv.label,TYPE_LABEL[hv.type]+(hv.jur?' · '+hv.jur:'')];
+      ctx.font="600 12px 'Manrope'";let wmax=0;lines.forEach(l=>wmax=Math.max(wmax,ctx.measureText(l).width));
+      let bx=hv.x+16,by=hv.y-30;if(bx+wmax+18>this.w)bx=hv.x-wmax-26;
+      ctx.fillStyle='rgba(8,17,14,.94)';ctx.strokeStyle=TYPE_COLORS[hv.type]+'88';ctx.lineWidth=1;
+      ctx.beginPath();ctx.roundRect(bx,by,wmax+18,lines.length*17+12,8);ctx.fill();ctx.stroke();
+      ctx.textAlign='left';
+      lines.forEach((l,i)=>{ctx.fillStyle=i?TYPE_COLORS[hv.type]:'#e9f2ee';ctx.font=i?"600 10.5px 'Manrope'":"700 12px 'Manrope'";ctx.fillText(l,bx+9,by+18+i*17);});
+    }
+    this._raf=requestAnimationFrame(()=>this.loop());
+  }
+}
+/* ============================================================
+   视图渲染器
+   ============================================================ */
+const RENDERERS={};
+const afterRender={};
+const inv=DATA.release.inventory;
+
+/* ---------- 研究概览 ---------- */
+RENDERERS.overview=()=>{
+  const kpi=(ic,color,val,lab,sp)=>`<div class="card kpi rise">
+    <div class="shine" style="background:${color}44"></div>
+    <div class="top"><div class="ic" style="background:${color}1f;color:${color}">${ic}</div>
+      <span class="chip" style="font-size:10px">release</span></div>
+    <div class="val">${val}</div><div class="lab">${lab}</div>
+    <div class="spark">${spark(sp,color,200,40)}</div></div>`;
+  const kpis=[
+    kpi(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>`,'#fbbf24',inv.jurisdictions,'联邦辖区 / Jurisdictions',[3,4,5,7,8,10,12]),
+    kpi(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></svg>`,'#34e0a1',fmtC(inv.source_records),'官方源记录 / Source records',[20,32,38,52,61,74,82]),
+    kpi(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><circle cx="12" cy="12" r="2.5"/><path d="M8 7l3 4M16 7l-3 4M8 17l3-4M16 17l-3-4"/></svg>`,'#22d3ee',fmtC(inv.country_nodes),'国家图节点 / Nodes',[40,55,70,88,100,112,120]),
+    kpi(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M7 11l10-4M7 13l10 4"/></svg>`,'#8b9cf7',fmtC(inv.country_edges),'国家图关系 / Edges',[300,420,560,700,820,910,974]),
+    kpi(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="12" r="2.5"/><path d="M8 6c8 0 6 6 8 6M8 18c8 0 6-6 8-6"/></svg>`,'#2dd4bf',fmtC(inv.shared_nodes),'跨国共享节点 / Shared',[12,18,25,31,38,42,45]),
+    kpi(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>`,'#f472b6',fmtC(inv.alignment_edges),'联邦对齐边 / Aligned',[15,22,30,36,41,45,49])
+  ];
+  /* 辖区规模（按源语言配色） */
+  const LANG_COL={zh:'#34e0a1',ja:'#f472b6',ko:'#8b9cf7',en:'#22d3ee',hu:'#fbbf24',nl:'#a3e635'};
+  const covRows=DATA.release.coverage.map(c=>({label:(JUR_NAME[c.jurisdiction]||c.jurisdiction),
+    value:parseInt(c.records)||0,color:LANG_COL[c.source_language]||'#34e0a1'}))
+    .sort((a,b)=>b.value-a.value).slice(0,8);
+  /* 有效成分英文完成度 */
+  const enRows=DATA.release.coverage.map(c=>({label:JUR_NAME[c.jurisdiction]||c.jurisdiction,
+    value:(parseFloat(c.active_english)||0)*100,color:'#34e0a1',suffix:'%'}))
+    .sort((a,b)=>b.value-a.value).slice(0,8);
+  /* donut 数据 */
+  const typeDonut=DATA.nodeTypes.map(x=>({label:TYPE_LABEL[x.type]||x.type,value:x.count,color:TYPE_COLORS[x.type]||'#34e0a1'}));
+  const enStatusMap={unknown:['未标注','#61736b'],official_source_language_en:['英文为源语言','#34e0a1'],
+    official_english_field:['官方英文字段','#22d3ee'],unresolved:['待对齐','#fbbf24'],missing_or_requires_alignment:['需补全','#fb7a5c']};
+  const enDonut=DATA.englishStatus.map(x=>({label:(enStatusMap[x.status]||[x.status])[0],value:x.count,color:(enStatusMap[x.status]||['',TYPE_COLORS[x.status]||'#888'])[1]}));
+
+  return `
+  <section class="hero">
+    <div class="hero-graph"><canvas id="heroGraph"></canvas></div>
+    <div class="inner">
+      <span class="eyebrow"><i style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></i>Federated Knowledge Graph · 2026</span>
+      <h1>发光的<span class="g">多国农药登记</span><br>知识网络工作台</h1>
+      <p>跨 12 个辖区、4 种源语言，将分散的农药登记证据联邦对齐为可追溯、可比较、可检索的知识图谱。</p>
+      <div class="acts">
+        <button class="btn btn-primary" data-go="explore">开始探索图谱
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button class="btn" data-go="compare">对比分析</button>
+      </div>
+      <div class="meta">
+        <div class="m"><div class="n" style="color:var(--green)">${inv.jurisdictions}</div><div class="l">联邦辖区</div></div>
+        <div class="m"><div class="n" style="color:var(--cyan)">${fmtC(inv.source_records)}</div><div class="l">源记录</div></div>
+        <div class="m"><div class="n" style="color:var(--violet)">${fmtC(inv.country_edges)}</div><div class="l">关系边</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid grid-4" style="margin-top:22px">${kpis.join('')}</div>
+
+  <div class="section-t"><h2>联邦知识网络</h2><span class="hint">52 个样本实体 · 108 条关系 · 可拖拽 / 悬停</span>
+    <button class="btn" style="padding:7px 14px" data-go="explore">进入数据探索</button></div>
+  <div class="grid" style="grid-template-columns:1.85fr 1fr">
+    <div class="graph-box" style="height:540px">
+      <canvas id="mainGraph"></canvas>
+      <div class="graph-tools">
+        <button class="iconbtn" id="gReheat" aria-label="重新布局"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg></button>
+        <button class="iconbtn" id="gFull" aria-label="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+      </div>
+      <div class="legend" id="mainLegend">
+        ${Object.keys(TYPE_LABEL).filter(k=>DATA.nodeTypes.some(x=>x.type===k)||['CountryJurisdiction'].includes(k)).slice(0,7).map(k=>
+          `<span class="lg" data-type="${k}"><i style="background:${TYPE_COLORS[k]};box-shadow:0 0 7px ${TYPE_COLORS[k]}"></i>${TYPE_LABEL[k]}</span>`).join('')}
+      </div>
+      <div class="graph-info">force-directed · canvas</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="card"><div class="card-h"><h3>样本节点构成</h3><span class="sub">entity types</span></div>
+        ${donut(typeDonut,{size:158,thickness:18,centerLabel:'样本节点'})}</div>
+      <div class="card"><div class="card-h"><h3>英文状态分布</h3><span class="sub">english status</span></div>
+        ${donut(enDonut,{size:158,thickness:18,centerLabel:'字段数'})}</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:22px">
+    <div class="card"><div class="card-h"><h3>辖区源记录规模</h3><span class="sub">by jurisdiction</span></div>
+      ${hBars(covRows,{labelW:'96px',valW:'70px'})}</div>
+    <div class="card"><div class="card-h"><h3>有效成分英文完成度</h3><span class="sub">active ingredient EN</span></div>
+      ${hBars(enRows,{labelW:'96px',valW:'64px',h:9})}</div>
+  </div>
+
+  <div class="card" style="margin-top:22px;border-color:rgba(251,191,36,.28);background:linear-gradient(135deg,rgba(251,191,36,.07),var(--surface))">
+    <div style="display:flex;gap:14px;align-items:flex-start">
+      <div style="width:38px;height:38px;border-radius:10px;background:rgba(251,191,36,.15);color:var(--amber);display:grid;place-items:center;flex:none">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></svg></div>
+      <div><h3 style="font-size:14px;margin-bottom:5px">分发状态：${DATA.release.distribution_status==='release_ready'?'数据就绪':'待重建清单'}</h3>
+      <p style="font-size:12px;color:var(--muted)">该版本机器数据哈希校验通过，但部分文本与顶层清单不一致，<b style="color:var(--amber)">需重建归档与清单后方可公开分发</b>；完整 JSON-LD / GraphML 仅发布有界浏览样本。</p></div>
+    </div>
+  </div>`;
+};
+
+/* ---------- 数据探索 ---------- */
+RENDERERS.explore=()=>{
+  const rows=filteredExplore();
+  const sel=getSelRow();
+  const jurs=['',...new Set(DATA.exploreRows.map(r=>r.jurisdiction))];
+  const statuses=['',...new Set(DATA.exploreRows.map(r=>r.status).filter(Boolean))];
+  return `
+  <div style="margin-bottom:6px">
+    <h2 style="font-size:23px">数据探索</h2>
+    <p style="color:var(--muted);font-size:13px;margin-top:5px">筛选辖区与登记状态，点击任意记录查看其局部关系网络与来源出处。</p>
+  </div>
+  <div class="card" style="margin:18px 0">
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:14px;align-items:end">
+      <div class="field"><label>辖区</label>
+        <select class="select" id="fJur">${jurs.map(j=>`<option value="${j}" ${state.explore.jur===j?'selected':''}>${j?JUR_NAME[j]||j:'全部辖区'}</option>`).join('')}</select></div>
+      <div class="field"><label>登记状态</label>
+        <select class="select" id="fStatus">${statuses.map(s=>`<option value="${s}" ${state.explore.status===s?'selected':''}>${s||'全部状态'}</option>`).join('')}</select></div>
+      <div class="field"><label>关键词（产品 / 成分）</label>
+        <input class="input" id="fQ" value="${esc(state.explore.q)}" placeholder="如 glyphosate / 草…"></div>
+      <div style="display:flex;gap:9px">
+        <button class="btn btn-primary" id="fApply" style="flex:1;justify-content:center">应用筛选</button>
+        <button class="btn" id="fReset" aria-label="重置"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="grid" style="grid-template-columns:1.7fr 1fr;align-items:start">
+    <div class="tablewrap">
+      <table class="data">
+        <colgroup><col style="width:11%"><col style="width:30%"><col style="width:21%"><col style="width:22%"><col style="width:16%"></colgroup>
+        <thead><tr><th>辖区</th><th>产品</th><th>有效成分</th><th>作物</th><th>状态</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr data-use="${esc(r.use_id)}" class="${sel&&sel.use_id===r.use_id?'sel':''}" style="cursor:pointer">
+          <td><span class="flag"><i>${r.jurisdiction}</i></span></td>
+          <td style="font-weight:600;max-width:240px"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.product)}</div></td>
+          <td style="font-size:11.5px;color:var(--muted)">${r.ai.length?esc(r.ai.slice(0,2).join(', ')):'—'}</td>
+          <td style="font-size:11px;color:var(--faint)"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.crops.length?esc(r.crops[0]):'—'}</div></td>
+          <td>${r.status?`<span class="badge ${/current|valid|active|alap/i.test(r.status)?'green':/expired/i.test(r.status)?'coral':'amber'}">${esc(r.status.slice(0,12))}</span>`:'—'}</td>
+        </tr>`).join('')||`<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--faint)">当前筛选条件下没有已发布记录</td></tr>`}</tbody>
+      </table>
+    </div>
+    <div style="position:sticky;top:84px">
+      ${sel?exploreDetail(sel):''}
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--faint);margin-top:14px">共 ${rows.length} 条（有界浏览样本，共 ${DATA.exploreRows.length} 条）。完整数据需通过数据下载或 API 获取。</p>`;
+};
+function filteredExplore(){
+  const {jur,status,q}=state.explore;const ql=(q||'').toLowerCase();
+  return DATA.exploreRows.filter(r=>{
+    if(jur&&r.jurisdiction!==jur)return false;
+    if(status&&r.status!==status)return false;
+    if(q&&!((r.product||'').toLowerCase().includes(ql)||(r.ai||[]).some(a=>a.toLowerCase().includes(ql))))return false;
+    return true;
+  });
+}
+function getSelRow(){
+  if(state.selRow){const f=DATA.exploreRows.find(r=>r.use_id===state.selRow);if(f)return f;}
+  return filteredExplore()[0]||DATA.exploreRows[0];
+}
+function exploreDetail(r){
+  return `<div class="graph-box" style="height:300px"><canvas id="localGraph"></canvas>
+    <div class="graph-info">${r.jurisdiction} 局部网络</div></div>
+  <div class="card" style="margin-top:14px">
+    <div class="card-h"><h3 style="font-size:14px">登记使用记录</h3><span class="badge green">${r.jurisdiction}</span></div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:12px;word-break:break-word">${esc(r.product)}</div>
+    ${detailRow('有效成分',r.ai.length?r.ai.map(esc).join('、'):'—')}
+    ${detailRow('作物',r.crops.length?r.crops.map(esc).join('；'):'—')}
+    ${detailRow('防治对象',r.targets.length?r.targets.map(esc).join('；'):'—')}
+    ${detailRow('登记状态',r.status||'—')}
+    ${detailRow('登记日期',r.registration_date||'—')}
+    ${detailRow('到期日期',r.expiry_date||'—')}
+    <div style="margin-top:13px;display:flex;gap:8px">
+      <a class="btn btn-primary" style="flex:1;justify-content:center" ${/^https?:/.test(r.source_url)?`href="${esc(r.source_url)}" target="_blank" rel="noopener"`:`data-srcurl="1"`}>查看官方来源</a>
+      <button class="btn" data-copyuse="${esc(r.use_id)}" aria-label="复制ID"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+    </div>
+    <div class="mono" style="font-size:10px;color:var(--faint);margin-top:10px;word-break:break-all">${esc(r.use_id)}</div>
+  </div>`;
+}
+function detailRow(l,v){return `<div style="display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--border);font-size:12px">
+  <span style="color:var(--faint);width:64px;flex:none;font-weight:600">${l}</span>
+  <span style="color:var(--ink);word-break:break-word">${v}</span></div>`;}
+
+/* ---------- 对比分析 ---------- */
+const PAL=['#34e0a1','#22d3ee','#f472b6','#8b9cf7','#fbbf24','#fb7a5c','#a3e635','#c084fc','#2dd4bf','#f0a3c8'];
+const CMP_TABS=[['q1','Q1 · 成分使用广度'],['q4','Q4 · 产品剂型多样性'],['q5','Q5 · 跨国覆盖'],['q3','Q3 · 作物×对象'],['radar','多维雷达']];
+RENDERERS.compare=()=>{
+  const tab=state.cmpTab;
+  let body='';
+  if(tab==='q1'){
+    const rows=DATA.compare.q1.map((x,i)=>({label:x.ai,value:x.uses,color:PAL[i]}));
+    body=`<div class="grid grid-2" style="align-items:start">
+      <div class="card"><div class="card-h"><h3>登记使用记录数 Top 10</h3><span class="sub">registration uses</span></div>${hBars(rows,{labelW:'150px',valW:'62px'})}</div>
+      <div class="card"><div class="card-h"><h3>头部成分速览</h3><span class="sub">highlights</span></div>
+        ${DATA.compare.q1.slice(0,5).map((x,i)=>cmpMini(x.ai,[['使用记录',fmtC(x.uses),PAL[i]],['覆盖辖区',x.countries+' 国',PAL[i]],['涉及作物',x.crops+' 类',PAL[i]]],PAL[i])).join('')}</div></div>`;
+  }else if(tab==='q4'){
+    const rows=DATA.compare.q4.map((x,i)=>({label:x.ai,value:x.products,color:PAL[i]}));
+    body=`<div class="grid grid-2" style="align-items:start">
+      <div class="card"><div class="card-h"><h3>关联产品数 Top 10</h3><span class="sub">products</span></div>${hBars(rows,{labelW:'150px',valW:'62px'})}</div>
+      <div class="card"><div class="card-h"><h3>剂型丰富度</h3><span class="sub">formulations</span></div>
+        ${DATA.compare.q4.slice(0,6).map((x,i)=>cmpMini(x.ai,[['产品数',fmtC(x.products),PAL[i]],['剂型数',x.forms+' 种',PAL[i]],['辖区',x.countries+' 国',PAL[i]]],PAL[i])).join('')}</div></div>`;
+  }else if(tab==='q5'){
+    const rows=DATA.compare.q5.slice(0,10).map((x,i)=>({label:x.ai,value:x.uses,color:PAL[i]}));
+    body=`<div class="grid grid-2" style="align-items:start">
+      <div class="card"><div class="card-h"><h3>跨国登记使用规模 Top 10</h3><span class="sub">cross-country uses</span></div>${hBars(rows,{labelW:'150px',valW:'68px'})}</div>
+      <div class="card"><div class="card-h"><h3>覆盖广度</h3><span class="sub">reach</span></div>
+        ${DATA.compare.q5.slice(0,6).map((x,i)=>cmpMini(x.ai,[['覆盖辖区',x.countries+' 国',PAL[i]],['使用记录',fmtC(x.uses),PAL[i]],['产品数',fmtC(x.products),PAL[i]]],PAL[i])).join('')}</div></div>`;
+  }else if(tab==='q3'){
+    const rows=DATA.compare.q3.map((x,i)=>({label:x.crop+' × '+x.target,value:x.uses,color:PAL[i],suffix:''}));
+    body=`<div class="card"><div class="card-h"><h3>作物 × 防治对象组合（按使用记录）</h3><span class="sub">crop × target</span></div>
+      ${hBars(rows,{labelW:'230px',valW:'60px'})}</div>
+      <div class="grid grid-3" style="margin-top:18px">
+        ${DATA.compare.q3.slice(0,3).map((x,i)=>`<div class="card"><div style="font-size:11px;color:var(--faint);font-weight:700">组合 ${i+1}</div>
+          <div style="font-size:14px;font-weight:700;margin:8px 0 4px">${esc(x.crop)}</div>
+          <div style="font-size:12px;color:var(--muted)">防治：${esc(x.target)}</div>
+          <div style="display:flex;gap:14px;margin-top:11px"><div><b style="color:${PAL[i]};font-family:var(--font-d)">${x.countries}</b><small style="font-size:10px;color:var(--faint)"> 辖区</small></div>
+          <div><b style="color:${PAL[i]};font-family:var(--font-d)">${fmtC(x.uses)}</b><small style="font-size:10px;color:var(--faint)"> 使用</small></div></div></div>`).join('')}</div>`;
+  }else{
+    const rd=DATA.compare.radar;const d=rd.dims;
+    const dims=['辖区','产品','使用','作物','对象','剂型'];
+    const values=[d.countries/10,d.products/100,d.uses/10000,d.crops/40,d.targets/10,d.forms/20];
+    body=`<div class="grid grid-2" style="align-items:center">
+      <div class="card"><div class="card-h"><h3>${rd.name} 多维分布</h3><span class="sub">radar</span></div>
+        ${radar(dims,{values})}</div>
+      <div class="card"><div class="card-h"><h3>真实指标</h3><span class="sub">metrics</span></div>
+        <div class="grid grid-2" style="gap:13px">
+          ${[['覆盖辖区',d.countries,'#34e0a1'],['关联产品',d.products,'#22d3ee'],['登记使用',fmtC(d.uses),'#f472b6'],['涉及作物',d.crops,'#a3e635'],['防治对象',d.targets,'#fb7a5c'],['剂型',d.forms,'#8b9cf7']]
+            .map(m=>`<div style="padding:15px;border-radius:12px;background:var(--surface);border:1px solid var(--border)">
+              <div style="font-family:var(--font-d);font-size:23px;color:${m[2]};font-weight:700">${m[1]}</div>
+              <div style="font-size:11px;color:var(--faint);margin-top:2px">${m[0]}</div></div>`).join('')}
+        </div>
+        <p style="font-size:11px;color:var(--faint);margin-top:13px">注：该样本"防治对象"维度为 0，表明样本中该成分未关联 TargetLocal 实体，属数据覆盖局限，非零值不做填补。</p>
+      </div></div>`;
+  }
+  return `<div style="margin-bottom:4px"><h2 style="font-size:23px">对比分析</h2>
+    <p style="color:var(--muted);font-size:13px;margin-top:5px">围绕 5 个研究问题，对有效成分的使用广度、多样性与跨国覆盖进行可比较的量化分析。</p></div>
+  <div class="tabs" style="margin-top:16px">${CMP_TABS.map(x=>`<button data-cmp="${x[0]}" class="${tab===x[0]?'on':''}">${x[1]}</button>`).join('')}</div>
+  ${body}`;
+};
+function cmpMini(name,cells,color){
+  return `<div style="padding:13px 0;border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px"><i style="width:8px;height:8px;border-radius:50%;background:${color};box-shadow:0 0 7px ${color}"></i>
+      <b style="font-size:13px">${esc(name)}</b></div>
+    <div style="display:flex;gap:18px">${cells.map(c=>`<div><b style="color:${c[2]};font-family:var(--mono);font-size:13px">${c[1]}</b><div style="font-size:10px;color:var(--faint)">${c[0]}</div></div>`).join('')}</div></div>`;
+}
+
+/* ---------- 实体档案 ---------- */
+RENDERERS.entity=()=>{
+  const types=[...new Set(DATA.graph.nodes.map(n=>n.type))];
+  const et=state.entityType||'CountryJurisdiction';
+  const list=DATA.graph.nodes.filter(n=>n.type===et);
+  const id=state.entityId&&DATA.graph.nodes.some(n=>n.id===state.entityId)?state.entityId:(list[0]&&list[0].id);
+  const node=DATA.graph.nodes.find(n=>n.id===id);
+  const nb=node?neighborhood(node.id,1):{nodes:[],edges:[]};
+  return `<div style="margin-bottom:4px"><h2 style="font-size:23px">实体档案</h2>
+    <p style="color:var(--muted);font-size:13px;margin-top:5px">按类型浏览样本实体，查看其有界邻域网络与档案属性。</p></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:18px 0">
+    ${types.map(tp=>`<button class="chip" data-et="${tp}" style="${et===tp?'background:var(--grad);color:#05120d;border-color:transparent':''}">
+      <span class="d" style="background:${TYPE_COLORS[tp]}"></span>${TYPE_LABEL[tp]||tp} · ${DATA.graph.nodes.filter(n=>n.type===tp).length}</button>`).join('')}</div>
+  <div class="grid" style="grid-template-columns:280px 1fr;align-items:start">
+    <div class="tablewrap" style="max-height:560px;overflow-y:auto">
+      <table class="data" style="min-width:0"><tbody>
+        ${list.map(n=>`<tr data-eid="${esc(n.id)}" class="${id===n.id?'sel':''}" style="cursor:pointer"><td style="font-size:12px;font-weight:600">
+          <div style="display:flex;align-items:center;gap:8px"><i style="width:8px;height:8px;border-radius:50%;background:${TYPE_COLORS[n.type]};flex:none"></i>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(n.label)}</span></div></td></tr>`).join('')}</tbody></table>
+    </div>
+    ${node?`<div>
+      <div class="graph-box" style="height:400px"><canvas id="nbGraph"></canvas>
+        <div class="graph-info">1 跳邻域 · ${nb.nodes.length} 节点 / ${nb.edges.length} 边</div></div>
+      <div class="card" style="margin-top:14px">
+        <div class="card-h"><h3 style="font-size:14px">实体属性</h3><span class="badge green">${node.jurisdiction||''}</span></div>
+        ${detailRow('名称',esc(node.label))}
+        ${detailRow('类型',(TYPE_LABEL[node.type]||node.type)+' <span class="mono" style="color:var(--faint)">'+node.type+'</span>')}
+        ${detailRow('辖区',node.jurisdiction||'—')}
+        ${detailRow('节点 ID',`<span class="mono" style="font-size:10.5px">${esc(node.id)}</span>`)}
+        ${detailRow('邻接关系',nb.edges.length+' 条')}
+      </div></div>`:'<div class="card">该类型暂无实体</div>'}
+  </div>`;
+};
+function neighborhood(id){
+  const keep=new Set([id]);
+  for(const e of DATA.graph.edges){
+    if(e.s===id)keep.add(e.t);else if(e.t===id)keep.add(e.s);
+  }
+  return {nodes:DATA.graph.nodes.filter(n=>keep.has(n.id)),edges:DATA.graph.edges.filter(e=>keep.has(e.s)&&keep.has(e.t))};
+}
+
+/* ---------- 数据下载 ---------- */
+RENDERERS.downloads=()=>{
+  const r=DATA.release;
+  const citation=`PestKG. ${r.title}, release ${r.version}. Published ${r.published_at}. https://github.com/WangRain-rt/MyPestKg`;
+  return `<div style="margin-bottom:4px"><h2 style="font-size:23px">数据下载</h2>
+    <p style="color:var(--muted);font-size:13px;margin-top:5px">下载前可核验版本身份、字节数、SHA256 校验和与许可。</p></div>
+  <div class="grid grid-3" style="margin:20px 0">
+    <div class="card"><div style="font-size:11px;color:var(--faint);font-weight:700">数据版本</div><div class="mono" style="color:var(--green);font-size:13px;margin-top:7px">${r.version}</div></div>
+    <div class="card"><div style="font-size:11px;color:var(--faint);font-weight:700">发布 / 截止</div><div style="font-size:13px;margin-top:7px">${r.published_at}<br><span style="color:var(--faint);font-size:11px">cutoff ${r.cutoff}</span></div></div>
+    <div class="card"><div style="font-size:11px;color:var(--faint);font-weight:700">许可协议</div><div style="font-size:13px;margin-top:7px">CC BY 4.0<br><span style="color:var(--faint);font-size:11px">项目衍生数据</span></div></div>
+  </div>
+  <div class="card" style="border-color:rgba(251,191,36,.28);margin-bottom:20px">
+    <div style="display:flex;gap:11px;align-items:center;font-size:12.5px;color:var(--muted)">
+      <span class="badge amber">BLOCKED</span>分发状态：${r.distribution_status} —— 当前仅提供有界浏览样本，公开分发包待清单重建。</div></div>
+  <div class="grid grid-2">
+    ${DATA.downloads.map((a,i)=>{
+      const fname=(a.name||'').split('/').pop();
+      return `<div class="card" style="padding:18px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:11px;background:var(--surface-3);display:grid;place-items:center;color:var(--green);flex:none">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg></div>
+          <div style="min-width:0"><div style="font-size:13.5px;font-weight:700">${esc(fname)}</div>
+          <div class="mono" style="font-size:10px;color:var(--faint)">${esc(a.category)} · ${bytesFmt(a.bytes)}</div></div>
+          <span class="badge green" style="margin-left:auto">${a.format.toUpperCase()}</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:13px;padding:9px 11px;background:var(--surface);border-radius:9px">
+          <span style="font-size:10px;color:var(--faint);flex:none">SHA256</span>
+          <span class="mono" style="font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.checksum)}…</span>
+          <button class="iconbtn" style="width:28px;height:28px;margin-left:auto" data-copycs="${esc(a.checksum)}" aria-label="复制校验和"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:11px" data-dl="${i}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>下载样本</button>
+      </div>`;}).join('')}
+  </div>
+  <div class="grid grid-2" style="margin-top:20px">
+    <div class="card"><div class="card-h"><h3>校验方法</h3></div>
+      <p style="font-size:12px;color:var(--muted)">下载后用对应工具比对 SHA256：</p>
+      <div class="mono" style="font-size:11.5px;background:var(--bg-3);border-radius:9px;padding:11px;margin-top:9px;color:var(--green)">certutil -hashfile 文件 SHA256<br>sha256sum 文件</div></div>
+    <div class="card"><div class="card-h"><h3>引用格式</h3><button class="iconbtn" style="width:30px;height:30px;margin-left:auto" id="copyCite" aria-label="复制引用"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
+      <p style="font-size:11.5px;color:var(--muted);line-height:1.7">${esc(citation)}</p></div>
+  </div>`;
+};
+
+/* ---------- 方法架构 ---------- */
+RENDERERS.methods=()=>{
+  const steps=[
+    ['官方源采集','从各辖区官方登记网站采集原始快照，记录 source_sha256 与行数，保证可追溯。','#34e0a1',`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`],
+    ['国家图构建','按统一 schema 映射为 9 类节点与关系，检测断边并构建各辖区独立知识图。','#22d3ee',`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><circle cx="12" cy="12" r="2.5"/></svg>`],
+    ['联邦对齐','在不合并原始库的前提下匹配共享节点（4.5 万），建立 4.9 万联邦对齐边。','#f472b6',`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>`],
+    ['校验与发布','哈希校验机器数据，发布有界浏览样本与元数据，重建清单后公开分发。','#fbbf24',`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>`]
+  ];
+  const ntRows=Object.entries(DATA.release.node_types).map(([k,v],i)=>({label:k,value:v,color:TYPE_COLORS[k]||PAL[i%PAL.length]}));
+  const relRows=[...new Set(Object.entries(DATA.release.relation_types).map(([k])=>k))].map((k,i)=>{
+    const v=DATA.release.relation_types[k];return {label:k,value:v,color:PAL[i%PAL.length]};
+  });
+  return `<div style="margin-bottom:4px"><h2 style="font-size:23px">方法与架构</h2>
+    <p style="color:var(--muted);font-size:13px;margin-top:5px">联邦式多国农药登记知识图谱的构建流程、数据模型与接口契约。</p></div>
+  <div class="grid grid-4" style="margin:22px 0">
+    ${steps.map((s,i)=>`<div class="card rise" style="overflow:visible">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:11px">
+        <div style="width:40px;height:40px;border-radius:11px;background:${s[2]}1f;color:${s[2]};display:grid;place-items:center">${s[3]}</div>
+        <span class="mono" style="font-size:13px;color:${s[2]};font-weight:700">0${i+1}</span></div>
+      <h3 style="font-size:14px;margin-bottom:6px">${s[0]}</h3>
+      <p style="font-size:11.5px;color:var(--muted)">${s[1]}</p></div>`).join('')}
+  </div>
+  <div class="grid grid-2">
+    <div class="card"><div class="card-h"><h3>节点类型清单（全量）</h3><span class="sub">9 node types</span></div>
+      ${hBars(ntRows,{labelW:'170px',valW:'72px',compact:false})}</div>
+    <div class="card"><div class="card-h"><h3>关系类型清单（全量）</h3><span class="sub">relation types</span></div>
+      ${hBars(relRows,{labelW:'170px',valW:'72px'})}</div>
+  </div>
+  <div class="grid grid-2" style="margin-top:20px">
+    <div class="card"><div class="card-h"><h3>API 契约 v1.1（只读 REST）</h3></div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+        ${[['GET','releases · 版本列表'],['GET','release · 版本详情/清单'],['GET','countries · 辖区'],['GET','explore · 有界浏览'],['GET','compare · Q1–Q5 对比'],['GET','entity · 实体邻域'],['GET','downloads · 制品目录']]
+          .map(e=>`<div style="display:flex;align-items:center;gap:11px;padding:8px 11px;background:var(--surface);border-radius:9px">
+            <span class="badge green" style="background:rgba(52,224,161,.15)">${e[0]}</span><span style="color:var(--muted)">/api/v1/${e[1]}</span></div>`).join('')}
+      </div></div>
+    <div class="card"><div class="card-h"><h3>已知限制</h3><span class="sub">limitations</span></div>
+      ${DATA.release.known_limitations.map((l,i)=>`<div style="display:flex;gap:10px;padding:10px 0;border-top:${i?'1px solid var(--border)':'none'}">
+        <span class="mono" style="color:var(--amber);font-size:11px;flex:none">L${i+1}</span>
+        <p style="font-size:11.5px;color:var(--muted)">${esc(l)}</p></div>`).join('')}</div>
+  </div>`;
+};
+
+/* ============================================================
+   图谱实例管理 & 后置初始化
+   ============================================================ */
+let _fgs=[];
+function clearGraphs(){_fgs.forEach(f=>{try{f.destroy();}catch(e){}});_fgs=[];}
+function makeGraph(cv,nodes,edges,opt){
+  if(!cv)return null;
+  const fg=new ForceGraph(cv,Object.assign({nodes,edges},opt||{}));
+  _fgs.push(fg);return fg;
+}
+function filterByType(nodes,edges,hidden){
+  const ns=nodes.filter(n=>!hidden.has(n.type));
+  const ids=new Set(ns.map(n=>n.id));
+  const es=edges.filter(e=>ids.has(e.s)&&ids.has(e.t));
+  return {nodes:ns,edges:es};
+}
+afterRender.overview=()=>{
+  clearGraphs();
+  const g=DATA.graph;
+  /* hero 点缀图（紧凑） */
+  makeGraph($('#heroGraph'),g.nodes,g.edges,{charge:650,link:40});
+  /* 主图（可点节点进入实体档案） */
+  buildMainGraph();
+};
+function buildMainGraph(){
+  const hidden=state.graphHidden;
+  const f=filterByType(DATA.graph.nodes,DATA.graph.edges,hidden);
+  makeGraph($('#mainGraph'),f.nodes,f.edges,{
+    charge:1250,link:62,
+    onPick:n=>{state.entityType=n.type;state.entityId=n.id;go('entity');}
+  });
+  /* legend 状态同步 */
+  $$('#mainLegend .lg').forEach(el=>el.classList.toggle('off',hidden.has(el.dataset.type)));
+}
+afterRender.explore=()=>{
+  clearGraphs();
+  const sel=getSelRow();state.selRow=sel.use_id;
+  const jur=sel.jurisdiction;
+  let nodes=DATA.graph.nodes.filter(n=>n.jurisdiction===jur);
+  let info;
+  if(!nodes.length){
+    nodes=DATA.graph.nodes;info='该辖区关系样本暂缺，展示联邦样本总览';
+  }else{info=jur+' 局部网络';}
+  const ids=new Set(nodes.map(n=>n.id));
+  const edges=DATA.graph.edges.filter(e=>ids.has(e.s)&&ids.has(e.t));
+  makeGraph($('#localGraph'),nodes,edges,{charge:1000,link:52});
+  const gi=$('#localGraph').previousElementSibling;
+};
+afterRender.entity=()=>{
+  clearGraphs();
+  const node=DATA.graph.nodes.find(n=>n.id===state.entityId)||
+    DATA.graph.nodes.find(n=>n.type===(state.entityType||'CountryJurisdiction'));
+  if(!node)return;
+  state.entityId=node.id;
+  const nb=neighborhood(node.id);
+  makeGraph($('#nbGraph'),nb.nodes,nb.edges,{charge:1050,link:56});
+};
+afterRender.compare=()=>clearGraphs();
+afterRender.downloads=()=>clearGraphs();
+afterRender.methods=()=>clearGraphs();
+
+/* ============================================================
+   复制
+   ============================================================ */
+function copyText(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast('已复制到剪贴板')).catch(()=>fallbackCopy(t));}
+  else fallbackCopy(t);
+}
+function fallbackCopy(t){
+  const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast('已复制到剪贴板');}catch(e){toast('复制失败，请手动选择');}
+  document.body.removeChild(ta);
+}
+
+/* ============================================================
+   全局事件委托
+   ============================================================ */
+function bindEvents(){
+  /* 导航 */
+  $('#nav').addEventListener('click',e=>{const a=e.target.closest('[data-route]');if(a){closeSide();go(a.dataset.route);}});
+  document.addEventListener('click',e=>{
+    const goEl=e.target.closest('[data-go]');if(goEl){go(goEl.dataset.go);return;}
+    const cmp=e.target.closest('[data-cmp]');if(cmp){state.cmpTab=cmp.dataset.cmp;render();return;}
+    const et=e.target.closest('[data-et]');if(et){state.entityType=et.dataset.et;state.entityId=null;render();return;}
+    const eid=e.target.closest('[data-eid]');if(eid){state.entityId=eid.dataset.eid;render();return;}
+    const use=e.target.closest('[data-use]');if(use){state.selRow=use.dataset.use;render();return;}
+    const dl=e.target.closest('[data-dl]');if(dl){toast('演示环境：分发包待清单重建，部署后可下载');return;}
+    const srcu=e.target.closest('[data-srcurl]');if(srcu){toast('该来源为内部站点编号，请在部署环境访问');return;}
+    const cpu=e.target.closest('[data-copyuse]');if(cpu){copyText(cpu.dataset.copyuse);return;}
+    const ccs=e.target.closest('[data-copycs]');if(ccs){copyText(ccs.dataset.copycs);return;}
+    if(e.target.closest('#copyCite')){copyText(`PestKG. ${DATA.release.title}, release ${DATA.release.version}. Published ${DATA.release.published_at}. https://github.com/WangRain-rt/MyPestKg`);return;}
+    /* 图谱图例过滤 */
+    const lg=e.target.closest('#mainLegend .lg');if(lg){const tp=lg.dataset.type;
+      state.graphHidden.has(tp)?state.graphHidden.delete(tp):state.graphHidden.add(tp);
+      clearGraphs();buildMainGraph();return;}
+    if(e.target.closest('#gReheat')){clearGraphs();buildMainGraph();toast('已重新布局');return;}
+    if(e.target.closest('#gFull')){openGraphFull();return;}
+  });
+  /* 筛选 */
+  document.addEventListener('click',e=>{
+    if(e.target.closest('#fApply')){
+      state.explore.jur=$('#fJur').value;state.explore.status=$('#fStatus').value;
+      state.explore.q=$('#fQ').value;state.selRow=null;render();
+    }else if(e.target.closest('#fReset')){
+      state.explore={jur:'',q:'',status:''};state.selRow=null;render();
+    }
+  });
+  /* 语言 */
+  $('#langseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+    state.lang=b.dataset.lang;$$('#langseg button').forEach(x=>x.classList.toggle('on',x===b));render();});
+  /* 全局搜索 */
+  $('#globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){
+    state.explore.q=e.target.value;state.selRow=null;go('explore');}});
+  /* 移动端菜单 */
+  $('#burger').addEventListener('click',()=>{$('#sidebar').classList.add('open');$('#overlay').classList.add('show');});
+  $('#overlay').addEventListener('click',closeSide);
+  /* 灯箱 */
+  $('#lbClose').addEventListener('click',closeLB);
+  $('#lightbox').addEventListener('click',e=>{if(e.target.id==='lightbox')closeLB();});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLB();closeSide();}});
+}
+function closeSide(){$('#sidebar').classList.remove('open');$('#overlay').classList.remove('show');}
+/* 图谱全屏灯箱 */
+function openGraphFull(){
+  openLB(`<div class="graph-box" style="height:74vh"><canvas id="lbGraph"></canvas>
+    <div class="graph-info">联邦知识网络 · 全屏</div></div>`);
+  requestAnimationFrame(()=>{
+    const f=filterByType(DATA.graph.nodes,DATA.graph.edges,state.graphHidden);
+    makeGraph($('#lbGraph'),f.nodes,f.edges,{charge:1500,link:76,
+      onPick:n=>{closeLB();state.entityType=n.type;state.entityId=n.id;go('entity');}});
+  });
+}
+const _closeLB=closeLB;
+closeLB=function(){_closeLB();clearGraphs();if(state.route==='overview')buildMainGraph();};
+
+/* ============================================================
+   启动
+   ============================================================ */
+function init(){
+  bindEvents();
+  const r=(location.hash||'').replace('#','');
+  go(ROUTES.includes(r)?r:'overview');
+}
+init();
+</script>
+</body>
+</html>
