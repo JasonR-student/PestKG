@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PestKG 前端优化方案 v1.0</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f6254'/%3E%3Cpath d='M10 22a6 6 0 0 1 0-12M22 10a6 6 0 0 1 0 12M10 16h12' stroke='white' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+/* ============ Design tokens (与 PestKG 门户同源) ============ */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --surface-subtle:#f8faf9;
+  --ink:#17201d; --muted:#64716b; --faint:#87938d;
+  --border:#d6ddd9; --border-strong:#b8c3bd;
+  --green:#1f6254; --green-700:#17493f; --green-soft:#e7f0ed;
+  --coral:#b9583d; --coral-soft:#f6e9e4;
+  --blue:#3c6e97; --blue-soft:#e9f0f6;
+  --amber:#a87c2c; --amber-soft:#faf3e2;
+  --purple:#7b5d91;
+  --shadow:0 14px 38px rgba(23,32,29,.11);
+  --radius-sm:3px; --radius:5px; --radius-lg:7px;
+  --dur:180ms; --ease:cubic-bezier(.2,.6,.2,1);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --sans:"Segoe UI Variable","Noto Sans SC","Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.72;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+::selection{background:var(--green); color:#fff}
+
+/* ============ Layout: doc TOC + content ============ */
+.doc{display:flex; align-items:flex-start; max-width:1280px; margin:0 auto}
+.toc{
+  position:sticky; top:0; width:248px; height:100vh; overflow-y:auto;
+  padding:26px 18px; border-right:1px solid var(--border);
+  background:var(--surface-subtle); flex-shrink:0;
+}
+.toc-brand{display:flex; align-items:center; gap:10px; margin-bottom:20px}
+.toc-brand svg{flex-shrink:0}
+.toc-brand strong{display:block; font-size:14px; line-height:1.3}
+.toc-brand small{color:var(--muted); font-size:10px}
+.toc nav a{
+  display:block; padding:6px 10px; border-radius:var(--radius-sm);
+  color:var(--muted); font-size:12.5px; text-decoration:none;
+  border-left:2px solid transparent; transition:all var(--dur) var(--ease);
+}
+.toc nav a:hover{color:var(--ink); background:#edf1ef}
+.toc nav a.active{color:var(--green); border-left-color:var(--green); background:var(--green-soft); font-weight:700}
+.toc .toc-sub{padding-left:22px; font-size:11.5px}
+.content{min-width:0; flex:1; padding:0 46px 100px; max-width:980px}
+
+/* mobile toc jump */
+.toc-jump{display:none; width:100%; height:42px; padding:0 12px; border:1px solid var(--border-strong);
+  border-radius:var(--radius); background:var(--surface); font-family:var(--sans); font-size:13px; color:var(--ink)}
+
+/* ============ Hero ============ */
+.hero{padding:58px 0 34px; border-bottom:1px solid var(--border); margin-bottom:8px}
+.hero .eyebrow{display:inline-flex; align-items:center; gap:7px; padding:4px 11px; border:1px solid var(--border-strong);
+  border-radius:20px; color:var(--green); font-size:11px; font-weight:700; background:var(--surface)}
+.hero h1{margin:18px 0 10px; font-size:38px; line-height:1.18; letter-spacing:-.5px}
+.hero .lead{max-width:720px; color:var(--muted); font-size:16px; margin:0 0 22px}
+.hero-meta{display:flex; flex-wrap:wrap; gap:10px 26px; font-size:12px; color:var(--muted)}
+.hero-meta strong{color:var(--ink)}
+
+/* ============ Sections ============ */
+section.block{padding:40px 0 8px; scroll-margin-top:20px}
+.sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:8px}
+.sec-num{font-family:var(--mono); font-size:13px; color:var(--green); font-weight:700}
+h2{font-size:25px; margin:0; letter-spacing:-.3px}
+.sec-sub{color:var(--muted); font-size:13.5px; margin:0 0 20px; max-width:760px}
+h3{font-size:17px; margin:30px 0 10px}
+h4{font-size:14.5px; margin:22px 0 8px}
+p{margin:10px 0}
+a.inline{color:var(--green); font-weight:600; text-decoration:none; border-bottom:1px solid rgba(31,98,84,.35)}
+a.inline:hover{border-bottom-color:var(--green)}
+code.inline{font-family:var(--mono); font-size:.86em; background:#e9eeeb; padding:2px 6px; border-radius:3px; color:#17493f}
+ul.clean,ol.clean{padding-left:22px; margin:10px 0}
+ul.clean li,ol.clean li{margin:6px 0}
+
+/* ============ Tags / badges ============ */
+.tag{display:inline-flex; align-items:center; gap:5px; padding:2px 9px; border-radius:20px;
+  font-size:10.5px; font-weight:800; letter-spacing:.3px; white-space:nowrap}
+.tag-p0{background:var(--coral-soft); color:var(--coral)}
+.tag-p1{background:var(--amber-soft); color:var(--amber)}
+.tag-p2{background:var(--blue-soft); color:var(--blue)}
+.tag-done{background:var(--green-soft); color:var(--green)}
+.chip{display:inline-block; padding:1px 8px; border:1px solid var(--border-strong); border-radius:var(--radius-sm);
+  font-family:var(--mono); font-size:10.5px; color:var(--muted); background:var(--surface)}
+
+/* ============ Callouts ============ */
+.callout{display:flex; gap:13px; padding:15px 18px; border-radius:var(--radius); margin:18px 0;
+  border:1px solid var(--border); background:var(--surface); font-size:13.5px}
+.callout .ico{flex-shrink:0; margin-top:2px}
+.callout--key{border-color:#bcd4cc; background:var(--green-soft)}
+.callout--warn{border-color:#e4c98e; background:var(--amber-soft)}
+.callout p{margin:4px 0}
+.callout strong{font-size:13.5px}
+
+/* ============ Cards / grids ============ */
+.grid{display:grid; gap:16px}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--surface); padding:18px 20px; min-width:0}
+.card h4{margin-top:0; display:flex; align-items:center; gap:8px}
+.card .ico{display:inline-grid; place-items:center; width:30px; height:30px; border-radius:var(--radius);
+  background:var(--green-soft); color:var(--green); flex-shrink:0}
+.card p{font-size:13px; color:var(--muted); margin-bottom:0}
+.card ul{font-size:13px; margin:8px 0 0; padding-left:18px}
+.card ul li{margin:4px 0}
+
+/* score ring */
+.score-wrap{display:flex; align-items:center; gap:24px; flex-wrap:wrap}
+.score-ring{position:relative; width:132px; height:132px; flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring .v{position:absolute; inset:0; display:grid; place-content:center; text-align:center}
+.score-ring .v strong{font-size:30px; line-height:1}
+.score-ring .v small{font-size:10px; color:var(--muted)}
+.score-bars{flex:1; min-width:260px}
+.score-bar{display:grid; grid-template-columns:110px 1fr 44px; align-items:center; gap:10px; margin:7px 0; font-size:12px}
+.score-bar .track{height:8px; border-radius:4px; background:#e4e9e6; overflow:hidden}
+.score-bar .fill{height:100%; border-radius:4px; background:var(--green)}
+.score-bar .num{font-family:var(--mono); text-align:right; font-weight:700}
+
+/* ============ Tables ============ */
+.table-wrap{overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--surface); margin:18px 0}
+table.data{width:100%; border-collapse:collapse; font-size:12.5px; min-width:560px}
+table.data th{position:sticky; top:0; background:#f5f7f6; text-align:left; padding:10px 14px;
+  font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); border-bottom:1px solid var(--border-strong)}
+table.data td{padding:11px 14px; border-bottom:1px solid #e8ecea; vertical-align:top}
+table.data tr:last-child td{border-bottom:0}
+table.data td code{font-family:var(--mono); font-size:11px; color:var(--blue)}
+table.data .id{font-family:var(--mono); font-size:11px; color:var(--muted)}
+table.data .strong{font-weight:700}
+
+/* ============ Token swatches ============ */
+.swatch-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px; margin:16px 0}
+.swatch{border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); overflow:hidden}
+.swatch .c{height:46px}
+.swatch .meta{padding:7px 10px; font-size:10.5px}
+.swatch .meta code{font-family:var(--mono); font-size:10px; color:var(--blue); display:block}
+.swatch .meta small{color:var(--muted)}
+
+/* ============ Before / after ============ */
+.ba{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0}
+.ba .pane{border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; background:var(--surface)}
+.ba .pane .bar{padding:8px 14px; font-size:11.5px; font-weight:800; letter-spacing:.4px}
+.ba .before .bar{background:#f1e8e5; color:var(--coral)}
+.ba .after .bar{background:var(--green-soft); color:var(--green)}
+.ba .pane .body{padding:14px; font-size:12.5px}
+.ba .pane .body ul{margin:0; padding-left:17px}
+.ba .pane .body li{margin:5px 0}
+
+/* ============ Timeline / roadmap ============ */
+.phase{display:grid; grid-template-columns:150px 1fr; gap:0; border:1px solid var(--border);
+  border-radius:var(--radius-lg); background:var(--surface); margin:16px 0; overflow:hidden}
+.phase .aside{padding:20px 18px; border-right:1px solid var(--border); background:var(--surface-subtle)}
+.phase .aside .ph{font-family:var(--mono); font-size:11px; color:var(--muted)}
+.phase .aside h4{margin:4px 0 6px; font-size:16px}
+.phase .aside .eff{font-size:11px; color:var(--muted)}
+.phase .aside .eff strong{color:var(--green)}
+.phase .main{padding:16px 20px}
+.phase .main .task{display:flex; gap:10px; align-items:flex-start; padding:7px 0; border-bottom:1px dashed #e6ebe8; font-size:13px}
+.phase .main .task:last-child{border-bottom:0}
+.phase .main .task .t-dot{width:7px; height:7px; border-radius:50%; margin-top:8px; flex-shrink:0}
+.phase .main .task small{color:var(--muted)}
+
+/* gantt */
+.gantt{margin:18px 0; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--surface); padding:18px; overflow-x:auto}
+.gantt svg{display:block; min-width:640px}
+
+/* ============ Checklist ============ */
+.checklist{border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--surface); padding:8px 20px; margin:16px 0}
+.checklist .ci{display:flex; gap:11px; align-items:flex-start; padding:9px 0; border-bottom:1px solid #eef2f0; font-size:13.5px}
+.checklist .ci:last-child{border-bottom:0}
+.checklist .box{width:18px; height:18px; border:2px solid var(--green); border-radius:4px; flex-shrink:0; margin-top:2px; position:relative}
+.checklist .box::after{content:""; position:absolute; left:4px; top:1px; width:5px; height:9px;
+  border:solid var(--green); border-width:0 2px 2px 0; transform:rotate(45deg)}
+.checklist small{color:var(--muted)}
+
+/* ============ Footer ============ */
+.doc-footer{margin-top:60px; padding-top:24px; border-top:1px solid var(--border);
+  display:flex; justify-content:space-between; gap:16px; font-size:11.5px; color:var(--muted); flex-wrap:wrap}
+
+/* ============ Responsive ============ */
+@media (max-width:1020px){
+  .toc{display:none}
+  .doc{display:block}
+  .content{padding:0 22px 80px; max-width:100%}
+  .toc-jump{display:block; margin:16px 0 0}
+  .hero{padding:34px 0 26px}
+  .hero h1{font-size:29px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .ba{grid-template-columns:1fr}
+  .phase{grid-template-columns:1fr}
+  .phase .aside{border-right:0; border-bottom:1px solid var(--border)}
+}
+@media (max-width:560px){
+  body{font-size:14px}
+  .content{padding:0 15px 60px}
+  .hero h1{font-size:25px}
+  h2{font-size:21px}
+  .score-wrap{gap:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition-duration:.01ms !important; animation-duration:.01ms !important}
+}
+@media print{
+  .toc,.toc-jump{display:none}
+  .content{padding:0; max-width:100%}
+  body{background:#fff}
+  section.block{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="doc">
+
+<!-- ============ TOC ============ -->
+<aside class="toc">
+  <div class="toc-brand">
+    <svg width="34" height="34" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#1f6254"/><path d="M10 22a6 6 0 0 1 0-12M22 10a6 6 0 0 1 0 12M10 16h12" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    <div><strong>PestKG 前端优化方案</strong><small>FRONTEND OPTIMIZATION · v1.0</small></div>
+  </div>
+  <nav id="tocNav">
+    <a href="#summary">01 执行摘要</a>
+    <a href="#status">02 现状盘点</a>
+    <a href="#diagnosis">03 问题诊断</a>
+    <a href="#tokens">04 设计系统补全</a>
+    <a href="#ia">05 信息架构与导航</a>
+    <a href="#graph">06 图谱画布重构</a>
+    <a href="#search">07 全局搜索</a>
+    <a href="#states">08 状态体系</a>
+    <a href="#i18n">09 国际化与数字格式</a>
+    <a href="#explore">10 筛选工作台</a>
+    <a href="#perf">11 性能优化</a>
+    <a href="#deploy">12 部署与 Web 服务器</a>
+    <a href="#test">13 质量与测试</a>
+    <a href="#roadmap">14 实施路线图</a>
+    <a href="#acceptance">15 验收标准</a>
+    <a href="#appendix">附录 改动清单</a>
+  </nav>
+</aside>
+
+<main class="content">
+<select class="toc-jump" id="tocJump" aria-label="跳转到章节"></select>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <span class="eyebrow">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    内部技术方案 · 基于代码审查
+  </span>
+  <h1>PestKG 知识图谱门户<br>前端优化方案</h1>
+  <p class="lead">在不改变"研究证据工作台"定位与常青绿视觉方向的前提下，修复功能缺陷、补全设计系统与状态体系、重构图谱画布，使门户从"功能可跑"提升为"可公开发布、可长期运维"。</p>
+  <div class="hero-meta">
+    <span>方案版本 <strong>v1.0</strong></span>
+    <span>审查对象 <strong>main 分支 @ 2026-09-24</strong></span>
+    <span>数据版本 <strong>2026.08.3_federated</strong></span>
+    <span>API 契约 <strong>v1.1</strong></span>
+    <span>预计工作量 <strong>16–20 人天</strong></span>
+  </div>
+</header>
+
+<!-- ============ 01 执行摘要 ============ -->
+<section class="block" id="summary">
+  <div class="sec-head"><span class="sec-num">01</span><h2>执行摘要</h2></div>
+  <p class="sec-sub">现有前端架构规范、视觉统一、版本治理严谨，已具备良好基础；主要短板集中在<strong>少量功能缺陷、图谱与搜索交互、状态体系完整性、国际化落地与测试覆盖</strong>五个方面。</p>
+
+  <div class="score-wrap">
+    <div class="score-ring">
+      <svg width="132" height="132" viewBox="0 0 132 132">
+        <circle cx="66" cy="66" r="56" fill="none" stroke="#e4e9e6" stroke-width="11"/>
+        <circle cx="66" cy="66" r="56" fill="none" stroke="#1f6254" stroke-width="11" stroke-linecap="round"
+          stroke-dasharray="239.5" stroke-dashoffset="76.6"/>
+      </svg>
+      <div class="v"><div><strong>68</strong><small>现状综合分<br>（审查评估）</small></div></div>
+    </div>
+    <div class="score-bars">
+      <div class="score-bar"><span>架构 / 工程化</span><span class="track"><span class="fill" style="width:85%"></span></span><span class="num">85</span></div>
+      <div class="score-bar"><span>视觉一致性</span><span class="track"><span class="fill" style="width:80%"></span></span><span class="num">80</span></div>
+      <div class="score-bar"><span>功能完整度</span><span class="track"><span class="fill" style="width:70%"></span></span><span class="num">70</span></div>
+      <div class="score-bar"><span>交互体验</span><span class="track"><span class="fill" style="width:65%"></span></span><span class="num">65</span></div>
+      <div class="score-bar"><span>无障碍</span><span class="track"><span class="fill" style="width:70%"></span></span><span class="num">70</span></div>
+      <div class="score-bar"><span>国际化落地</span><span class="track"><span class="fill" style="width:55%"></span></span><span class="num">55</span></div>
+      <div class="score-bar"><span>测试覆盖</span><span class="track"><span class="fill" style="width:50%"></span></span><span class="num">50</span></div>
+    </div>
+  </div>
+
+  <h3>优化目标</h3>
+  <div class="grid grid-3">
+    <div class="card">
+      <h4><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span>缺陷清零</h4>
+      <p>修复死按钮、实体属性渲染、404 处理等 6 项 P0 问题；补齐服务不可用时的全局降级与 ErrorBoundary，杜绝白屏。</p>
+    </div>
+    <div class="card">
+      <h4><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6m11-11h-6M7 12H1m17.07-7.07l-4.24 4.24M9.17 14.83l-4.24 4.24m0-14.14l4.24 4.24m5.66 5.66l4.24 4.24"/></svg></span>体验达标</h4>
+      <p>图谱画布增量更新、按规模选布局、配图例与关系标签；搜索支持完整键盘操作；加载/空/错/阻断四态统一。</p>
+    </div>
+    <div class="card">
+      <h4><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>可运维</h4>
+      <p>设计 token 全量落地，页面文案 100% 走 i18n；修正缓存/压缩/安全头；核心逻辑单测 + E2E 全绿，综合分提升至 88+。</p>
+    </div>
+  </div>
+
+  <div class="callout callout--key">
+    <span class="ico" style="color:var(--green)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
+    <div><strong>三阶段推进</strong>
+    <p><strong>阶段一（3–4 天）P0 止血</strong>：功能缺陷与全局降级；<strong>阶段二（8–10 天）体验达标</strong>：图谱重构、状态体系、i18n；<strong>阶段三（5–6 天）工程加固</strong>：token 替换、部署配置、测试补齐。详见 <a class="inline" href="#roadmap">第 14 节路线图</a>。</p></div>
+  </div>
+</section>
+
+<!-- ============ 02 现状盘点 ============ -->
+<section class="block" id="status">
+  <div class="sec-head"><span class="sec-num">02</span><h2>现状盘点</h2></div>
+  <p class="sec-sub">门户前端位于仓库 <code class="inline">apps/web</code>，是一套与 FastAPI 只读服务配套的单页应用（SPA），通过版本化 URL 与 <code class="inline">X-PestKG-Release</code> 请求头绑定不可变数据发布。</p>
+
+  <h3>技术栈</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:150px">层面</th><th style="width:260px">选型</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">框架 / 语言</td><td><code>React 19 · TypeScript 6</code></td><td>函数组件 + Hooks，严格类型</td></tr>
+        <tr><td class="strong">构建</td><td><code>Vite 8（Rolldown）</code></td><td>开发态 /api、/downloads 代理到 8000 端口</td></tr>
+        <tr><td class="strong">路由</td><td><code>react-router-dom 7</code></td><td>6 个页面全部 <code>lazy()</code> 懒加载，Suspense 兜底</td></tr>
+        <tr><td class="strong">数据请求</td><td><code>TanStack Query 5</code></td><td>统一 client：信封解析、错误码、Request-ID、Release 头；登记用途用 <code>useInfiniteQuery</code> 游标分页</td></tr>
+        <tr><td class="strong">图谱可视化</td><td><code>Cytoscape 3</code></td><td>动态 import 隔离在异步 chunk，BFS 1–2 跳受限子图</td></tr>
+        <tr><td class="strong">图表</td><td><code>ECharts 6</code></td><td>按需注册 Bar/Grid/Legend/Tooltip，体积可控</td></tr>
+        <tr><td class="strong">地图</td><td><code>d3-geo + topojson</code></td><td>Natural Earth 投影，按节点量对数分档着色，支持键盘操作</td></tr>
+        <tr><td class="strong">国际化</td><td><code>i18next</code></td><td>中英双语，语言偏好持久化（落地不完整，见第 9 节）</td></tr>
+        <tr><td class="strong">图标</td><td><code>lucide-react</code></td><td>统一线性图标</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>页面清单</h3>
+  <div class="grid grid-3">
+    <div class="card"><h4>研究概览 <span class="chip">/</span></h4><p>五列指标条、辖区覆盖地图、国家图谱规模排名、英文完成度条件图。</p></div>
+    <div class="card"><h4>数据探索 <span class="chip">/explore</span></h4><p>多维筛选带、登记用途证据表（游标分页）、选中记录的局部关系图。</p></div>
+    <div class="card"><h4>跨国比较 <span class="chip">/compare</span></h4><p>Q1–Q5 能力问题切换、条形图 + 动态列表格，支持结果集搜索与辖区过滤。</p></div>
+    <div class="card"><h4>实体详情 <span class="chip">/entity/:id</span></h4><p>双语首选名、标识与来源、类型化属性、一阶邻域图。</p></div>
+    <div class="card"><h4>数据下载 <span class="chip">/downloads</span></h4><p>版本元信息、阻断警告、制品目录、引用信息与完整性报告。</p></div>
+    <div class="card"><h4>方法与质量 <span class="chip">/methods</span></h4><p>四条原则、研究流程图、节点/关系清单、发布不变量。</p></div>
+  </div>
+
+  <h3>已经做对的事（优化中必须保留）</h3>
+  <div class="grid grid-2">
+    <div class="card">
+      <ul>
+        <li><strong>版本治理严谨</strong>：Release 不可变、URL 显式携带、跨版本不复用游标，阻断状态诚实暴露，不暗示数据已公开。</li>
+        <li><strong>性能基础良好</strong>：路由级代码分割、ECharts 按需注册、Cytoscape 动态加载、500 KiB chunk 硬检查。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <ul>
+        <li><strong>响应式断点完整</strong>：1280 / 1020 / 780 / 500 四档，表格保持横向滚动而非降级为卡片。</li>
+        <li><strong>无障碍起步正确</strong>：skip-link、focus-visible、地图键盘可达、<code>prefers-reduced-motion</code> 已处理。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 问题诊断 ============ -->
+<section class="block" id="diagnosis">
+  <div class="sec-head"><span class="sec-num">03</span><h2>问题诊断</h2></div>
+  <p class="sec-sub">下列 27 项问题均来自对 <code class="inline">apps/web/src</code> 的逐文件审查，按严重程度分为三级：<span class="tag tag-p0">P0 功能缺陷</span> <span class="tag tag-p1">P1 体验/一致性</span> <span class="tag tag-p2">P2 工程/部署</span>。</p>
+
+  <h3>P0 · 功能缺陷（6 项，阶段一必须修复）</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:46px">#</th><th style="width:120px">模块</th><th>问题</th><th style="width:230px">定位</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>图谱画布</td><td><span class="tag tag-p0">P0</span> 右下角全屏图标 <code>Maximize2</code> 无任何点击行为，是"死按钮"，用户预期可放大查看图谱。</td><td class="id">GraphCanvas.tsx:147</td></tr>
+        <tr><td>2</td><td>应用骨架</td><td><span class="tag tag-p0">P0</span> 服务 503（<code>no_release_available</code>）或暂无 Release 时，所有查询不启用，页面落到<strong>无错误信息的 ErrorState</strong>，用户不知发生了什么。</td><td class="id">ReleaseProvider / AppShell</td></tr>
+        <tr><td>3</td><td>实体详情</td><td><span class="tag tag-p0">P0</span> 类型化属性值为对象/数组时，<code>String(value)</code> 直接渲染成 <code>[object Object]</code>。</td><td class="id">EntityPage.tsx:68</td></tr>
+        <tr><td>4</td><td>实体详情</td><td><span class="tag tag-p0">P0</span> 实体不存在（404 <code>entity_not_found</code>）只显示英文 "Entity not found"，中文用户无母语提示、无返回入口。</td><td class="id">EntityPage.tsx:35</td></tr>
+        <tr><td>5</td><td>全局搜索</td><td><span class="tag tag-p0">P0</span> 容器声明了 <code>role="listbox"</code> 却不支持 ↑↓ 选择、Enter 确认、Esc 关闭；点击页面其他区域结果不收起，只能鼠标操作。</td><td class="id">GlobalSearch.tsx</td></tr>
+        <tr><td>6</td><td>跨国比较</td><td><span class="tag tag-p0">P0</span> 结果集搜索框每次按键立即发请求，无防抖，快速输入产生大量被中止的请求（虽不会出错，但浪费且抖动）。</td><td class="id">ComparePage.tsx:78</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>P1 · 体验与一致性（13 项，阶段二处理）</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:46px">#</th><th style="width:120px">模块</th><th>问题</th></tr></thead>
+      <tbody>
+        <tr><td>7</td><td>国际化</td><td><span class="tag tag-p1">P1</span> i18n 词条仅覆盖导航与 common，约 <strong>90% 页面文案是 <code>english ? '…' : '…'</code> 三元硬编码</strong>，语言切换易漏翻、无法统一维护。</td></tr>
+        <tr><td>8</td><td>数字格式</td><td><span class="tag tag-p1">P1</span> <code>formatCompact / formatInteger</code> 使用 <code>undefined</code>（浏览器）locale，英文界面 + 中文浏览器会显示"97.4 万"而非"974K"，与界面语言不一致。</td></tr>
+        <tr><td>9</td><td>图谱画布</td><td><span class="tag tag-p1">P1</span> graph / language / onNodeSelect 任一变化都<strong>销毁并重建整个 Cytoscape 实例</strong>，缩放与平移位置丢失，大图重新布局明显卡顿。</td></tr>
+        <tr><td>10</td><td>图谱画布</td><td><span class="tag tag-p1">P1</span> 深度 2、节点接近服务端上限（1000）时，<code>cose</code> 力导向布局计算缓慢、画面长时间不稳定。</td></tr>
+        <tr><td>11</td><td>图谱画布</td><td><span class="tag tag-p1">P1</span> 无节点类型<strong>图例</strong>；边不显示关系谓词，用户无法理解颜色与连线含义。</td></tr>
+        <tr><td>12</td><td>图谱画布</td><td><span class="tag tag-p1">P1</span> 节点颜色在组件内硬编码，与 token 不同源（如产品色 <code>#c06144</code> vs <code>--coral #b9583d</code>）。</td></tr>
+        <tr><td>13</td><td>状态体系</td><td><span class="tag tag-p1">P1</span> ErrorState 不显示 API 稳定错误码（<code>ApiError.code</code> 未被使用），也无"重试"操作，不符合概念文档要求。</td></tr>
+        <tr><td>14</td><td>状态体系</td><td><span class="tag tag-p1">P1</span> 无统一 EmptyState 组件，空态文案各处自行实现，且未保留"重置筛选"等恢复操作。</td></tr>
+        <tr><td>15</td><td>状态体系</td><td><span class="tag tag-p1">P1</span> 加载骨架为通用三条块，不匹配具体页面结构，数据到达时仍有明显布局位移（CLS）。</td></tr>
+        <tr><td>16</td><td>筛选工作台</td><td><span class="tag tag-p1">P1</span> 仅 jurisdiction 同步到 URL，其余筛选条件刷新或分享链接后丢失，无法复现分析现场。</td></tr>
+        <tr><td>17</td><td>数据下载</td><td><span class="tag tag-p1">P1</span> 静态"流水线已支持"四行清单与<strong>真实制品列表并存</strong>，版本处于阻断状态时容易让人误以为这些文件可下载。</td></tr>
+        <tr><td>18</td><td>通用</td><td><span class="tag tag-p1">P1</span> 实体 ID、来源记录 ID、引用（Citation）文本均无一键复制按钮，研究人员需手动选中。</td></tr>
+        <tr><td>19</td><td>方法页</td><td><span class="tag tag-p1">P1</span> 两张研究流程图无放大查看（灯箱），图中细节在小屏不可读；图片也未懒加载。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>P2 · 工程与部署（8 项，阶段三处理）</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:46px">#</th><th style="width:120px">模块</th><th>问题</th></tr></thead>
+      <tbody>
+        <tr><td>20</td><td>设计 token</td><td><span class="tag tag-p2">P2</span> <code>tokens.css</code> 仅含颜色，缺间距、圆角、字号、动效、层级（z-index）、布局尺寸 token，导致样式文件中 20+ 处硬编码颜色与数值。</td></tr>
+        <tr><td>21</td><td>Web 服务器</td><td><span class="tag tag-p2">P2</span> nginx：<code>index.html</code> 无 no-cache（发版后用户可能停留旧版）、hash 资源仅缓存 7 天、未开启 gzip、缺 CSP / X-Frame-Options 等安全头。</td></tr>
+        <tr><td>22</td><td>数据请求</td><td><span class="tag tag-p2">P2</span> 全局 <code>retry: 1</code> 对 404 / 422 等确定性 4xx 错误也重试一次，白白增加等待。</td></tr>
+        <tr><td>23</td><td>测试</td><td><span class="tag tag-p2">P2</span> 单元测试仅覆盖 client 与 format，图谱同步、搜索键盘、URL 序列化等核心逻辑无测试。</td></tr>
+        <tr><td>24</td><td>应用骨架</td><td><span class="tag tag-p2">P2</span> 缺 React <strong>ErrorBoundary</strong>，组件渲染期抛出异常会导致整页白屏。</td></tr>
+        <tr><td>25</td><td>路由</td><td><span class="tag tag-p2">P2</span> 无 404 页面，未知路径 <code>*</code> 直接重定向首页，错误 URL 没有任何反馈。</td></tr>
+        <tr><td>26</td><td>导航</td><td><span class="tag tag-p2">P2</span> "数据探索"导航项使用 Search（放大镜）图标，与顶栏全局搜索语义重复，建议改用 Network / Compass。</td></tr>
+        <tr><td>27</td><td>性能</td><td><span class="tag tag-p2">P2</span> 方法页图片未声明 <code>loading="lazy"</code> / <code>decoding="async"</code>，首屏携带不必要的图片流量。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <span class="ico" style="color:var(--muted)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+    <div><p>问题分布特征：<strong>P0 集中在"状态边界"与"交互承诺未兑现"</strong>（死按钮、无降级、承诺了 listbox 却无键盘行为）；P1 集中在图谱画布（4 项）与状态体系（3 项）；P2 集中在设计 token 与部署配置。这决定了路线图的资源投放重点。</p></div>
+  </div>
+</section>
+
+<!-- ============ 04 设计系统补全 ============ -->
+<section class="block" id="tokens">
+  <div class="sec-head"><span class="sec-num">04</span><h2>设计系统补全</h2></div>
+  <p class="sec-sub">现有 <code class="inline">tokens.css</code> 只定义了颜色，且组件中仍有 20+ 处硬编码。建议将 token 扩展为<strong>三层结构</strong>：原始值（Primitive）→ 语义角色（Semantic）→ 组件/节点类型（Component），所有组件只允许引用语义层及以上。</p>
+
+  <h3>Token 三层模型</h3>
+  <div class="grid grid-3">
+    <div class="card"><h4>① Primitive 原始值</h4><p>按色阶/刻度命名，不绑定用途，如 <code>--green-700</code>、<code>--space-2</code>。只在本层出现具体 hex/px。</p></div>
+    <div class="card"><h4>② Semantic 语义角色</h4><p>表达"是什么角色"，如 <code>--color-primary</code>、<code>--color-text-muted</code>、<code>--radius-panel</code>，组件主要引用本层。</p></div>
+    <div class="card"><h4>③ Component / Type</h4><p>节点类型等领域语义，如 <code>--node-product</code>、<code>--node-ingredient</code>，供图谱、图例、表格徽章共用。</p></div>
+  </div>
+
+  <h3>色板（含节点类型语义色）</h3>
+  <p>下列颜色在保留现有视觉的前提下统一归源；仅产品色由 <code>#c06144</code> 收敛到 <code>--coral #b9583d</code>、靶标色收敛到 <code>--amber</code>，其余保持不变。</p>
+  <div class="swatch-grid">
+    <div class="swatch"><div class="c" style="background:#17493f"></div><div class="meta"><code>--green-700</code><small>主色按下 / 深绿</small></div></div>
+    <div class="swatch"><div class="c" style="background:#1f6254"></div><div class="meta"><code>--green / --color-primary</code><small>主操作 / 常青绿</small></div></div>
+    <div class="swatch"><div class="c" style="background:#e7f0ed"></div><div class="meta"><code>--green-soft</code><small>选中底 / 浅绿</small></div></div>
+    <div class="swatch"><div class="c" style="background:#b9583d"></div><div class="meta"><code>--coral / --node-product</code><small>产品 / 对比强调</small></div></div>
+    <div class="swatch"><div class="c" style="background:#3c6e97"></div><div class="meta"><code>--blue / --node-ingredient</code><small>有效成分</small></div></div>
+    <div class="swatch"><div class="c" style="background:#a87c2c"></div><div class="meta"><code>--amber / --node-target</code><small>靶标 / 警告</small></div></div>
+    <div class="swatch"><div class="c" style="background:#7b964f"></div><div class="meta"><code>--node-crop</code><small>作物</small></div></div>
+    <div class="swatch"><div class="c" style="background:#7b5d91"></div><div class="meta"><code>--purple / --node-registration</code><small>登记</small></div></div>
+    <div class="swatch"><div class="c" style="background:#6d7772"></div><div class="meta"><code>--node-formulation</code><small>剂型</small></div></div>
+    <div class="swatch"><div class="c" style="background:#205b4f"></div><div class="meta"><code>--node-use</code><small>登记用途（中心节点）</small></div></div>
+    <div class="swatch"><div class="c" style="background:#17201d"></div><div class="meta"><code>--ink</code><small>主文字 / 炭黑</small></div></div>
+    <div class="swatch"><div class="c" style="background:#d6ddd9"></div><div class="meta"><code>--border</code><small>边框 / 冷灰</small></div></div>
+  </div>
+
+  <h3>新增非颜色 Token</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:130px">类别</th><th>建议 Token 与取值</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">间距（4px 基准）</td><td><code>--space-1:4 · --space-2:8 · --space-3:12 · --space-4:16 · --space-5:20 · --space-6:24 · --space-8:32</code></td></tr>
+        <tr><td class="strong">圆角</td><td><code>--radius-sm:3px · --radius:5px · --radius-lg:7px</code>（与概念文档 3–7px 一致，不用胶囊形容器）</td></tr>
+        <tr><td class="strong">字号</td><td><code>--fs-caption:10px · --fs-sm:11px · --fs-body:13px · --fs-h3:15px · --fs-h2:22px · --fs-h1:32px</code>，不随视口缩放</td></tr>
+        <tr><td class="strong">动效</td><td><code>--dur-fast:140ms · --dur:180ms · --dur-slow:220ms · --ease:cubic-bezier(.2,.6,.2,1)</code>，仅限透明度/位移反馈</td></tr>
+        <tr><td class="strong">层级 z-index</td><td><code>--z-topbar:30 · --z-scrim:35 · --z-sidebar:40 · --z-menu:60 · --z-modal:70</code></td></tr>
+        <tr><td class="strong">布局尺寸</td><td><code>--rail-width:232px · --topbar-h:64px · --content-max:1580px</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>落地方式</h3>
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>节点色单一来源</h4>
+      <p>新增 <code>shared/lib/node-theme.ts</code>，导出 <code>NODE_COLOR: Record&lt;NodeType,string&gt;</code> 与类型中文/英文名；GraphCanvas、图例、表格徽章统一引用，避免颜色多处维护。Cytoscape 不直接读 CSS 变量，由该模块作为与 token 同步的唯一来源。</p>
+    </div>
+    <div class="card">
+      <h4>渐进替换，不推倒重来</h4>
+      <p>阶段三按 CSS 文件逐个把硬编码替换为 token（<code>#17493f→var(--green-700)</code>、<code>#e8ecea→var(--border)</code> 等），每次替换后跑构建与 E2E；可加一条 lint 规则（stylelint/自定义脚本）禁止样式文件新增 hex。</p>
+    </div>
+  </div>
+
+  <div class="callout callout--key">
+    <span class="ico" style="color:var(--green)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>
+    <div><p><strong>tokens.css 扩展示例（节选）</strong></p>
+    <p style="font-family:var(--mono); font-size:11.5px; white-space:pre; line-height:1.6; margin-top:6px">:root{
+  /* primitive */
+  --green-700:#17493f; --green:#1f6254; --green-soft:#e7f0ed;
+  --space-1:4px; --space-2:8px; --space-4:16px;
+  --radius-sm:3px; --radius:5px; --radius-lg:7px;
+  /* semantic */
+  --color-primary:var(--green);
+  --color-text:var(--ink);
+  --radius-panel:var(--radius-lg);
+  /* domain: node types */
+  --node-use:#205b4f; --node-product:var(--coral);
+  --node-ingredient:var(--blue); --node-crop:#7b964f;
+  --node-target:var(--amber); --node-registration:var(--purple);
+  --node-formulation:#6d7772;
+}</p></div>
+  </div>
+</section>
+
+<!-- ============ 05 信息架构与导航 ============ -->
+<section class="block" id="ia">
+  <div class="sec-head"><span class="sec-num">05</span><h2>信息架构与导航</h2></div>
+  <p class="sec-sub">整体骨架（固定导航栏 + 顶栏全局搜索与版本选择）符合研究工作台定位，<strong>保留不动</strong>；仅修正图标语义、补齐面包屑、404 页面与搜索的"查看全部"出口。</p>
+
+  <h3>应用骨架结构</h3>
+  <div class="table-wrap" style="padding:8px">
+    <svg viewBox="0 0 900 340" style="width:100%; height:auto; display:block" role="img" aria-label="PestKG 应用骨架结构图">
+      <!-- sidebar -->
+      <rect x="10" y="10" width="180" height="320" rx="7" fill="#f8faf9" stroke="#b8c3bd"/>
+      <rect x="10" y="10" width="180" height="46" rx="7" fill="#1f6254"/>
+      <rect x="10" y="40" width="180" height="16" fill="#1f6254"/>
+      <text x="26" y="39" fill="#fff" font-size="12" font-weight="700">PestKG</text>
+      <!-- nav items -->
+      <g font-size="11" fill="#44534e">
+        <rect x="22" y="70" width="156" height="30" rx="5" fill="#1f6254"/><text x="38" y="89" fill="#fff" font-weight="700">研究概览</text>
+        <rect x="22" y="106" width="156" height="30" rx="5" fill="#eef2f0"/><text x="38" y="125">数据探索</text>
+        <rect x="22" y="142" width="156" height="30" rx="5" fill="#eef2f0"/><text x="38" y="161">跨国比较</text>
+        <rect x="22" y="178" width="156" height="30" rx="5" fill="#eef2f0"/><text x="38" y="197">数据下载</text>
+        <rect x="22" y="214" width="156" height="30" rx="5" fill="#eef2f0"/><text x="38" y="233">方法与质量</text>
+      </g>
+      <text x="26" y="278" fill="#64716b" font-size="10">Release 状态 · 中 / EN</text>
+      <!-- topbar -->
+      <rect x="200" y="10" width="690" height="46" rx="7" fill="#ffffff" stroke="#b8c3bd"/>
+      <rect x="218" y="20" width="360" height="26" rx="5" fill="#f8faf9" stroke="#d6ddd9"/>
+      <text x="234" y="38" fill="#87938d" font-size="11">搜索实体或 ID …</text>
+      <rect x="700" y="20" width="86" height="26" rx="5" fill="#f8faf9" stroke="#d6ddd9"/>
+      <text x="712" y="37" fill="#17201d" font-size="10" font-weight="700">2026.08.3</text>
+      <!-- main pages -->
+      <g>
+        <rect x="210" y="70" width="218" height="116" rx="7" fill="#ffffff" stroke="#d6ddd9"/>
+        <text x="226" y="94" fill="#17201d" font-size="12" font-weight="700">研究概览 / 实体详情</text>
+        <rect x="226" y="106" width="186" height="12" rx="3" fill="#e7f0ed"/>
+        <rect x="226" y="124" width="186" height="46" rx="3" fill="#f3f5f4"/>
+        <rect x="226" y="176" width="120" height="0" />
+        <rect x="226" y="148" width="140" height="10" rx="2" fill="#dfe7e3"/>
+        <rect x="438" y="70" width="218" height="116" rx="7" fill="#ffffff" stroke="#d6ddd9"/>
+        <text x="454" y="94" fill="#17201d" font-size="12" font-weight="700">数据探索 / 跨国比较</text>
+        <rect x="454" y="106" width="186" height="12" rx="3" fill="#faf3e2"/>
+        <rect x="454" y="124" width="186" height="46" rx="3" fill="#f3f5f4"/>
+        <rect x="454" y="148" width="140" height="10" rx="2" fill="#dfe7e3"/>
+        <rect x="666" y="70" width="214" height="116" rx="7" fill="#ffffff" stroke="#d6ddd9"/>
+        <text x="682" y="94" fill="#17201d" font-size="12" font-weight="700">数据下载 / 方法</text>
+        <rect x="682" y="106" width="182" height="12" rx="3" fill="#e9f0f6"/>
+        <rect x="682" y="124" width="182" height="46" rx="3" fill="#f3f5f4"/>
+        <rect x="682" y="148" width="140" height="10" rx="2" fill="#dfe7e3"/>
+      </g>
+      <!-- entry arrows -->
+      <g stroke="#1f6254" stroke-width="1.4" fill="none" stroke-dasharray="4 3">
+        <path d="M390 46 C 300 56, 260 60, 250 70" />
+        <path d="M390 46 C 480 56, 520 60, 547 70" />
+      </g>
+      <text x="226" y="214" fill="#64716b" font-size="10" />
+      <rect x="210" y="200" width="670" height="118" rx="7" fill="#ffffff" stroke="#d6ddd9"/>
+      <text x="226" y="224" fill="#17201d" font-size="12" font-weight="700">统一状态层（新增）</text>
+      <g font-size="10.5" fill="#44534e">
+        <rect x="226" y="238" width="140" height="30" rx="5" fill="#f8faf9" stroke="#d6ddd9"/><text x="240" y="257">页面级骨架</text>
+        <rect x="378" y="238" width="140" height="30" rx="5" fill="#f8faf9" stroke="#d6ddd9"/><text x="392" y="257">空态 + 重置</text>
+        <rect x="530" y="238" width="160" height="30" rx="5" fill="#f8faf9" stroke="#d6ddd9"/><text x="544" y="257">错误码 + 重试</text>
+        <rect x="702" y="238" width="162" height="30" rx="5" fill="#faf3e2" stroke="#e4c98e"/><text x="716" y="257">阻断 / 503 降级</text>
+        <rect x="226" y="276" width="638" height="30" rx="5" fill="#f6e9e4" stroke="#e0b8ab"/><text x="240" y="295">ErrorBoundary：渲染期异常兜底（新增）</text>
+      </g>
+    </svg>
+  </div>
+
+  <h3>具体调整</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:150px">调整项</th><th>方案</th><th style="width:90px">优先级</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">导航图标</td><td>"数据探索"由放大镜 Search 改为 <code>Network</code>（或 Compass），与全局搜索区分；视觉无其他变化。</td><td><span class="tag tag-p2">P2</span></td></tr>
+        <tr><td class="strong">实体页面包屑</td><td>在现有"返回"按钮上方增加面包屑：<code>研究概览 / 数据探索 / {实体首选名}</code>；来源场景可通过路由 state 携带，缺失时回退为"返回"。</td><td><span class="tag tag-p1">P1</span></td></tr>
+        <tr><td class="strong">404 路由页</td><td>新增 <code>NotFoundPage</code>：说明"页面不存在或链接已变更"，提供"返回研究概览"按钮，替代当前无反馈的静默重定向。</td><td><span class="tag tag-p2">P2</span></td></tr>
+        <tr><td class="strong">搜索"查看全部"</td><td>全局搜索框按 Enter 且无高亮项时，跳转 <code>/explore?query={关键词}</code> 并自动应用筛选，为搜索提供完整结果出口（与第 10 节 URL 状态联动）。</td><td><span class="tag tag-p1">P1</span></td></tr>
+        <tr><td class="strong">文档标题</td><td>各页面在挂载时设置 <code>document.title</code>（如"数据探索 · PestKG"），便于多标签页辨识与书签管理。</td><td><span class="tag tag-p2">P2</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 06 图谱画布重构 ============ -->
+<section class="block" id="graph">
+  <div class="sec-head"><span class="sec-num">06</span><h2>图谱画布重构（核心）</h2></div>
+  <p class="sec-sub">GraphCanvas 是门户信息密度最高、复用最多（探索页 + 实体页）的组件，当前 4 项 P1 问题集中于此。重构目标：<strong>一个持久实例、数据增量同步、按规模选布局、补齐图例与关系语义、全屏真实可用</strong>。</p>
+
+  <h3>重构要点总览</h3>
+  <div class="grid grid-3">
+    <div class="card"><h4><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 1 1-6.22-8.56"/><path d="M21 3v6h-6"/></svg></span>单实例 + 增量同步</h4><p>Cytoscape 实例只创建一次；数据变化用 add/remove diff，语言变化只更新标签。缩放、平移位置不再丢失。</p></div>
+    <div class="card"><h4><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg></span>按规模选布局</h4><p>小图 cose、大图 concentric（围绕中心节点、确定性、无长计算）；仅在节点集合变化时重布局。</p></div>
+    <div class="card"><h4><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 3 5-6"/></svg></span>语义可读</h4><p>左下角类型图例（可点击高亮）、边显示关系谓词（小图常驻 / 大图悬停）、中心节点环形高亮。</p></div>
+  </div>
+
+  <h3>① 单实例与增量同步</h3>
+  <p>将"创建实例"与"同步数据"拆为两个 effect，并把同步逻辑抽到可单测的 <code class="inline">useGraphSync</code> hook；组件接收新增的 <code class="inline">centerId</code> prop（探索页传选中记录的 use_id，实体页传当前 nodeId）。</p>
+  <div class="callout">
+    <span class="ico" style="color:var(--blue); margin-top:4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>
+    <div style="width:100%"><p style="font-family:var(--mono); font-size:11.5px; white-space:pre; line-height:1.65; margin:0">// 数据变化：diff，而非 destroy/recreate
+function syncGraph(cy, graph, centerId) {
+  cy.startBatch()
+  const nextNodes = new Map(graph.nodes.map(n => [n.id, n]))
+  cy.nodes().filter(n => !nextNodes.has(n.id())).remove()
+  cy.edges().filter(e => !graph.edges.some(x => x.id === e.id())).remove()
+  for (const node of graph.nodes) {
+    const el = cy.getElementById(node.id)
+    const data = buildNodeData(node, centerId)
+    el.length ? el.data(data) : cy.add({ group: 'nodes', data })
+  }
+  for (const edge of graph.edges) {
+    if (!cy.getElementById(edge.id).length) cy.add({ group: 'edges', data: buildEdgeData(edge) })
+  }
+  cy.endBatch()
+  if (needsLayout(cy, graph)) runLayout(cy, centerId)  // 仅结构变化时
+  else cy.resize()
+}
+// 语言变化：只改标签，不碰结构
+function applyLanguage(cy, graph, language) {
+  cy.nodes().forEach(n => n.data('label', labelFor(n, graph, language)))
+  cy.style().update()
+}</p></div>
+  </div>
+
+  <h3>② 布局策略（解决深度 2 卡顿）</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:130px">节点规模</th><th style="width:150px">布局</th><th>理由</th></tr></thead>
+      <tbody>
+        <tr><td>1–3</td><td><code>grid</code></td><td>最简单、确定，与现状一致。</td></tr>
+        <tr><td>4–80</td><td><code>cose</code>（animate:false）</td><td>力导向美观，规模可控时计算快。</td></tr>
+        <tr><td>&gt; 80</td><td><code>concentric</code></td><td>以中心节点为同心圆分层，确定性强、复杂度低，近 1000 节点也能快速稳定；零新增依赖。</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>重布局只在<strong>首次渲染或节点集合发生增删</strong>时触发；切换选中行若节点集合不变则保持视口。若后续仍希望大图拥有力导向观感，可评估将 <code>cose-bilkent</code>（约百余 KB）动态 import 进图谱异步 chunk，但需先验证 500 KiB chunk 门，<strong>默认方案不引入新依赖</strong>。</p>
+
+  <h3>③ 图例、关系标签、中心节点</h3>
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>类型图例（左下角）</h4>
+      <ul>
+        <li>只列出当前图中实际出现的节点类型，圆点色取自 <code>node-theme.ts</code>。</li>
+        <li>点击某类型：其余节点淡化（opacity 0.25），再次点击恢复——真实过滤交互。</li>
+        <li>图例与右下角节点计数、控件不重叠。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>边的关系谓词</h4>
+      <ul>
+        <li>节点 ≤ 20：边标签常驻（9px、灰色、<code>text-background</code> 白底）。</li>
+        <li>大图：悬停某条边时显示谓词，避免标签铺满。</li>
+        <li>与中心节点直接相连的边，谓词常驻。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>中心节点高亮</h4>
+      <ul>
+        <li>中心节点加 <code>.center</code> class：尺寸加大（34px）、双层环形描边、标签始终常驻。</li>
+        <li>点击中心节点不重复跳转自身；其余节点 tap 仍进入实体页。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>视图控件</h4>
+      <ul>
+        <li>保留滚轮 / 双指缩放；新增"复位视图（fit）"按钮。</li>
+        <li>全屏按钮接入 Fullscreen API（见下），图标随状态在放大/缩小间切换。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>④ 全屏（修复死按钮）</h3>
+  <div class="callout">
+    <span class="ico" style="color:var(--green); margin-top:4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></span>
+    <div style="width:100%"><p style="font-family:var(--mono); font-size:11.5px; white-space:pre; line-height:1.65; margin:0">const toggleFullscreen = () => {
+  if (document.fullscreenElement) document.exitFullscreen()
+  else wrapRef.current?.requestFullscreen()
+}
+// 监听 fullscreenchange 切换图标；全屏后调用 cy.resize()
+/* CSS：
+.graph-canvas-wrap:fullscreen { background:#fff; padding:18px }
+.graph-canvas-wrap:fullscreen .graph-canvas { height:100% } */</p>
+      <p style="margin-bottom:0">不支持 Fullscreen API 的环境（极少数）：按钮改为打开独立全屏弹窗或隐藏，<strong>不保留无行为按钮</strong>。</p></div>
+  </div>
+
+  <h3>优化前后对比</h3>
+  <div class="ba">
+    <div class="pane before">
+      <div class="bar">现状（BEFORE）</div>
+      <div class="body"><ul>
+        <li>选行 / 切深度 / 切语言 → 实例销毁重建，视口复位</li>
+        <li>深度 2 cose 布局长时间卡顿</li>
+        <li>无图例、边无关系标签</li>
+        <li>全屏图标无响应（死按钮）</li>
+        <li>节点颜色组件内硬编码</li>
+      </ul></div>
+    </div>
+    <div class="pane after">
+      <div class="bar">重构后（AFTER）</div>
+      <div class="body"><ul>
+        <li>单实例 diff 同步，视口与交互状态保留</li>
+        <li>大图 concentric 快速稳定，无长计算</li>
+        <li>可点击图例 + 关系谓词（常驻/悬停）</li>
+        <li>Fullscreen API 真实全屏，Esc 退出</li>
+        <li>颜色统一引用 node-theme / token</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 全局搜索 ============ -->
+<section class="block" id="search">
+  <div class="sec-head"><span class="sec-num">07</span><h2>全局搜索</h2></div>
+  <p class="sec-sub">顶栏全局搜索是跨页面的主入口，当前仅支持鼠标、承诺了 listbox 语义却无键盘行为。优化后达到<strong>"可纯键盘完成一次检索"</strong>，并补齐 ARIA 与外部点击关闭。</p>
+
+  <h3>交互规格</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:150px">行为</th><th>规格</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">输入防抖</td><td>在现有 <code>useDeferredValue</code> 基础上增加 300ms debounce（推荐抽 <code>useDebouncedValue</code> hook），停止输入后才发请求；快速输入不产生请求风暴。</td></tr>
+        <tr><td class="strong">↑ / ↓ 方向键</td><td>在结果间移动高亮（<code>activeIndex</code>），高亮项滚动到可见；鼠标悬停与键盘高亮保持同一状态。</td></tr>
+        <tr><td class="strong">Enter</td><td>有高亮项 → 打开该实体；无高亮项（或未展开）→ 跳转 <code>/explore?query={词}</code> 查看完整结果集。</td></tr>
+        <tr><td class="strong">Esc</td><td>收起结果列表并保留输入框文字；再次输入可重新展开。</td></tr>
+        <tr><td class="strong">点击外部</td><td>通过容器 ref 监听 <code>mousedown</code>，点到搜索框以外区域收起结果。</td></tr>
+        <tr><td class="strong">输入提示</td><td>输入 1 个字符时提示"至少输入 2 个字符"；加载中、无结果文案走 i18n，不再硬编码英文。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>ARIA 规范</h3>
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>角色与属性</h4>
+      <ul>
+        <li>容器 <code>role="listbox"</code>，每条结果 <code>role="option"</code>。</li>
+        <li>输入框 <code>aria-controls</code> 指向列表、<code>aria-activedescendant</code> 指向高亮项 id、<code>aria-expanded</code> 表示展开状态。</li>
+        <li>高亮项 <code>aria-selected="true"</code>。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>键盘逻辑示例</h4>
+      <p style="font-family:var(--mono); font-size:11px; white-space:pre; line-height:1.6; margin:0">const onKeyDown = (e) => {
+  const n = data.length
+  if (e.key === 'ArrowDown')
+    setActive(i => (i + 1) % n)
+  if (e.key === 'ArrowUp')
+    setActive(i => (i - 1 + n) % n)
+  if (e.key === 'Enter')
+    active != null ? open(data[active])
+                   : goExplore(query)
+  if (e.key === 'Escape') setOpen(false)
+}</p>
+    </div>
+  </div>
+
+  <div class="callout callout--warn">
+    <span class="ico" style="color:var(--amber); margin-top:2px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+    <div><p>搜索结果面板层级使用 <code>--z-menu:60</code>，需高于顶栏（30）与侧边栏（40），避免被遮挡；移动端面板宽度 <code>min(560px,82vw)</code> 已在现有样式中，保持不变。</p></div>
+  </div>
+</section>
+
+<!-- ============ 08 状态体系 ============ -->
+<section class="block" id="states">
+  <div class="sec-head"><span class="sec-num">08</span><h2>状态体系</h2></div>
+  <p class="sec-sub">按概念文档要求，每个数据视图都需覆盖<strong>加载、空、错误、阻断、已填充</strong>五类状态，并在服务整体不可用时提供全局降级。当前骨架通用、错误无码无重试、空态分散、缺全局降级与 ErrorBoundary。</p>
+
+  <h3>请求状态机</h3>
+  <div class="table-wrap" style="padding:10px">
+    <svg viewBox="0 0 900 250" style="width:100%; height:auto; display:block" role="img" aria-label="请求状态机示意图">
+      <defs><marker id="arr" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9z" fill="#899790"/></marker></defs>
+      <!-- nodes -->
+      <g font-size="12" font-weight="700">
+        <rect x="30" y="100" width="110" height="48" rx="7" fill="#f8faf9" stroke="#b8c3bd"/><text x="62" y="129" fill="#44534e">未启用</text>
+        <rect x="200" y="100" width="110" height="48" rx="7" fill="#e9f0f6" stroke="#3c6e97"/><text x="237" y="129" fill="#3c6e97">加载中</text>
+        <rect x="380" y="20" width="130" height="48" rx="7" fill="#e7f0ed" stroke="#1f6254"/><text x="420" y="49" fill="#1f6254">已填充</text>
+        <rect x="380" y="100" width="130" height="48" rx="7" fill="#faf3e2" stroke="#a87c2c"/><text x="430" y="129" fill="#a87c2c">空结果</text>
+        <rect x="380" y="180" width="130" height="48" rx="7" fill="#f6e9e4" stroke="#b9583d"/><text x="420" y="209" fill="#b9583d">错误</text>
+        <rect x="600" y="100" width="150" height="48" rx="7" fill="#fff" stroke="#1f6254" stroke-dasharray="5 3"/><text x="640" y="129" fill="#1f6254">阻断（Release 级）</text>
+      </g>
+      <!-- edges -->
+      <g stroke="#899790" stroke-width="1.5" fill="none" marker-end="url(#arr)">
+        <path d="M140 124 L 198 124"/>
+        <path d="M310 112 C 340 90, 350 60, 378 50"/>
+        <path d="M310 124 L 378 124"/>
+        <path d="M310 136 C 340 160, 350 190, 378 200"/>
+      </g>
+      <g stroke="#b9583d" stroke-width="1.5" fill="none" marker-end="url(#arr)">
+        <path d="M445 180 C 400 150, 300 150, 255 150"/>
+      </g>
+      <text x="285" y="172" fill="#b9583d" font-size="10">重试</text>
+      <g stroke="#a87c2c" stroke-width="1.4" fill="none" marker-end="url(#arr)">
+        <path d="M445 100 C 420 80, 300 82, 255 104"/>
+      </g>
+      <text x="288" y="86" fill="#a87c2c" font-size="10">重置筛选</text>
+      <path d="M510 124 L 598 124" stroke="#899790" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
+  <h3>统一组件接口</h3>
+  <div class="grid grid-3">
+    <div class="card">
+      <h4>LoadingState</h4>
+      <p>提供骨架"原语"（标题块 / 工具条 / 面板 / 表格行），由各页面<strong>按自身布局组合</strong>页面级骨架（如探索页 = 筛选带骨架 + 表格行骨架 + 图面板骨架），数据到达时无大幅位移。</p>
+    </div>
+    <div class="card">
+      <h4>ErrorState</h4>
+      <p>显示三部分：稳定错误码（等宽小字，如 <code>entity_not_found</code>）+ 面向用户的 message + <strong>"重试"按钮</strong>（接 <code>query.refetch</code>）。</p>
+    </div>
+    <div class="card">
+      <h4>EmptyState</h4>
+      <p>统一空态：说明"当前 Release 与筛选条件没有匹配的已发布记录"，并提供"重置筛选"按钮（传入 onReset 时显示）。</p>
+    </div>
+  </div>
+
+  <h3>全局降级与异常兜底</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:170px">场景</th><th>处理</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">Release 列表加载中</td><td>AppShell 渲染整页启动骨架，而非让各页面各自等待。</td></tr>
+        <tr><td class="strong">503 无可用 Release</td><td>全局 <code>ServiceUnavailable</code> 页：区分 <code>no_release_available</code>（当前没有已验证版本）与网络错误，说明原因并提供"重试"；不再落到无信息的错误框。</td></tr>
+        <tr><td class="strong">渲染期异常</td><td>新增 <code>AppErrorBoundary</code> 包裹主区域：捕获后显示友好兜底 + "刷新页面"，可在 <code>componentDidCatch</code> 预留上报钩子，杜绝整页白屏。</td></tr>
+        <tr><td class="strong">实体 404</td><td>识别 <code>code === 'entity_not_found'</code>，显示"该实体在此数据版本中不存在（可能已随版本更新变更）"，附"返回研究概览"。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>重试策略修正</h3>
+  <div class="callout">
+    <span class="ico" style="color:var(--blue); margin-top:3px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></span>
+    <div style="width:100%"><p style="font-family:var(--mono); font-size:11.5px; white-space:pre; line-height:1.6; margin:0">// main.tsx：仅对可恢复的 5xx / 网络错误重试一次
+retry: (failureCount, error) =>
+  (error.status >= 500 || error.status === 0) && failureCount < 1
+// 404 / 422 / 409 等确定性错误立即返回，不再白等一次</p></div>
+  </div>
+</section>
+
+<!-- ============ 09 国际化与数字格式 ============ -->
+<section class="block" id="i18n">
+  <div class="sec-head"><span class="sec-num">09</span><h2>国际化与数字格式</h2></div>
+  <p class="sec-sub">门户定位为中英双语研究工作台，但 i18n 目前只覆盖导航，页面文案以三元表达式散落在组件中；数字格式也不跟随界面语言。目标：<strong>可见文案 100% 走 i18n，数字/日期随界面语言，标识符永不翻译</strong>。</p>
+
+  <h3>文案归位</h3>
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>词条组织</h4>
+      <ul>
+        <li>按功能分区扩展资源：<code>overview / explore / compare / entity / downloads / methods</code>，与导航、common 并列。</li>
+        <li>当前规模可继续维护在 i18n.ts 单文件；词条超过数百条时再拆 <code>locales/zh/*.json</code> 并按路由懒加载。</li>
+        <li>组件内一律 <code>t('explore.title')</code>，删除 <code>english ? … : …</code>。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>不翻译的内容</h4>
+      <ul>
+        <li>节点 ID、Release ID、source_record_id、官方字段值、来源 URL。</li>
+        <li>技术谓词名（<code>exactMatch</code> / <code>lexicalAlignment</code>）保留原文。</li>
+        <li>较长英文标签允许换行，不靠缩小字号强行单行。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>词条结构示例</h3>
+  <div class="callout">
+    <span class="ico" style="color:var(--green); margin-top:3px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg></span>
+    <div style="width:100%"><p style="font-family:var(--mono); font-size:11.5px; white-space:pre; line-height:1.6; margin:0">zh: { overview: { title:'多国农药登记知识图谱',
+    metrics:{ jurisdictions:'司法辖区', sourceRecords:'源记录' } },
+  explore: { title:'登记使用数据探索', actions:{ export:'导出筛选 CSV' } } }
+en: { overview: { title:'Multicountry pesticide registration knowledge graph',
+    metrics:{ jurisdictions:'Jurisdictions', sourceRecords:'Source records' } },
+  explore: { title:'Registration-use explorer', actions:{ export:'Export filtered CSV' } } }</p></div>
+  </div>
+
+  <h3>数字与日期随语言</h3>
+  <p>格式化函数接收显式 locale（<code>en→'en-US'，zh→'zh-CN'</code>），由调用方从 <code>i18n.language</code> 传入，确保英文界面一律 K/M、中文界面一律万/亿。</p>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:200px">函数</th><th>调整</th></tr></thead>
+      <tbody>
+        <tr><td><code>formatCompact(v, locale)</code></td><td>en-US：<code>974K / 1.2M</code>；zh-CN：<code>97.4万 / 120万</code>，与界面语言严格一致。</td></tr>
+        <tr><td><code>formatInteger(v, locale)</code></td><td>分隔符随 locale（en 逗号 / zh 可不用或按习惯），数字统一 <code>font-variant-numeric: tabular-nums</code>。</td></tr>
+        <tr><td>日期</td><td>Release 发布日、截止日、登记/到期日期使用 <code>Intl.DateTimeFormat(locale)</code>；原始 ISO 日期在详情中保留可核对。</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 10 筛选工作台 ============ -->
+<section class="block" id="explore">
+  <div class="sec-head"><span class="sec-num">10</span><h2>筛选工作台（Explore）</h2></div>
+  <p class="sec-sub">保留现有"草稿（draft）→ 应用（applied）"的两段式筛选（避免边输边查），但要让<strong>全部已应用筛选可被 URL 完整表达</strong>，使刷新、分享、从搜索/地图跳入都能复现分析现场。</p>
+
+  <h3>URL 状态双向同步</h3>
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>进入 URL 的字段</h4>
+      <ul>
+        <li><code>jurisdiction · query · product · active_ingredient · crop · target · formulation</code>（registration_status / pairing_status 同理）。</li>
+        <li>地图、国家排名、全局搜索 Enter 均通过这些参数落地（如 <code>?jurisdiction=AU</code>、<code>?query=glyphosate</code>）。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>不进入 URL 的字段</h4>
+      <ul>
+        <li>分页游标 cursor：与 Release、筛选指纹绑定，<strong>不可分享、不可跨版本复用</strong>，仅存在于查询状态。</li>
+        <li>当前选中行：可选（use_id 较长），首条记录自动选中即可满足图谱展示。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>序列化函数（可单测）</h3>
+  <div class="callout">
+    <span class="ico" style="color:var(--blue); margin-top:3px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>
+    <div style="width:100%"><p style="font-family:var(--mono); font-size:11.5px; white-space:pre; line-height:1.6; margin:0">// filters → URL
+const toParams = (f) => {
+  const p = new URLSearchParams()
+  if (f.jurisdictions[0]) p.set('jurisdiction', f.jurisdictions[0])
+  for (const [k, v] of Object.entries(f))
+    if (k !== 'jurisdictions' && v) p.set(k, v)
+  return p
+}
+// URL → applied filters（初始化 & 分享链接落地）
+const fromParams = (p) => ({
+  jurisdictions: p.get('jurisdiction') ? [p.get('jurisdiction')] : [],
+  query: p.get('query') ?? '',
+  active_ingredient: p.get('active_ingredient') ?? '',
+  crop: p.get('crop') ?? '', /* …其余字段同理 */
+})</p></div>
+  </div>
+
+  <div class="callout callout--key">
+    <span class="ico" style="color:var(--green); margin-top:3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+    <div><p>应用筛选时用 <code>setSearchParams(toParams(draft))</code>；初始化 applied filters 改为 <code>fromParams(searchParams)</code>。这样"地图点击 → 探索页 → 调整筛选 → 复制链接给同事"全链路状态一致，且这两个纯函数可直接写单元测试。</p></div>
+  </div>
+</section>
+
+<!-- ============ 11 性能优化 ============ -->
+<section class="block" id="perf">
+  <div class="sec-head"><span class="sec-num">11</span><h2>性能优化</h2></div>
+  <p class="sec-sub">现有代码分割与按需加载已打下好基础，进一步的优化以<strong>"预测下一步操作并预取"和"消除不必要的加载"</strong>为主，不增加复杂度。</p>
+
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:170px">手段</th><th>方案</th><th style="width:90px">优先级</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">交互预取</td><td>鼠标悬停/聚焦国家排名行或地图国家时，<code>queryClient.prefetchInfiniteQuery</code> 该辖区登记用途首屏；点击即出结果。预取在空闲时进行、可取消。</td><td><span class="tag tag-p2">P2</span></td></tr>
+        <tr><td class="strong">查询缓存分级</td><td>Release 列表/ Schema 变化极少 → <code>staleTime: 10min+</code>；stats 概览沿用 60s；搜索结果短缓存。按查询单独设置，避免统一过期。</td><td><span class="tag tag-p2">P2</span></td></tr>
+        <tr><td class="strong">图片懒加载</td><td>方法页两张研究图加 <code>loading="lazy" decoding="async"</code>；首屏不携带非首屏图片字节。</td><td><span class="tag tag-p2">P2</span></td></tr>
+        <tr><td class="strong">图谱 chunk 校验</td><td>确认 Cytoscape 经动态 import 形成独立异步 chunk（必要时在 Rolldown 分组中显式命名 <code>cytoscape</code>），与 ECharts chunk 互不影响，全部 ≤ 500 KiB。</td><td><span class="tag tag-p2">P2</span></td></tr>
+        <tr><td class="strong">入口预加载</td><td>index.html 对首屏关键 chunk 使用 <code>modulepreload</code>（Vite 通常自动注入，构建后核对），favicon 与图标 SVG 保持现状。</td><td><span class="tag tag-p2">P2</span></td></tr>
+        <tr><td class="strong">大数据布局</td><td>深度 2 大图改用 concentric（见第 6 节），从根本上消除布局长计算；无需 Web Worker 即可满足当前规模。</td><td><span class="tag tag-p1">P1</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <span class="ico" style="color:var(--muted); margin-top:3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+    <div><p>登记用途总量虽达 82 万，但采用<strong>游标分页 + 每页 20 条</strong>，DOM 中始终只有少量行，<strong>不需要引入虚拟滚动</strong>；避免为不存在的性能问题增加依赖。</p></div>
+  </div>
+</section>
+
+<!-- ============ 12 部署与 Web 服务器 ============ -->
+<section class="block" id="deploy">
+  <div class="sec-head"><span class="sec-num">12</span><h2>部署与 Web 服务器</h2></div>
+  <p class="sec-sub">前端容器（<code class="inline">apps/web/nginx.conf</code>）只负责静态资源；生产入口由 Caddy（<code class="inline">infra/caddy</code>）承担 TLS 与 /api、/downloads 反向代理。优化集中在<strong>缓存分层、压缩、安全响应头</strong>三处。</p>
+
+  <h3>缓存策略（关键）</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:180px">资源</th><th>当前</th><th>建议</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">Vite hash 资源（/assets/*）</td><td>7d + immutable</td><td><code>public, max-age=31536000, immutable</code>（文件名含内容 hash，可永久缓存）。</td></tr>
+        <tr><td class="strong">index.html</td><td>默认（可能被缓存）</td><td><code>Cache-Control: no-cache</code>，每次校验；发版后用户立即拿到新 html + 新 hash 资源，消除"旧版白屏"。</td></tr>
+        <tr><td class="strong">/research、favicon 等</td><td>7d</td><td>中等时长（如 7d）即可，不带 immutable。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>建议 nginx.conf（静态容器内）</h3>
+  <div class="callout">
+    <span class="ico" style="color:var(--blue); margin-top:3px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>
+    <div style="width:100%"><p style="font-family:var(--mono); font-size:11px; white-space:pre; line-height:1.6; margin:0">gzip on;
+gzip_types text/css application/javascript image/svg+xml application/json;
+gzip_min_length 1024;
+
+server {
+  listen 80; server_name _;
+  root /usr/share/nginx/html; index index.html;
+
+  location = /healthz { return 200 "ok\n"; add_header Content-Type text/plain; }
+
+  # hash 资源：永久强缓存
+  location /assets/ {
+    expires 1y; add_header Cache-Control "public, immutable";
+  }
+  # 入口 html：每次校验
+  location = /index.html { add_header Cache-Control "no-cache"; }
+  location / { try_files $uri $uri/ /index.html; }
+
+  add_header X-Content-Type-Options nosniff always;
+  add_header X-Frame-Options "DENY" always;
+  add_header Referrer-Policy strict-origin-when-cross-origin always;
+  add_header Permissions-Policy "geolocation=(), microphone=()" always;
+  # CSP 按实际内联/外部资源收紧；style 需允许 'unsafe-inline'（框架样式）
+  add_header Content-Security-Policy
+    "default-src 'self'; img-src 'self' data:; script-src 'self';
+     style-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'" always;
+}</p></div>
+  </div>
+
+  <div class="callout callout--warn">
+    <span class="ico" style="color:var(--amber); margin-top:2px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+    <div><p>CSP 上线前需在真实构建上验证（确认无被拦截的脚本/样式/连接），先以 <code>Content-Security-Policy-Report-Only</code> 观察一轮再转强制；Caddy 层继续负责 TLS（www.pestkg.samlab.cn）、/api 与 /downloads 反代，职责不与静态容器混淆。</p></div>
+  </div>
+</section>
+
+<!-- ============ 13 质量与测试 ============ -->
+<section class="block" id="test">
+  <div class="sec-head"><span class="sec-num">13</span><h2>质量与测试</h2></div>
+  <p class="sec-sub">当前单测仅覆盖 client 与 format，E2E 已覆盖 6 条主流程。建议<strong>把"难回归的纯逻辑"下沉为可单测函数并补齐单测，E2E 补关键边界场景</strong>，形成两层防护。</p>
+
+  <h3>单元测试矩阵（新增）</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:220px">对象</th><th>用例要点</th></tr></thead>
+      <tbody>
+        <tr><td><code>format.ts</code></td><td>显式 locale：en-US 输出 K/M、zh-CN 输出万/亿；formatBytes 边界（1023/1024/各单位）。</td></tr>
+        <tr><td><code>filters URL 序列化</code></td><td>toParams/fromParams 往返一致；空值不产生参数；jurisdiction 大小写与缺省。</td></tr>
+        <tr><td><code>useGraphSync</code></td><td>用 mock Cytoscape 验证：新增/移除/更新被正确调用；语言变化只更新标签；节点规模对应布局选择。</td></tr>
+        <tr><td><code>搜索键盘 reducer</code></td><td>↑↓ 环绕、Enter 有/无高亮分支、Esc 收起；防抖 hook 的计时行为（fake timers）。</td></tr>
+        <tr><td><code>node-theme.ts</code></td><td>每种节点类型都有颜色与显示名；与 token 一致。</td></tr>
+        <tr><td>状态组件</td><td>ErrorState 渲染 code/message/重试并触发 onRetry；EmptyState 在传入 onReset 时显示重置。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>E2E 补充场景</h3>
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>新增用例</h4>
+      <ul>
+        <li>图谱全屏进入/退出（Esc），画布正确 resize。</li>
+        <li>全局搜索纯键盘：输入、↓、Enter 到实体页。</li>
+        <li>未知路由显示 404 页；实体 404 显示专门提示。</li>
+        <li>复制带筛选的 URL 再打开，筛选与结果复现。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>状态与语言</h4>
+      <ul>
+        <li>通过路由拦截模拟空结果 / 503，验证空态、全局降级与重试按钮。</li>
+        <li>切换到英文后，指标显示 K/M 而非"万"；文档标题随之变化。</li>
+        <li>保留现有"console / pageerror 必须为空"的强校验。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>基础设施与 CI</h3>
+  <div class="callout">
+    <span class="ico" style="color:var(--green); margin-top:3px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+    <div><p>新增测试工具：<code>createTestQueryClient()</code> 与带 MemoryRouter、i18n 的 <code>renderWithProviders()</code>，统一现有 jsdom setup。CI（现有 <code>.github/workflows/ci.yml</code>）在 PR 上跑 lint + 单测 + build（含 bundle 门），E2E 在合并到 main 后或每日定时执行。</p></div>
+  </div>
+</section>
+
+<!-- ============ 14 实施路线图 ============ -->
+<section class="block" id="roadmap">
+  <div class="sec-head"><span class="sec-num">14</span><h2>实施路线图</h2></div>
+  <p class="sec-sub">按"先止血、再达标、后加固"分三阶段推进，单人连续投入约 3 周（16–20 个工作日）；每阶段结束都有可验证的里程碑，可独立交付、独立回滚。</p>
+
+  <div class="phase">
+    <div class="aside">
+      <div class="ph">PHASE 1 · 工作日 1–4</div>
+      <h4>P0 止血</h4>
+      <div class="eff">工作量 <strong>3–4 人天</strong></div>
+      <div class="eff">里程碑 <strong>M1：零死按钮 / 零白屏</strong></div>
+    </div>
+    <div class="main">
+      <div class="task"><span class="t-dot" style="background:var(--coral)"></span><span>全屏按钮接入 Fullscreen API（含不支持环境的降级）<small> · GraphCanvas</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--coral)"></span><span>全局 ServiceUnavailable 降级页 + AppErrorBoundary<small> · AppShell / ReleaseProvider</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--coral)"></span><span>实体属性对象/数组安全渲染（JSON 序列化）<small> · EntityPage</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--coral)"></span><span>实体 404 中文专门提示 + 返回入口<small> · EntityPage</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--coral)"></span><span>全局搜索完整键盘交互 + 外部点击关闭<small> · GlobalSearch</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--coral)"></span><span>Compare 搜索框 300ms 防抖<small> · ComparePage</small></span></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="aside">
+      <div class="ph">PHASE 2 · 工作日 4–13</div>
+      <h4>体验达标</h4>
+      <div class="eff">工作量 <strong>8–10 人天</strong></div>
+      <div class="eff">里程碑 <strong>M2：四态统一 / 图谱重构完成</strong></div>
+    </div>
+    <div class="main">
+      <div class="task"><span class="t-dot" style="background:var(--amber)"></span><span>GraphCanvas 单实例增量重构 + concentric 布局 + 图例 + 边标签 + 中心节点<small> · 核心，约 3 天</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--amber)"></span><span>页面文案全量迁入 i18n；数字/日期随界面语言<small> · 全部页面，约 2 天</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--amber)"></span><span>统一 Loading（页面级骨架）/ Error（码+重试）/ Empty（重置）组件<small> · shared/ui，约 1.5 天</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--amber)"></span><span>Explore 筛选全量 URL 双向同步（含搜索/地图跳入）<small> · 约 1 天</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--amber)"></span><span>下载页静态清单与真实制品梳理，消除误导<small> · 约 0.5 天</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--amber)"></span><span>ID / 引用一键复制；方法页图片灯箱与懒加载<small> · 约 1 天</small></span></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="aside">
+      <div class="ph">PHASE 3 · 工作日 13–19</div>
+      <h4>工程加固</h4>
+      <div class="eff">工作量 <strong>5–6 人天</strong></div>
+      <div class="eff">里程碑 <strong>M3：可公开发布 / 可长期运维</strong></div>
+    </div>
+    <div class="main">
+      <div class="task"><span class="t-dot" style="background:var(--blue)"></span><span>Token 体系全量替换样式硬编码 + 禁止新增 hex 的检查<small> · 约 1.5 天</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--blue)"></span><span>nginx 缓存分层 + gzip + 安全头（CSP 先 Report-Only）<small> · 约 1 天</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--blue)"></span><span>重试策略按状态码；404 路由页；导航图标修正；文档标题<small> · 约 1 天</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--blue)"></span><span>单元测试补齐 + E2E 边界场景 + 测试工具封装<small> · 约 2 天</small></span></div>
+      <div class="task"><span class="t-dot" style="background:var(--blue)"></span><span>交互预取、缓存分级等性能增强与最终核对<small> · 约 0.5 天</small></span></div>
+    </div>
+  </div>
+
+  <h3>甘特总览</h3>
+  <div class="gantt">
+    <svg viewBox="0 0 900 300" role="img" aria-label="三阶段实施甘特图">
+      <!-- week scale -->
+      <g font-size="10" fill="#87938d">
+        <text x="266" y="26" text-anchor="middle">第 1 周</text>
+        <text x="431" y="26" text-anchor="middle">第 2 周</text>
+        <text x="596" y="26" text-anchor="middle">第 3 周</text>
+        <text x="761" y="26" text-anchor="middle">第 4 周</text>
+      </g>
+      <g stroke="#eef2f0" stroke-width="1">
+        <line x1="200" y1="34" x2="200" y2="250"/>
+        <line x1="365" y1="34" x2="365" y2="250"/>
+        <line x1="530" y1="34" x2="530" y2="250"/>
+        <line x1="695" y1="34" x2="695" y2="250"/>
+        <line x1="860" y1="34" x2="860" y2="250"/>
+      </g>
+      <!-- rows -->
+      <g font-size="12" fill="#17201d" font-weight="700">
+        <text x="18" y="78">阶段一 · P0 止血</text>
+        <text x="18" y="148">阶段二 · 体验达标</text>
+        <text x="18" y="218">阶段三 · 工程加固</text>
+      </g>
+      <!-- bars -->
+      <rect x="200" y="58" width="132" height="34" rx="6" fill="#b9583d"/>
+      <text x="214" y="80" fill="#fff" font-size="11" font-weight="700">P0 × 6</text>
+      <rect x="332" y="128" width="297" height="34" rx="6" fill="#a87c2c"/>
+      <text x="346" y="150" fill="#fff" font-size="11" font-weight="700">P1 × 13（图谱 / i18n / 状态 / URL）</text>
+      <rect x="629" y="198" width="198" height="34" rx="6" fill="#3c6e97"/>
+      <text x="643" y="220" fill="#fff" font-size="11" font-weight="700">P2 × 8（Token / 部署 / 测试）</text>
+      <!-- milestones -->
+      <g>
+        <path d="M332 100 L342 110 L332 120 L322 110 Z" fill="#17201d"/>
+        <path d="M629 170 L639 180 L629 190 L619 180 Z" fill="#17201d"/>
+        <path d="M827 170 L837 180 L827 190 L817 180 Z" fill="#17201d"/>
+      </g>
+      <g font-size="9.5" fill="#64716b">
+        <text x="332" y="135" text-anchor="middle">M1</text>
+        <text x="629" y="205" text-anchor="middle">M2</text>
+        <text x="827" y="165" text-anchor="middle">M3 发布就绪</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ 15 验收标准 ============ -->
+<section class="block" id="acceptance">
+  <div class="sec-head"><span class="sec-num">15</span><h2>验收标准</h2></div>
+  <p class="sec-sub">沿用仓库既有质量门并补充量化指标；以下逐条核对，全部满足方可视为优化完成。</p>
+
+  <h3>功能与状态</h3>
+  <div class="checklist">
+    <div class="ci"><span class="box"></span><span>6 项 P0 全部修复：无死按钮；服务不可用/无版本时有全局降级；实体属性与 404 正确；搜索可纯键盘完成；比较搜索已防抖。<small> 覆盖探索页、实体页、比较页、下载页、方法页。</small></span></div>
+    <div class="ci"><span class="box"></span><span>每个数据视图五态可验证：加载（页面级骨架）、空（含重置）、错（错误码 + 重试）、阻断（视觉与文案区别）、已填充。</span></div>
+    <div class="ci"><span class="box"></span><span>图谱：切换选中/深度/语言不重建实例、视口保留；大图布局快速稳定；图例可点击、关系谓词可见、全屏可进出。</span></div>
+    <div class="ci"><span class="box"></span><span>筛选可分享：全部已应用筛选在 URL 中完整表达，复制链接再打开结果一致；游标不跨版本复用。</span></div>
+  </div>
+
+  <h3>质量门指标</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:230px">指标</th><th>目标</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">视口核对</td><td>桌面 1440×1000、移动 390×844：无横向页面溢出（表格仅在自身容器内滚动）、无元素重叠、图谱移动高度约 420px。</td></tr>
+        <tr><td class="strong">控制台</td><td>console error / pageerror 为 0（沿用现有 E2E 强校验）。</td></tr>
+        <tr><td class="strong">产物体积</td><td>每个 JS chunk ≤ 500 KiB（check-bundle 硬门）；Cytoscape 独立异步 chunk。</td></tr>
+        <tr><td class="strong">自动化测试</td><td>lint、单测、build、E2E 全部通过；新增单测覆盖第 13 节矩阵。</td></tr>
+        <tr><td class="strong">Lighthouse（参考）</td><td>性能 / 无障碍 / 最佳实践 / SEO 均 ≥ 90；数字为参考目标，以真实部署环境实测为准。</td></tr>
+        <tr><td class="strong">浏览器矩阵</td><td>Chrome / Edge / Firefox / Safari 最新两个大版本内核验证通过；含缩放 110%–125% 场景。</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 附录 ============ -->
+<section class="block" id="appendix">
+  <div class="sec-head"><span class="sec-num">A</span><h2>附录：改动清单与边界</h2></div>
+
+  <h3>新增文件（建议）</h3>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th style="width:320px">文件</th><th>职责</th></tr></thead>
+      <tbody>
+        <tr><td><code>shared/lib/node-theme.ts</code></td><td>节点类型颜色与显示名的唯一来源。</td></tr>
+        <tr><td><code>features/explore/hooks/useGraphSync.ts</code></td><td>Cytoscape 单实例创建与数据/语言增量同步。</td></tr>
+        <tr><td><code>shared/lib/filters-url.ts</code></td><td>筛选 ↔ URL 的 toParams / fromParams 纯函数。</td></tr>
+        <tr><td><code>shared/hooks/useDebouncedValue.ts</code></td><td>通用防抖值 hook（搜索、比较工具栏）。</td></tr>
+        <tr><td><code>app/components/AppErrorBoundary.tsx</code></td><td>渲染期异常兜底。</td></tr>
+        <tr><td><code>app/components/ServiceUnavailable.tsx</code></td><td>503 / 无 Release 全局降级页。</td></tr>
+        <tr><td><code>features/misc/NotFoundPage.tsx</code></td><td>真正的 404 路由页。</td></tr>
+        <tr><td><code>shared/ui/CopyButton.tsx · Lightbox.tsx</code></td><td>一键复制、研究图灯箱。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>修改文件</h3>
+  <p><span class="chip">tokens.css（扩展）</span> <span class="chip">GraphCanvas（重构）</span> <span class="chip">GlobalSearch</span> <span class="chip">ExplorePage</span> <span class="chip">EntityPage</span> <span class="chip">ComparePage</span> <span class="chip">DownloadsPage</span> <span class="chip">MethodsPage</span> <span class="chip">OverviewPage</span> <span class="chip">AppShell</span> <span class="chip">App.tsx</span> <span class="chip">main.tsx</span> <span class="chip">i18n.ts</span> <span class="chip">nginx.conf</span></p>
+
+  <h3>风险与对策</h3>
+  <div class="grid grid-3">
+    <div class="card"><h4>数据仍处阻断</h4><p>前端优化可先行，但"公开发布/分发"相关动作须等归档与清单重建、数据放行后启用；阻断态继续诚实展示。</p></div>
+    <div class="card"><h4>图谱重构回归</h4><p>以 useGraphSync 单测 + 图谱 E2E 兜底；重构与其他改动分开提交，便于定位与回滚。</p></div>
+    <div class="card"><h4>CSP / 依赖版本</h4><p>CSP 先 Report-Only 观察；TS 6 / Vite 8 / React 19 等激进版本以 CI 构建与 E2E 验证兼容性。</p></div>
+  </div>
+
+  <h3>不在本次范围</h3>
+  <div class="callout">
+    <span class="ico" style="color:var(--muted); margin-top:3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></span>
+    <div><p>保持 <strong>/api/v1 v1.1 契约不变</strong>（不要求后端改动）；不做视觉方向重设计、不加营销化内容；不涉及用户/权限等写操作，不产出移动端原生应用。如确需后端配合（如搜索结果总量、对齐谓词明细），另行立项并同步更新契约版本。</p></div>
+  </div>
+
+  <div class="doc-footer">
+    <span>PestKG Frontend Optimization Proposal · v1.0</span>
+    <span>审查基准：main @ 2026-09-24 · Release 2026.08.3_federated · API v1.1</span>
+    <span>编制日期：2026-09-25</span>
+  </div>
+</section>
+</main>
+</div>
+
+<script>
+// TOC scrollspy + mobile jump (progressive enhancement; content is fully static without it)
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocNav a'));
+  var sel = document.getElementById('tocJump');
+  links.forEach(function(a){
+    var o=document.createElement('option'); o.value=a.getAttribute('href'); o.textContent=a.textContent; sel.appendChild(o);
+  });
+  sel.addEventListener('change',function(){ location.hash=this.value; });
+  var sections = links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(a){a.classList.toggle('active', a.getAttribute('href')==='#'+e.target.id);});
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px'});
+  sections.forEach(function(s){ if(s) obs.observe(s);});
+})();
+</script>
+</body>
+</html>
