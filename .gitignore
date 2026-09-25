@@ -28,3 +28,8 @@ data/state/*.json
 
 .DS_Store
 Thumbs.db
+/dataset/
+/delivery/
+/0922*.pptx
+*.rar
+*.7z
