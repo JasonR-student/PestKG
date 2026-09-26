@@ -644,9 +644,9 @@ export type OverviewData = {
      */
     title: string;
     /**
-     * Release Id
+     * Version
      */
-    release_id: string;
+    version: string;
     /**
      * Published At
      */
@@ -672,12 +672,29 @@ export type OverviewData = {
      */
     mode: string;
     /**
-     * Inventory
+     * Jurisdictions
      */
-    inventory: {
-        [key: string]: number;
-    };
-
+    jurisdictions: number;
+    /**
+     * Source Records
+     */
+    source_records: number;
+    /**
+     * Country Nodes
+     */
+    country_nodes: number;
+    /**
+     * Country Edges
+     */
+    country_edges: number;
+    /**
+     * Shared Nodes
+     */
+    shared_nodes: number;
+    /**
+     * Alignment Edges
+     */
+    alignment_edges: number;
     /**
      * Node Types
      */
@@ -912,15 +929,17 @@ export type ReleaseData = {
      */
     artifacts: Array<ReleaseArtifact>;
     /**
-     * Active
+     * Is Active
      */
-    active: boolean;
-
+    is_active: boolean;
     /**
      * Registry Status
      */
     registry_status: string;
-
+    /**
+     * Registered At
+     */
+    registered_at: string | null;
     [key: string]: unknown;
 };
 

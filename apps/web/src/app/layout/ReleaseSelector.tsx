@@ -23,7 +23,7 @@ export function ReleaseSelector() {
           {!releaseId ? <option value="">—</option> : null}
           {releases.map((item) => (
             <option key={item.release_id} value={item.release_id}>
-              {item.release_id}{Boolean((item as { active?: boolean }).active) ? (english ? ' · active' : ' · 当前') : ''}
+              {item.release_id}{item.is_active ? (english ? ' · active' : ' · 当前') : ''}
             </option>
           ))}
         </select>

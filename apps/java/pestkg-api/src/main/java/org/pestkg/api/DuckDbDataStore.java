@@ -386,6 +386,13 @@ public class DuckDbDataStore {
             Map<String, Long> relationTypes = groupCounts(con, "SELECT predicate, count(*) FROM edges GROUP BY predicate");
             Map<String, Object> release = catalog.readObject(catalog.releaseDir(context.releaseId()).resolve(
                     Files.isRegularFile(catalog.releaseDir(context.releaseId()).resolve("release.json")) ? "release.json" : "metadata/manifest.json"));
+            List<Map<String, Object>> coverage = "full".equals(mode(context)) ? coverage(context) : castMapList(release.get("coverage"));
+            long countryNodes = 0L;
+            long countryEdges = 0L;
+            for (Map<String, Object> row : countries(context)) {
+                countryNodes += ((Number) row.getOrDefault("nodes", 0L)).longValue();
+                countryEdges += ((Number) row.getOrDefault("edges", 0L)).longValue();
+            }
             return new OverviewData(
                 String.valueOf(release.getOrDefault("title", release.getOrDefault("release_name", "PestKG"))),
                 context.releaseId(),
@@ -396,8 +403,14 @@ public class DuckDbDataStore {
                 castList(release.get("known_limitations")),
                 mode(context),
                 castMap(release.get("inventory")),
+                nodeTypes.getOrDefault("Jurisdiction", 0L),
+                nodeTypes.getOrDefault("Source", 0L),
+                countryNodes, countryEdges,
+                nodeTypes.getOrDefault("CropTerm", 0L) + nodeTypes.getOrDefault("TargetTerm", 0L)
+                        + nodeTypes.getOrDefault("FormulationTerm", 0L) + nodeTypes.getOrDefault("LocalActiveIngredient", 0L),
+                relationTypes.getOrDefault("IN_TERRITORY", 0L),
                 nodeTypes, relationTypes,
-                "full".equals(mode(context)) ? coverage(context) : castMapList(release.get("coverage")));
+                coverage);
         } catch (Exception e) {
             throw new ReleaseException("dataset_unavailable", "overview failed", 503, e.getMessage());
         }

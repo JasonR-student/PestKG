@@ -223,6 +223,9 @@ public class ReleaseCatalogService {
 
     public OverviewData overview(ReleaseContext context) {
         Map<String, Object> release = readObject(releaseDir(context.releaseId()).resolve("release.json"));
+        Map<String, Long> nodeTypes = castLongMap(release.get("node_types"));
+        Map<String, Long> relationTypes = castLongMap(release.get("relation_types"));
+        Map<String, Object> inventory = castMap(release.get("inventory"));
         return new OverviewData(
                 String.valueOf(release.getOrDefault("title", "PestKG")),
                 context.releaseId(),
@@ -232,9 +235,14 @@ public class ReleaseCatalogService {
                 String.valueOf(release.getOrDefault("distribution_status", "unknown")),
                 castList(release.get("known_limitations")),
                 "sample",
-                castMap(release.get("inventory")),
-                castLongMap(release.get("node_types")),
-                castLongMap(release.get("relation_types")),
+                inventory,
+                nodeTypes.getOrDefault("Jurisdiction", 0L),
+                nodeTypes.getOrDefault("Source", 0L),
+                num(inventory.get("kg_nodes")), num(inventory.get("kg_edges")),
+                nodeTypes.getOrDefault("CropTerm", 0L) + nodeTypes.getOrDefault("TargetTerm", 0L)
+                        + nodeTypes.getOrDefault("FormulationTerm", 0L) + nodeTypes.getOrDefault("LocalActiveIngredient", 0L),
+                relationTypes.getOrDefault("IN_TERRITORY", 0L),
+                nodeTypes, relationTypes,
                 castMapList(release.get("coverage")));
     }
 
@@ -292,7 +300,13 @@ public class ReleaseCatalogService {
                 .map(item -> castMap(item)).toList();
     }
 
-    private static Map<String, Long> castLongMap(Object value) {
+    private static long num(Object value) {
+        if (value instanceof Number n) return n.longValue();
+        if (value == null) return 0L;
+        try { return Long.parseLong(String.valueOf(value)); } catch (NumberFormatException e) { return 0L; }
+    }
+
+private static Map<String, Long> castLongMap(Object value) {
         Map<String, Long> result = new LinkedHashMap<>();
         if (value instanceof Map<?, ?> map) {
             map.forEach((key, item) -> {

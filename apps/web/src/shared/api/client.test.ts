@@ -22,7 +22,7 @@ afterEach(() => {
 describe('API client', () => {
   it('sends release, request ID, and abort signal headers', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ data: { release_id: '2026.08.3_federated' } }), {
+      new Response(JSON.stringify({ data: { version: '2026.08.3_federated' } }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       }),
@@ -34,7 +34,7 @@ describe('API client', () => {
 
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
     const headers = new Headers(init.headers)
-    expect(url).toBe('/api/v1/datasets/overview')
+    expect(url).toBe('/api/v1/stats/overview')
     expect(init.signal).toBe(controller.signal)
     expect(headers.get('X-PestKG-Release')).toBe('2026.08.3_federated')
     expect(headers.get('X-Request-ID')).toBeTruthy()
@@ -61,10 +61,10 @@ describe('API client', () => {
       registration_status: null, pairing_status: null })
   })
 
-  it('maps Java error envelopes and response request IDs', async () => {
+  it('maps compatible detail errors and response request IDs', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
       new Response(JSON.stringify({
-        error: { code: 'invalid_cursor', message: 'Cursor is invalid' },
+        detail: { code: 'invalid_cursor', message: 'Cursor is invalid' },
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', 'X-Request-ID': 'request-42' },
@@ -81,35 +81,15 @@ describe('API client', () => {
     })
   })
 
-  it('creates an export job then downloads the CSV artifact', async () => {
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify({
-          data: {
-            job_id: 'job-1',
-            status: 'ready',
-            rows: 1,
-            download_url: '/api/v1/artifacts/job-1/download',
-          },
-        }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        }),
-      )
-      .mockResolvedValueOnce(
-        new Response('use_id,jurisdiction\nAU:1,AU\n', {
-          status: 200,
-          headers: { 'Content-Type': 'text/csv' },
-        }),
-      )
-    vi.stubGlobal('fetch', fetchMock)
+  it('returns CSV exports as blobs', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      new Response('use_id,jurisdiction\nAU:1,AU\n', {
+        status: 200,
+        headers: { 'Content-Type': 'text/csv' },
+      }),
+    ))
 
     const blob = await api.exportRegistrationUses(emptyFilters)
-
-    const calls = fetchMock.mock.calls as [string, RequestInit][]
-    expect(calls[0][0]).toBe('/api/v1/exports')
-    expect(calls[0][1].method).toBe('POST')
-    expect(calls[1][0]).toBe('/api/v1/artifacts/job-1/download')
     expect(blob.type).toBe('text/csv')
     expect(await blob.text()).toContain('use_id,jurisdiction')
   })

@@ -99,17 +99,17 @@ function nullableFilters(filters: RegistrationUseFilters) {
 
 export const api = {
   overview: (releaseId?: string | null, signal?: AbortSignal) =>
-    request<Overview>('/datasets/overview', { releaseId, signal }),
+    request<Overview>('/stats/overview', { releaseId, signal }),
   countries: (releaseId?: string | null, signal?: AbortSignal) =>
-    request<Country[]>('/datasets/coverage', { releaseId, signal }),
+    request<Country[]>('/stats/countries', { releaseId, signal }),
   schema: (releaseId?: string | null, signal?: AbortSignal) =>
-    request<Schema>('/datasets/schema', { releaseId, signal }),
+    request<Schema>('/schema', { releaseId, signal }),
   releases: (signal?: AbortSignal) => request<Release[]>('/releases', { signal }),
   search: (
     params: URLSearchParams,
     releaseId?: string | null,
     signal?: AbortSignal,
-  ) => request<Entity[]>(`/entities/search?${params.toString()}`, { releaseId, signal }),
+  ) => request<Entity[]>(`/search?${params.toString()}`, { releaseId, signal }),
   entity: (nodeId: string, releaseId?: string | null, signal?: AbortSignal) =>
     request<Entity>(`/entities/${encodeURIComponent(nodeId)}`, { releaseId, signal }),
   neighborhood: (
@@ -118,7 +118,7 @@ export const api = {
     releaseId?: string | null,
     signal?: AbortSignal,
   ) => request<GraphData>(
-    `/graph/neighborhood?nodeId=${encodeURIComponent(nodeId)}&depth=${depth}`,
+    `/graph/neighborhood?node_id=${encodeURIComponent(nodeId)}&depth=${depth}`,
     { releaseId, signal },
   ),
   path: (
@@ -127,7 +127,7 @@ export const api = {
     releaseId?: string | null,
     signal?: AbortSignal,
   ) => request<GraphData>(
-    `/graph/path?startId=${encodeURIComponent(startId)}&endId=${encodeURIComponent(endId)}`,
+    `/graph/path?start_id=${encodeURIComponent(startId)}&end_id=${encodeURIComponent(endId)}`,
     { releaseId, signal },
   ),
   registrationUses: (
@@ -156,7 +156,7 @@ export const api = {
     const params = new URLSearchParams({ limit: '200' })
     if (query) params.set('q', query)
     if (jurisdiction) params.set('jurisdiction', jurisdiction)
-    return request<ComparisonRow[]>(`/comparisons/${question}?${params.toString()}`, {
+    return request<ComparisonRow[]>(`/compare/${question}?${params.toString()}`, {
       releaseId,
       signal,
     })
@@ -166,21 +166,12 @@ export const api = {
     releaseId?: string | null,
     signal?: AbortSignal,
   ) => {
-    const result = await request<{
-      job_id: string
-      status: string
-      rows: number
-      download_url: string
-    }>('/exports', {
+    const response = await fetchResponse('/exports/registration-uses', {
       method: 'POST',
       releaseId,
       signal,
       body: JSON.stringify({ filters: nullableFilters(filters) }),
     })
-    // download_url is an absolute server path (/api/v1/artifacts/{id}/download);
-    // fetchResponse prefixes API_ROOT, so strip the root prefix.
-    const downloadPath = result.data.download_url.replace(/^\/api\/v1/, '')
-    const response = await fetchResponse(downloadPath, { releaseId, signal })
     return response.blob()
   },
 }
