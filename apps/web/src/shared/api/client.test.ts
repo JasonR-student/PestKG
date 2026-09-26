@@ -22,7 +22,7 @@ afterEach(() => {
 describe('API client', () => {
   it('sends release, request ID, and abort signal headers', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ data: { version: '2026.08.3_federated' } }), {
+      new Response(JSON.stringify({ data: { release_id: '2026.08.3_federated' } }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       }),

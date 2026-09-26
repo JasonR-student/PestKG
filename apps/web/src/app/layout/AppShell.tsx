@@ -88,7 +88,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="status-dot" aria-hidden="true" />
             <span>
               <small>{t('common.release')}</small>
-              <strong>{release?.release_id ?? overview.data?.data.version ?? '—'}</strong>
+              <strong>{release?.release_id ?? overview.data?.data.release_id ?? '—'}</strong>
             </span>
           </div>
           <div className="language-control" aria-label="Language">

@@ -31,3 +31,4 @@ Thumbs.db
 
 .agent-kernel/
 .idea/
+data/releases/*.zip

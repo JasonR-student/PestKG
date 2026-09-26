@@ -171,6 +171,33 @@ class SampleReleaseTest {
         assertTrue(first.containsKey("url"));
         assertTrue(String.valueOf(first.get("url")).startsWith("/api/v1/releases/"),
                 "artifact url should point at the release-files endpoint");
+        assertTrue(first.containsKey("format"));
+        assertTrue(first.containsKey("media_type"));
+    }
+
+    @Test
+    void downloadIndexFollowsLegacyCatalogLayout() {
+        var index = catalog.downloadIndex(RELEASE);
+        assertEquals(RELEASE, index.get("release_id"));
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> artifacts = (List<Map<String, Object>>) index.get("artifacts");
+        assertFalse(artifacts.isEmpty(), "legacy download index should list artifacts");
+        Map<String, Object> first = artifacts.get(0);
+        assertTrue(String.valueOf(first.get("url")).startsWith("/downloads/" + RELEASE + "/"),
+                "legacy catalog should use /downloads urls");
+        assertTrue(first.containsKey("format"));
+        assertTrue(first.containsKey("media_type"));
+    }
+
+    @Test
+    void sha256sumsListsEveryArtifact() {
+        String sums = catalog.sha256sums(RELEASE);
+        assertFalse(sums.isBlank(), "SHA256SUMS should not be empty");
+        for (String line : sums.split("\n")) {
+            if (!line.isBlank()) {
+                assertTrue(line.matches("[0-9a-f]{64}  .+"), "SHA256SUMS line malformed: " + line);
+            }
+        }
     }
 
     private static PestKgProperties properties() {

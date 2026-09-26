@@ -49,7 +49,7 @@ export function OverviewPage() {
           </p>
         </div>
         <div className={distributionBlocked ? 'release-summary release-summary--blocked' : 'release-summary'}>
-          <span>{data.version}</span>
+          <span>{data.release_id}</span>
           <strong>{distributionBlocked ? (english ? 'Distribution blocked' : '暂未公开发布') : data.status.replaceAll('_', ' ')}</strong>
           <small>{english ? `Source cutoff ${data.cutoff}` : `来源截止 ${data.cutoff}`}</small>
         </div>

@@ -141,10 +141,60 @@ public class ReleaseCatalogService {
         Map<String, Object> entry = new LinkedHashMap<>();
         entry.put("path", rel);
         entry.put("category", category);
+        entry.put("format", formatOf(rel));
+        entry.put("media_type", mediaTypeOf(rel));
         entry.put("bytes", fileSize(file));
         entry.put("sha256", sha256Cached(releaseId, rel, file));
         entry.put("url", "/api/v1/releases/" + releaseId + "/files/" + rel);
         return entry;
+    }
+
+    /**
+     * Download-catalog index in the original MyPestKg-Beta layout
+     * (downloads/index.json): release_id plus artifacts whose download URLs use
+     * the legacy /downloads/{release_id}/{path} convention served by the
+     * compatibility endpoints.
+     */
+    public Map<String, Object> downloadIndex(String releaseId) {
+        Map<String, Object> index = new LinkedHashMap<>();
+        index.put("release_id", releaseId);
+        List<Map<String, Object>> artifacts = new ArrayList<>();
+        for (Map<String, Object> entry : artifacts(releaseId)) {
+            Map<String, Object> copy = new LinkedHashMap<>(entry);
+            copy.put("url", "/downloads/" + releaseId + "/" + entry.get("path"));
+            artifacts.add(copy);
+        }
+        index.put("artifacts", artifacts);
+        return index;
+    }
+
+    /** SHA256SUMS-style digest manifest ("<hex>  <path>" per line, sorted by path). */
+    public String sha256sums(String releaseId) {
+        StringBuilder lines = new StringBuilder();
+        for (Map<String, Object> entry : artifacts(releaseId)) {
+            lines.append(entry.get("sha256")).append("  ").append(entry.get("path")).append('\n');
+        }
+        return lines.toString();
+    }
+
+    private static String formatOf(String rel) {
+        int dot = rel.lastIndexOf('.');
+        return dot < 0 ? "" : rel.substring(dot + 1).toLowerCase();
+    }
+
+    private static String mediaTypeOf(String rel) {
+        return switch (formatOf(rel)) {
+            case "parquet" -> "application/vnd.apache.parquet";
+            case "csv" -> "text/csv; charset=UTF-8";
+            case "json" -> "application/json";
+            case "md" -> "text/markdown";
+            case "txt" -> "text/plain";
+            case "yaml", "yml" -> "application/yaml";
+            case "png" -> "image/png";
+            case "svg" -> "image/svg+xml";
+            case "html", "htm" -> "text/html";
+            default -> "application/octet-stream";
+        };
     }
 
     private String sha256Cached(String releaseId, String rel, Path file) {
@@ -213,6 +263,16 @@ public class ReleaseCatalogService {
         } catch (IOException ex) {
             throw new ReleaseException("release_json_invalid", "Unable to read release metadata", 422,
                     Map.of("path", path.toString(), "message", ex.getMessage()));
+        }
+    }
+
+    /** Serializes an object to compact JSON (used for generated download catalogs). */
+    public String asJson(Object value) {
+        try {
+            return mapper.writeValueAsString(value);
+        } catch (IOException ex) {
+            throw new ReleaseException("release_json_invalid", "Unable to serialize release metadata", 422,
+                    Map.of("message", ex.getMessage()));
         }
     }
 

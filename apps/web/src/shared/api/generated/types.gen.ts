@@ -644,9 +644,9 @@ export type OverviewData = {
      */
     title: string;
     /**
-     * Version
+     * Release Id
      */
-    version: string;
+    release_id: string;
     /**
      * Published At
      */
