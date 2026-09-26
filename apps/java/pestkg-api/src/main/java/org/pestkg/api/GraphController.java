@@ -33,7 +33,7 @@ public class GraphController {
         ReleaseContext context = catalog.resolve(release, header);
         GraphData data = store.neighborhood(context, nodeId, depth, properties.getGraphNodeLimit(), properties.getGraphEdgeLimit());
         if (data.nodes().isEmpty()) throw new ReleaseException("graph_not_found", "Entity or neighborhood not found", 404, Map.of("node_id", nodeId));
-        return envelopes.wrap(context, data);
+        return envelopes.wrap(context, data, store.mode(context));
     }
 
     @GetMapping("/path")
@@ -45,6 +45,6 @@ public class GraphController {
         if (maxDepth < 1 || maxDepth > 3) throw new IllegalArgumentException("maxDepth must be between 1 and 3");
         ReleaseContext context = catalog.resolve(release, header);
         GraphData data = store.shortestPath(context, startId, endId, maxDepth);
-        return envelopes.wrap(context, data);
+        return envelopes.wrap(context, data, store.mode(context));
     }
 }

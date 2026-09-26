@@ -41,7 +41,7 @@ public class ExportController {
                 : request;
         var job = jobs.create(context, store.queryUses(context, safe.toUseQuery(), 0, 200_000).rows());
         return envelopes.wrap(context, Map.of("job_id", job.jobId(), "status", job.status(), "rows", job.rows(),
-                "download_url", "/api/v1/artifacts/" + job.jobId() + "/download"));
+                "download_url", "/api/v1/artifacts/" + job.jobId() + "/download"), store.mode(context));
     }
 
     @GetMapping("/jobs/{jobId}")
@@ -50,7 +50,7 @@ public class ExportController {
                                                 @RequestHeader(name = "X-PestKG-Release", required = false) String header) {
         ExportJobService.ExportJob job = jobs.get(jobId);
         ReleaseContext context = catalog.resolve(release == null ? job.releaseId() : release, header);
-        return envelopes.wrap(context, Map.of("job_id", job.jobId(), "status", job.status(), "rows", job.rows(), "release_id", job.releaseId()));
+        return envelopes.wrap(context, Map.of("job_id", job.jobId(), "status", job.status(), "rows", job.rows(), "release_id", job.releaseId()), store.mode(context));
     }
 
     @GetMapping("/artifacts/{jobId}/download")

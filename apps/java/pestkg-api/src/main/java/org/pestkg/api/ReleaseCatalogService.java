@@ -3,13 +3,17 @@ package org.pestkg.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.pestkg.domain.OverviewData;
 import org.pestkg.domain.ReleaseSummary;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,8 @@ import org.springframework.stereotype.Service;
 public class ReleaseCatalogService {
     private final PestKgProperties properties;
     private final ObjectMapper mapper;
+    private final Map<String, List<Map<String, Object>>> artifactsCache = new ConcurrentHashMap<>();
+    private final Map<String, String> shaCache = new ConcurrentHashMap<>();
 
     public ReleaseCatalogService(PestKgProperties properties, ObjectMapper mapper) {
         this.properties = properties;
@@ -32,7 +38,7 @@ public class ReleaseCatalogService {
         String selected = queryRelease != null ? queryRelease : headerRelease;
         if (selected == null || selected.isBlank()) selected = activeReleaseId();
         Path dir = releaseDir(selected);
-        Map<String, Object> release = readObject(dir.resolve("release.json"));
+        Map<String, Object> release = releaseMetadata(dir);
         String schema = String.valueOf(release.getOrDefault("schema_version", "1.0"));
         return new ReleaseContext(selected, schema);
     }
@@ -85,7 +91,7 @@ public class ReleaseCatalogService {
     }
 
     public ReleaseSummary summary(String releaseId) {
-        Map<String, Object> release = readObject(releaseDir(releaseId).resolve("release.json"));
+        Map<String, Object> release = releaseMetadata(releaseDir(releaseId));
         return new ReleaseSummary(
                 releaseId,
                 String.valueOf(release.getOrDefault("schema_version", "1.0")),
@@ -99,7 +105,70 @@ public class ReleaseCatalogService {
                 castMap(release.get("inventory")),
                 castMap(release.get("integrity")),
                 releaseId.equals(activeReleaseId()),
-                "discovered");
+                "discovered",
+                artifacts(releaseId));
+    }
+
+    /**
+     * Scans the release directory for downloadable artifacts (kg/, canonical/, docs/,
+     * metadata/ and root metadata files) and attaches a checksummed entry with a
+     * download URL served by the release-files endpoint. SHA-256 digests are cached
+     * per release+path so only the first listing pays the hashing cost.
+     */
+    public List<Map<String, Object>> artifacts(String releaseId) {
+        return artifactsCache.computeIfAbsent(releaseId, id -> {
+            Path dir = releaseDir(id);
+            List<Map<String, Object>> result = new ArrayList<>();
+            try (var stream = Files.walk(dir)) {
+                stream.filter(Files::isRegularFile)
+                        .filter(path -> !path.startsWith(dir.resolve("sample")))
+                        .sorted(Comparator.comparing(path -> dir.relativize(path).toString().replace('\\', '/')))
+                        .forEach(path -> result.add(artifactEntry(dir, id, path)));
+            } catch (IOException ex) {
+                throw new ReleaseException("release_catalog_unavailable", "Unable to scan release artifacts", 503, ex.getMessage());
+            }
+            return result;
+        });
+    }
+
+    private Map<String, Object> artifactEntry(Path dir, String releaseId, Path file) {
+        String rel = dir.relativize(file).toString().replace('\\', '/');
+        String category = rel.startsWith("kg/") ? "knowledge_graph"
+                : rel.startsWith("canonical/") ? "canonical"
+                : rel.startsWith("docs/") ? "docs"
+                : rel.startsWith("metadata/") ? "metadata"
+                : "metadata";
+        Map<String, Object> entry = new LinkedHashMap<>();
+        entry.put("path", rel);
+        entry.put("category", category);
+        entry.put("bytes", fileSize(file));
+        entry.put("sha256", sha256Cached(releaseId, rel, file));
+        entry.put("url", "/api/v1/releases/" + releaseId + "/files/" + rel);
+        return entry;
+    }
+
+    private String sha256Cached(String releaseId, String rel, Path file) {
+        return shaCache.computeIfAbsent(releaseId + "|" + rel, key -> sha256(file));
+    }
+
+    private static String sha256(Path file) {
+        try (InputStream in = Files.newInputStream(file)) {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] buffer = new byte[1 << 16];
+            int read;
+            while ((read = in.read(buffer)) > 0) digest.update(buffer, 0, read);
+            return HexFormat.of().formatHex(digest.digest());
+        } catch (Exception ex) {
+            return "";
+        }
+    }
+
+    private static long fileSize(Path file) {
+        try {
+            return Files.size(file);
+        } catch (IOException ex) {
+            return 0L;
+        }
     }
 
     public OverviewData overview(ReleaseContext context) {
@@ -130,6 +199,12 @@ public class ReleaseCatalogService {
         } catch (IOException ex) {
             throw new ReleaseException("release_json_invalid", "Unable to read countries metadata", 422, ex.getMessage());
         }
+    }
+
+    private Map<String, Object> releaseMetadata(Path dir) {
+        Path releaseJson = dir.resolve("release.json");
+        if (Files.isRegularFile(releaseJson)) return readObject(releaseJson);
+        return readObject(dir.resolve("metadata/manifest.json"));
     }
 
     public Map<String, Object> readObject(Path path) {

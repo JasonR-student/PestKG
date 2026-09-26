@@ -672,29 +672,12 @@ export type OverviewData = {
      */
     mode: string;
     /**
-     * Jurisdictions
+     * Inventory
      */
-    jurisdictions: number;
-    /**
-     * Source Records
-     */
-    source_records: number;
-    /**
-     * Country Nodes
-     */
-    country_nodes: number;
-    /**
-     * Country Edges
-     */
-    country_edges: number;
-    /**
-     * Shared Nodes
-     */
-    shared_nodes: number;
-    /**
-     * Alignment Edges
-     */
-    alignment_edges: number;
+    inventory: {
+        [key: string]: number;
+    };
+
     /**
      * Node Types
      */
@@ -929,17 +912,15 @@ export type ReleaseData = {
      */
     artifacts: Array<ReleaseArtifact>;
     /**
-     * Is Active
+     * Active
      */
-    is_active: boolean;
+    active: boolean;
+
     /**
      * Registry Status
      */
     registry_status: string;
-    /**
-     * Registered At
-     */
-    registered_at: string | null;
+
     [key: string]: unknown;
 };
 

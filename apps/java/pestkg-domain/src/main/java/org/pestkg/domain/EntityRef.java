@@ -1,4 +1,9 @@
 package org.pestkg.domain;
 
-public record EntityRef(String id, String labelOriginal, String labelEn) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record EntityRef(
+        @JsonProperty("id") String id,
+        @JsonProperty("label_original") String labelOriginal,
+        @JsonProperty("label_en") String labelEn) {
 }

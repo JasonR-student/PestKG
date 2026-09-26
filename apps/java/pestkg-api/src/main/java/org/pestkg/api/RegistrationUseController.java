@@ -37,7 +37,7 @@ public class RegistrationUseController {
         int pageSize = Math.max(1, Math.min(safe.pageSize() == null ? 50 : safe.pageSize(), 200));
         DuckDbDataStore.UsesPage page = store.queryUses(context, filter, offset, pageSize);
         String next = offset + page.rows().size() < page.total() ? cursors.encode(offset + page.rows().size(), context.releaseId(), fingerprint) : null;
-        ApiEnvelope<List<RegistrationUseData>> result = envelopes.wrap(context, page.rows());
+        ApiEnvelope<List<RegistrationUseData>> result = envelopes.wrap(context, page.rows(), store.mode(context));
         result.meta().put("total", page.total());
         result.meta().put("page_size", pageSize);
         if (next != null) result.meta().put("next_cursor", next);

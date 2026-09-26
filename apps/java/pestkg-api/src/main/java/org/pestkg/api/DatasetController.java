@@ -27,20 +27,20 @@ public class DatasetController {
     public ApiEnvelope<OverviewData> overview(@RequestParam(required = false) String release,
                                                @RequestHeader(name = "X-PestKG-Release", required = false) String header) {
         ReleaseContext context = catalog.resolve(release, header);
-        return envelopes.wrap(context, store.overview(context));
+        return envelopes.wrap(context, store.overview(context), store.mode(context));
     }
 
     @GetMapping("/coverage")
     public ApiEnvelope<List<Map<String, Object>>> coverage(@RequestParam(required = false) String release,
                                                             @RequestHeader(name = "X-PestKG-Release", required = false) String header) {
         ReleaseContext context = catalog.resolve(release, header);
-        return envelopes.wrap(context, store.countries(context));
+        return envelopes.wrap(context, store.countries(context), store.mode(context));
     }
 
     @GetMapping("/schema")
     public ApiEnvelope<Map<String, Object>> schema(@RequestParam(required = false) String release,
                                                    @RequestHeader(name = "X-PestKG-Release", required = false) String header) {
         ReleaseContext context = catalog.resolve(release, header);
-        return envelopes.wrap(context, catalog.readSchema(context));
+        return envelopes.wrap(context, catalog.readSchema(context), store.mode(context));
     }
 }

@@ -15,22 +15,29 @@
             <artifactId>pestkg-domain</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Temporal PostgreSQL adapter boundary: not wired until the release is
+             registered for production; optional so consumers do not inherit
+             DataSource/Flyway auto-configuration they never use. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

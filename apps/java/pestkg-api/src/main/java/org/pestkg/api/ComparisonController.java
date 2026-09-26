@@ -26,10 +26,11 @@ public class ComparisonController {
     @GetMapping("/{question}")
     public ApiEnvelope<List<Map<String, String>>> comparison(@PathVariable String question,
                                                               @RequestParam(required = false) String q,
+                                                              @RequestParam(required = false) String jurisdiction,
                                                               @RequestParam(defaultValue = "100") int limit,
                                                               @RequestParam(required = false) String release,
                                                               @RequestHeader(name = "X-PestKG-Release", required = false) String header) {
         ReleaseContext context = catalog.resolve(release, header);
-        return envelopes.wrap(context, store.comparison(context, question.toLowerCase(), q, limit));
+        return envelopes.wrap(context, store.comparison(context, question.toLowerCase(), q, jurisdiction, limit), store.mode(context));
     }
 }

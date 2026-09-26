@@ -26,13 +26,15 @@ export function OverviewPage() {
   const countryRows = countries.data.data.toSorted((a, b) => b.nodes - a.nodes)
   const english = i18n.language.startsWith('en')
   const distributionBlocked = data.distribution_status !== 'ready'
+  const nodeTypeCount = (type: string) => Number(data.node_types?.[type] ?? 0)
+  const inventory = (data.inventory ?? {}) as Record<string, number>
 
   const metrics = [
-    { label: english ? 'Jurisdictions' : '司法辖区', value: data.jurisdictions, icon: Database },
-    { label: english ? 'Source records' : '源记录', value: data.source_records, icon: Rows3 },
-    { label: english ? 'Country nodes' : '国家图谱节点', value: data.country_nodes, icon: Network },
-    { label: english ? 'Relations' : '登记关系', value: data.country_edges, icon: GitBranch },
-    { label: english ? 'Shared semantic nodes' : '共享语义节点', value: data.shared_nodes, icon: Network },
+    { label: english ? 'Jurisdictions' : '司法辖区', value: nodeTypeCount('Jurisdiction'), icon: Database },
+    { label: english ? 'Source records' : '源记录', value: nodeTypeCount('Source'), icon: Rows3 },
+    { label: english ? 'Country nodes' : '国家图谱节点', value: nodeTypeCount('CountryOrTerritory'), icon: Network },
+    { label: english ? 'KG edges' : '图谱关系', value: Number(inventory.kg_edges ?? 0), icon: GitBranch },
+    { label: english ? 'Registration uses' : '登记使用记录', value: Number(inventory.registration_uses ?? 0), icon: Network },
   ]
 
   return (
@@ -70,7 +72,7 @@ export function OverviewPage() {
               <h2>{english ? 'Jurisdiction coverage' : '司法辖区覆盖'}</h2>
               <p>{english ? 'Select a country to open filtered registration uses.' : '点击国家进入对应登记使用数据。'}</p>
             </div>
-            <span>{formatInteger(data.alignment_edges)} alignments</span>
+            <span>{formatInteger(Number(inventory.registration_uses ?? 0))} registration uses</span>
           </div>
           <WorldMap
             countries={countryRows}

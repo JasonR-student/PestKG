@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:8081}
+  port: ${PORT:18088}
 
 pestkg:
   data-dir: ${PESTKG_DATA_DIR:data/releases}
@@ -12,6 +12,8 @@ pestkg:
 spring:
   application:
     name: pestkg-java-api
+  jackson:
+    property-naming-strategy: SNAKE_CASE
   servlet:
     multipart:
       max-file-size: 512MB

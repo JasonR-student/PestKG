@@ -27,8 +27,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://127.0.0.1:8000',
-      '^/downloads/.+': 'http://127.0.0.1:8000',
+      '/api': 'http://127.0.0.1:18088',
+      '^/downloads/.+': 'http://127.0.0.1:18088',
     },
   },
   test: {

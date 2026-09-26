@@ -16,5 +16,6 @@ public record ReleaseSummary(
         Map<String, Object> inventory,
         Map<String, Object> integrity,
         boolean active,
-        String registryStatus) {
+        String registryStatus,
+        List<Map<String, Object>> artifacts) {
 }

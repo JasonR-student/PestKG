@@ -31,7 +31,7 @@ export function ReleaseProvider({ children }: { children: ReactNode }) {
   const validStoredRelease = releases.some((item) => item.release_id === storedRelease)
     ? storedRelease
     : null
-  const fallbackRelease = releases.find((item) => item.is_active)?.release_id ?? releases[0]?.release_id
+  const fallbackRelease = releases.find((item) => Boolean((item as { active?: boolean }).active))?.release_id ?? releases[0]?.release_id
   const releaseId = requestedRelease || validStoredRelease || fallbackRelease || null
   const release = releases.find((item) => item.release_id === releaseId) ?? null
 

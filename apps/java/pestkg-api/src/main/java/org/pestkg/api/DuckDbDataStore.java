@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +39,10 @@ public class DuckDbDataStore {
     private final ObjectMapper mapper;
     private final Map<String, Connection> connections = new ConcurrentHashMap<>();
     private final Map<String, String> modes = new ConcurrentHashMap<>();
+    private final Map<String, String> paths = new ConcurrentHashMap<>();
+    private final Map<String, Boolean> usesEnriched = new ConcurrentHashMap<>();
+    private final Map<String, List<Map<String, Object>>> countriesCache = new ConcurrentHashMap<>();
+    private final Map<String, List<Map<String, Object>>> coverageCache = new ConcurrentHashMap<>();
 
     public DuckDbDataStore(ReleaseCatalogService catalog, ObjectMapper mapper) {
         this.catalog = catalog;
@@ -68,6 +73,7 @@ public class DuckDbDataStore {
                 createLegacyViews(con, p);
                 modes.put(context.releaseId(), "sample");
             }
+            paths.put(context.releaseId(), p);
             return con;
         } catch (Exception e) {
             throw new ReleaseException("dataset_unavailable", "Unable to open duckdb connection", 503, e.getMessage());
@@ -127,23 +133,21 @@ public class DuckDbDataStore {
     }
 
     public List<EntityData> search(ReleaseContext context, String query, String type, String jurisdiction, int limit) {
-        StringBuilder sql = new StringBuilder("SELECT id, type, label_original, label_en, jurisdiction, source_record_id, source_url, properties_json FROM nodes WHERE ");
+        StringBuilder sql = new StringBuilder("SELECT id, type, label_original, label_en, jurisdiction, source_record_id, source_url, properties_json FROM nodes");
         List<Object> params = new ArrayList<>();
-        boolean first = true;
+        List<String> conditions = new ArrayList<>();
         if (query != null && !query.isBlank()) {
-            sql.append("(label_original ILIKE ? OR label_en ILIKE ? OR id ILIKE ?)");
-            String needle = "%" + query + "%";
+            String needle = likePattern(query);
+            conditions.add("(label_original ILIKE ? ESCAPE '\\' OR label_en ILIKE ? ESCAPE '\\' OR id ILIKE ? ESCAPE '\\')");
             params.add(needle); params.add(needle); params.add(needle);
-            first = false;
         }
         if (type != null && !type.isBlank()) {
-            if (!first) sql.append(" AND ");
-            sql.append("type = ?"); params.add(type); first = false;
+            conditions.add("type = ?"); params.add(type);
         }
         if (jurisdiction != null && !jurisdiction.isBlank()) {
-            if (!first) sql.append(" AND ");
-            sql.append("jurisdiction = ?"); params.add(jurisdiction.toUpperCase()); first = false;
+            conditions.add("jurisdiction = ?"); params.add(jurisdiction.toUpperCase());
         }
+        if (!conditions.isEmpty()) sql.append(" WHERE ").append(String.join(" AND ", conditions));
         sql.append(" ORDER BY coalesce(nullif(label_en, ''), label_original) LIMIT ?");
         params.add(Math.max(1, Math.min(limit, 100)));
         List<EntityData> result = new ArrayList<>();
@@ -260,6 +264,7 @@ public class DuckDbDataStore {
         useFilterSql(filter, where, params);
         String whereClause = where.length() == 0 ? "" : "WHERE " + where;
         Connection con = connection(context);
+        ensureEnrichedUses(context, con);
         int total;
         try (PreparedStatement ps = con.prepareStatement("SELECT count(*) FROM registration_uses " + whereClause)) {
             bind(ps, params);
@@ -286,9 +291,92 @@ public class DuckDbDataStore {
         return new UsesPage(rows, total);
     }
 
-    public List<Map<String, String>> comparison(ReleaseContext context, String question, String query, int limit) {
-        if (!question.matches("q[1-5]")) throw new ReleaseException("comparison_not_found", "Unknown comparison question", 404, Map.of("question", question));
-        return List.of(); // v1.0 has no competency-question CSVs; graceful degrade
+    public List<Map<String, String>> comparison(ReleaseContext context, String question, String query, String jurisdiction, int limit) {
+        if (!question.matches("q[1-5]")) {
+            throw new ReleaseException("comparison_not_found", "Unknown comparison question", 404, Map.of("question", question));
+        }
+        boolean hasJurisdiction = jurisdiction != null && !jurisdiction.isBlank();
+        boolean hasQuery = query != null && !query.isBlank();
+        connection(context); // ensure the release connection (and parquet path) is initialized
+        StringBuilder sql = comparisonSql(context, question, hasJurisdiction, hasQuery);
+        List<Object> params = new ArrayList<>();
+        if (hasJurisdiction) params.add(jurisdiction.toUpperCase());
+        if (hasQuery) { String needle = likePattern(query); params.add(needle); params.add(needle); }
+        params.add(Math.max(1, Math.min(limit, 500)));
+        List<Map<String, String>> rows = new ArrayList<>();
+        try (PreparedStatement ps = connection(context).prepareStatement(sql.toString())) {
+            bind(ps, params);
+            try (ResultSet rs = ps.executeQuery()) {
+                ResultSetMetaData md = rs.getMetaData();
+                while (rs.next()) {
+                    Map<String, String> row = new LinkedHashMap<>();
+                    for (int i = 1; i <= md.getColumnCount(); i++) {
+                        String value = rs.getString(i);
+                        row.put(md.getColumnLabel(i), value == null ? "" : value);
+                    }
+                    rows.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            throw new ReleaseException("dataset_unavailable", "comparison query failed", 503, e.getMessage());
+        }
+        return rows;
+    }
+
+    /** Real-data Q1-Q5 competency queries computed from kg edges + canonical uses. */
+    private StringBuilder comparisonSql(ReleaseContext context, String question, boolean hasJurisdiction, boolean hasQuery) {
+        String p = paths.get(context.releaseId());
+        String uses = "read_parquet('" + p + "/canonical/registration_uses.parquet', hive_partitioning=true) u";
+        StringBuilder sql = new StringBuilder("SELECT ");
+        switch (question) {
+            case "q1" -> sql.append("n_ai.label_en AS active_ingredient_label_en, n_crop.label_en AS crop_label_en, count(DISTINCT u.jurisdiction_id) AS jurisdiction_count, count(*) AS registration_use_count FROM ").append(uses)
+                    .append(" JOIN edges e_crop ON e_crop.start_id = u.registration_use_id AND e_crop.predicate = 'FOR_CROP'")
+                    .append(" JOIN edges e_ai ON e_ai.start_id = u.product_id AND e_ai.predicate = 'CONTAINS_ACTIVE_INGREDIENT'")
+                    .append(" JOIN nodes n_crop ON e_crop.end_id = n_crop.id")
+                    .append(" JOIN nodes n_ai ON e_ai.end_id = n_ai.id")
+                    .append(whereClause(hasJurisdiction, hasQuery, "n_ai.label_en", "n_crop.label_en"))
+                    .append(" GROUP BY 1, 2 ORDER BY registration_use_count DESC LIMIT ?");
+            case "q2" -> sql.append("n_prod.label_en AS product_name, n_tgt.label_en AS target_label_en, count(DISTINCT u.jurisdiction_id) AS jurisdiction_count, count(*) AS registration_use_count FROM ").append(uses)
+                    .append(" JOIN edges e_tgt ON e_tgt.start_id = u.registration_use_id AND e_tgt.predicate = 'FOR_TARGET'")
+                    .append(" JOIN edges e_prod ON e_prod.start_id = u.registration_use_id AND e_prod.predicate = 'USES_PRODUCT'")
+                    .append(" JOIN nodes n_prod ON e_prod.end_id = n_prod.id")
+                    .append(" JOIN nodes n_tgt ON e_tgt.end_id = n_tgt.id")
+                    .append(whereClause(hasJurisdiction, hasQuery, "n_prod.label_en", "n_tgt.label_en"))
+                    .append(" GROUP BY 1, 2 ORDER BY registration_use_count DESC LIMIT ?");
+            case "q3" -> sql.append("n_crop.label_en AS crop_label_en, n_tgt.label_en AS target_label_en, count(DISTINCT u.jurisdiction_id) AS jurisdiction_count, count(*) AS registration_use_count FROM ").append(uses)
+                    .append(" JOIN edges e_crop ON e_crop.start_id = u.registration_use_id AND e_crop.predicate = 'FOR_CROP'")
+                    .append(" JOIN edges e_tgt ON e_tgt.start_id = u.registration_use_id AND e_tgt.predicate = 'FOR_TARGET'")
+                    .append(" JOIN nodes n_crop ON e_crop.end_id = n_crop.id")
+                    .append(" JOIN nodes n_tgt ON e_tgt.end_id = n_tgt.id")
+                    .append(whereClause(hasJurisdiction, hasQuery, "n_crop.label_en", "n_tgt.label_en"))
+                    .append(" GROUP BY 1, 2 ORDER BY registration_use_count DESC LIMIT ?");
+            case "q4" -> sql.append("n_ai.label_en AS active_ingredient_label_en, u.formulation_original AS formulation_label_en, count(DISTINCT u.product_id) AS product_count, count(*) AS registration_use_count FROM ").append(uses)
+                    .append(" JOIN edges e_ai ON e_ai.start_id = u.product_id AND e_ai.predicate = 'CONTAINS_ACTIVE_INGREDIENT'")
+                    .append(" JOIN nodes n_ai ON e_ai.end_id = n_ai.id")
+                    .append(whereClause(hasJurisdiction, hasQuery, "n_ai.label_en", "u.formulation_original"))
+                    .append(" GROUP BY 1, 2 ORDER BY product_count DESC LIMIT ?");
+            case "q5" -> sql.append("n_jur.label_en AS jurisdiction, n_ai.label_en AS active_ingredient_label_en, count(*) AS registration_use_count, count(DISTINCT u.product_id) AS product_count FROM ").append(uses)
+                    .append(" JOIN edges e_ai ON e_ai.start_id = u.product_id AND e_ai.predicate = 'CONTAINS_ACTIVE_INGREDIENT'")
+                    .append(" JOIN nodes n_ai ON e_ai.end_id = n_ai.id")
+                    .append(" JOIN nodes n_jur ON n_jur.id = u.jurisdiction_id AND n_jur.type = 'Jurisdiction'")
+                    .append(whereClause(hasJurisdiction, hasQuery, "n_ai.label_en", "n_jur.label_en"))
+                    .append(" GROUP BY 1, 2 ORDER BY registration_use_count DESC LIMIT ?");
+            default -> throw new ReleaseException("comparison_not_found", "Unknown comparison question", 404, Map.of("question", question));
+        }
+        return sql;
+    }
+
+    private static String whereClause(boolean hasJurisdiction, boolean hasQuery, String labelA, String labelB) {
+        StringBuilder where = new StringBuilder();
+        if (hasJurisdiction) {
+            where.append(" WHERE u.jurisdiction_id = (SELECT id FROM nodes WHERE type = 'Jurisdiction' AND label_en = ?)");
+        }
+        if (hasQuery) {
+            if (where.length() == 0) where.append(" WHERE");
+            else where.append(" AND");
+            where.append(" (").append(labelA).append(" ILIKE ? ESCAPE '\\' OR ").append(labelB).append(" ILIKE ? ESCAPE '\\')");
+        }
+        return where.toString();
     }
 
     public OverviewData overview(ReleaseContext context) {
@@ -309,13 +397,71 @@ public class DuckDbDataStore {
                 mode(context),
                 castMap(release.get("inventory")),
                 nodeTypes, relationTypes,
-                castMapList(release.get("coverage")));
+                "full".equals(mode(context)) ? coverage(context) : castMapList(release.get("coverage")));
         } catch (Exception e) {
             throw new ReleaseException("dataset_unavailable", "overview failed", 503, e.getMessage());
         }
     }
 
     public List<Map<String, Object>> countries(ReleaseContext context) {
+        if ("full".equals(mode(context))) {
+            return countriesCache.computeIfAbsent(context.releaseId(), id -> derivedCountries(context));
+        }
+        return legacyCountries(context);
+    }
+
+    /** Full projection derived from Jurisdiction nodes and live kg counts (v1 layout). */
+    private List<Map<String, Object>> derivedCountries(ReleaseContext context) {
+        Connection con = connection(context);
+        Map<String, Long> nodeCounts;
+        Map<String, Long> edgeCounts;
+        Map<String, String> codes = new LinkedHashMap<>();
+        try {
+            nodeCounts = groupCounts(con, "SELECT jurisdiction, count(*) FROM nodes WHERE jurisdiction IS NOT NULL AND jurisdiction <> '' GROUP BY jurisdiction");
+            edgeCounts = groupCounts(con, "SELECT n.jurisdiction, count(*) FROM edges e JOIN nodes n ON e.start_id = n.id WHERE n.jurisdiction IS NOT NULL AND n.jurisdiction <> '' GROUP BY n.jurisdiction");
+            try (PreparedStatement ps = con.prepareStatement("SELECT id, label_en FROM nodes WHERE type = 'Jurisdiction'");
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) codes.put(rs.getString(1), rs.getString(2));
+            }
+        } catch (SQLException e) {
+            throw new ReleaseException("dataset_unavailable", "countries derivation failed", 503, e.getMessage());
+        }
+        List<Map<String, Object>> result = new ArrayList<>();
+        codes.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .forEach(entry -> result.add(countryRow(entry.getKey(), entry.getValue(), nodeCounts, edgeCounts)));
+        return result;
+    }
+
+    private Map<String, Object> countryRow(String jurisdictionId, String code, Map<String, Long> nodeCounts, Map<String, Long> edgeCounts) {
+        Map<String, Object> country = new LinkedHashMap<>();
+        country.put("jurisdiction", code);
+        country.put("jurisdiction_name", ISO_NAME.getOrDefault(code, code));
+        country.put("sovereign_country", code);
+        country.put("site_id", "");
+        country.put("official_url", "");
+        country.put("source_file", "");
+        country.put("source_sha256", "");
+        country.put("source_snapshot_eligible", Boolean.FALSE);
+        country.put("source_rows", 0L);
+        country.put("skipped_rows", 0L);
+        country.put("nodes", nodeCounts.getOrDefault(jurisdictionId, 0L));
+        country.put("edges", edgeCounts.getOrDefault(jurisdictionId, 0L));
+        country.put("broken_edges", 0L);
+        country.put("graph_scope", "SINGLE_LINEAGE");
+        country.put("language", "");
+        country.put("iso3", ISO3.getOrDefault(code, ""));
+        country.put("map_id", String.valueOf(ISO_NUM.getOrDefault(code, -1)));
+        country.put("coverage", Map.of());
+        return country;
+    }
+
+    /** Legacy fallback: countries.json projection or a minimal CountryOrTerritory derivation. */
+    private List<Map<String, Object>> legacyCountries(ReleaseContext context) {
+        Path dir = catalog.releaseDir(context.releaseId());
+        if (Files.isRegularFile(dir.resolve("countries.json"))) {
+            return catalog.readCountries(context);
+        }
         List<Map<String, Object>> result = new ArrayList<>();
         try (PreparedStatement ps = connection(context).prepareStatement(
                 "SELECT id, label_original, jurisdiction FROM nodes WHERE type = 'CountryOrTerritory'")) {
@@ -334,6 +480,67 @@ public class DuckDbDataStore {
         return result;
     }
 
+    /** Per-jurisdiction label coverage computed live from kg edges + canonical uses. */
+    private List<Map<String, Object>> coverage(ReleaseContext context) {
+        return coverageCache.computeIfAbsent(context.releaseId(), id -> computeCoverage(context));
+    }
+
+    private List<Map<String, Object>> computeCoverage(ReleaseContext context) {
+        Connection con = connection(context);
+        String p = paths.get(context.releaseId());
+        List<Map<String, Object>> result = new ArrayList<>();
+        String sql = "SELECT n_jur.label_en AS code, count(*) AS total, " +
+                "count(DISTINCT e_crop.start_id) AS with_crop, count(DISTINCT e_tgt.start_id) AS with_target, " +
+                "count(DISTINCT e_ai.start_id) AS with_ai, " +
+                "count(DISTINCT CASE WHEN u.formulation_original IS NOT NULL AND u.formulation_original <> '' THEN u.registration_use_id END) AS with_form " +
+                "FROM read_parquet('" + p + "/canonical/registration_uses.parquet', hive_partitioning=true) u " +
+                "JOIN nodes n_jur ON n_jur.id = u.jurisdiction_id AND n_jur.type = 'Jurisdiction' " +
+                "LEFT JOIN edges e_crop ON e_crop.start_id = u.registration_use_id AND e_crop.predicate = 'FOR_CROP' " +
+                "LEFT JOIN edges e_tgt ON e_tgt.start_id = u.registration_use_id AND e_tgt.predicate = 'FOR_TARGET' " +
+                "LEFT JOIN edges e_ai ON e_ai.start_id = u.product_id AND e_ai.predicate = 'CONTAINS_ACTIVE_INGREDIENT' " +
+                "GROUP BY 1 ORDER BY 1";
+        try (PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String code = rs.getString("code");
+                long total = rs.getLong("total");
+                Map<String, Object> cov = new LinkedHashMap<>();
+                cov.put("jurisdiction", code);
+                cov.put("source_language", "");
+                cov.put("records", total);
+                cov.put("crop_source", "kg FOR_CROP edges");
+                cov.put("target_source", "kg FOR_TARGET edges");
+                cov.put("active_source", "kg CONTAINS_ACTIVE_INGREDIENT edges");
+                cov.put("formulation_source", "canonical formulation_original");
+                cov.put("crop_english_given_source", ratio(rs.getLong("with_crop"), total));
+                cov.put("target_english_given_source", ratio(rs.getLong("with_target"), total));
+                cov.put("active_english_given_source", ratio(rs.getLong("with_ai"), total));
+                cov.put("formulation_english_given_source", ratio(rs.getLong("with_form"), total));
+                result.add(cov);
+            }
+        } catch (SQLException e) {
+            throw new ReleaseException("dataset_unavailable", "coverage computation failed", 503, e.getMessage());
+        }
+        return result;
+    }
+
+    private static Double ratio(long part, long total) {
+        return total == 0 ? 0.0 : Math.round((part * 10000.0) / total) / 10000.0;
+    }
+
+    private static final Map<String, String> ISO_NAME = Map.ofEntries(
+            Map.entry("AU", "Australia"), Map.entry("CN", "China"), Map.entry("GB", "United Kingdom"),
+            Map.entry("GB-NI", "Northern Ireland (UK)"), Map.entry("HU", "Hungary"), Map.entry("IE", "Ireland"),
+            Map.entry("JP", "Japan"), Map.entry("KR", "South Korea"), Map.entry("NL", "Netherlands"),
+            Map.entry("NZ", "New Zealand"), Map.entry("TW", "Taiwan"), Map.entry("US", "United States"));
+    private static final Map<String, Integer> ISO_NUM = Map.ofEntries(
+            Map.entry("AU", 36), Map.entry("CN", 156), Map.entry("GB", 826), Map.entry("GB-NI", 826),
+            Map.entry("HU", 348), Map.entry("IE", 372), Map.entry("JP", 392), Map.entry("KR", 410),
+            Map.entry("NL", 528), Map.entry("NZ", 554), Map.entry("TW", 158), Map.entry("US", 840));
+    private static final Map<String, String> ISO3 = Map.ofEntries(
+            Map.entry("AU", "AUS"), Map.entry("CN", "CHN"), Map.entry("GB", "GBR"), Map.entry("GB-NI", "GBR"),
+            Map.entry("HU", "HUN"), Map.entry("IE", "IRL"), Map.entry("JP", "JPN"), Map.entry("KR", "KOR"),
+            Map.entry("NL", "NLD"), Map.entry("NZ", "NZL"), Map.entry("TW", "TWN"), Map.entry("US", "USA"));
+
     // ---- helpers ----
 
     private void useFilterSql(CsvDataStore.UseQuery f, StringBuilder where, List<Object> params) {
@@ -351,8 +558,9 @@ public class DuckDbDataStore {
         addTextFilter(where, params, "pairing_status", f.pairingStatus());
         if (f.query() != null && !f.query().isBlank()) {
             if (where.length() > 0) where.append(" AND ");
-            where.append("(product_label_search ILIKE ? OR active_ingredients_search ILIKE ? OR crops_search ILIKE ? OR targets_search ILIKE ? OR formulations_search ILIKE ?)");
-            String needle = "%" + f.query() + "%";
+            where.append("(product_label_search ILIKE ? ESCAPE '\\' OR active_ingredients_search ILIKE ? ESCAPE '\\' " +
+                    "OR crops_search ILIKE ? ESCAPE '\\' OR targets_search ILIKE ? ESCAPE '\\' OR formulations_search ILIKE ? ESCAPE '\\')");
+            String needle = likePattern(f.query());
             for (int i = 0; i < 5; i++) params.add(needle);
         }
     }
@@ -360,9 +568,87 @@ public class DuckDbDataStore {
     private void addTextFilter(StringBuilder where, List<Object> params, String column, String value) {
         if (value != null && !value.isBlank()) {
             if (where.length() > 0) where.append(" AND ");
-            where.append(column).append(" ILIKE ?");
-            params.add("%" + value + "%");
+            where.append(column).append(" ILIKE ? ESCAPE '\\'");
+            params.add(likePattern(value));
         }
+    }
+
+    /** Escapes LIKE/ILIKE wildcards so user input matches literally. */
+    private static String likePattern(String value) {
+        return "%" + value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%";
+    }
+
+    /**
+     * In full (parquet) mode the v1 registration_uses view intentionally carries empty
+     * search/ref columns. On first use query we replace that view with a materialized
+     * table enriched from kg nodes and edges: product labels, crop/target labels via
+     * FOR_CROP/FOR_TARGET edges and active-ingredient labels via CONTAINS_ACTIVE_INGREDIENT.
+     * One-time cost per process (~seconds); subsequent queries are plain indexed scans.
+     */
+    private void ensureEnrichedUses(ReleaseContext context, Connection con) {
+        String releaseId = context.releaseId();
+        if (Boolean.TRUE.equals(usesEnriched.get(releaseId))) return;
+        if (!"full".equals(modes.getOrDefault(releaseId, "sample"))) return;
+        String p = paths.get(releaseId);
+        if (p == null) return;
+        synchronized (usesEnriched) {
+            if (Boolean.TRUE.equals(usesEnriched.get(releaseId))) return;
+            try {
+                con.createStatement().execute("DROP VIEW IF EXISTS registration_uses");
+                con.createStatement().execute(enrichUsesSql(p));
+                usesEnriched.put(releaseId, Boolean.TRUE);
+            } catch (SQLException e) {
+                try {
+                    con.createStatement().execute("DROP TABLE IF EXISTS registration_uses");
+                } catch (SQLException cleanup) {
+                    // best-effort cleanup so a retry can rebuild
+                }
+                throw new ReleaseException("dataset_unavailable", "registration uses enrichment failed", 503, e.getMessage());
+            }
+        }
+    }
+
+    private static String enrichUsesSql(String p) {
+        return "CREATE TABLE registration_uses AS " +
+            "WITH crop_agg AS (" +
+            "    SELECT e.start_id AS use_id, group_concat(DISTINCT n.label_original, '|') AS labels, " +
+            "           to_json(list_distinct(list({'id': n.id, 'label_original': n.label_original, 'label_en': n.label_en}))) AS refs " +
+            "    FROM edges e JOIN nodes n ON e.end_id = n.id " +
+            "    WHERE e.predicate = 'FOR_CROP' GROUP BY e.start_id), " +
+            "target_agg AS (" +
+            "    SELECT e.start_id AS use_id, group_concat(DISTINCT n.label_original, '|') AS labels, " +
+            "           to_json(list_distinct(list({'id': n.id, 'label_original': n.label_original, 'label_en': n.label_en}))) AS refs " +
+            "    FROM edges e JOIN nodes n ON e.end_id = n.id " +
+            "    WHERE e.predicate = 'FOR_TARGET' GROUP BY e.start_id), " +
+            "ai_agg AS (" +
+            "    SELECT e.start_id AS product_id, group_concat(DISTINCT n.label_original, '|') AS labels, " +
+            "           to_json(list_distinct(list({'id': n.id, 'label_original': n.label_original, 'label_en': n.label_en}))) AS refs " +
+            "    FROM edges e JOIN nodes n ON e.end_id = n.id " +
+            "    WHERE e.predicate = 'CONTAINS_ACTIVE_INGREDIENT' GROUP BY e.start_id) " +
+            "SELECT u.registration_use_id AS use_id, u.jurisdiction_id AS jurisdiction, u.product_id, " +
+            "       coalesce(p.label_original, '') AS product_label_original, " +
+            "       coalesce(p.label_en, '') AS product_label_en, " +
+            "       coalesce(p.label_original, '') AS product_label_search, " +
+            "       coalesce(ai.labels, '') AS active_ingredients_search, " +
+            "       coalesce(c.labels, '') AS crops_search, " +
+            "       coalesce(t.labels, '') AS targets_search, " +
+            "       coalesce(u.formulation_original, '') AS formulations_search, " +
+            "       coalesce(ai.refs, '[]') AS active_ingredients_json, " +
+            "       coalesce(c.refs, '[]') AS crops_json, " +
+            "       coalesce(t.refs, '[]') AS targets_json, " +
+            "       '[]' AS formulations_json, " +
+            "       coalesce(r.original_status, '') AS registration_status, " +
+            "       u.pairing_status, " +
+            "       coalesce(r.registration_date_normalized, '') AS registration_date, " +
+            "       coalesce(r.expiry_date_normalized, '') AS expiry_date, " +
+            "       u.source_record_id, '' AS source_url " +
+            "FROM read_parquet('" + p + "/canonical/registration_uses.parquet', hive_partitioning=true) u " +
+            "LEFT JOIN read_parquet('" + p + "/canonical/registrations.parquet', hive_partitioning=true) r " +
+            "ON u.registration_id = r.registration_id " +
+            "LEFT JOIN nodes p ON u.product_id = p.id " +
+            "LEFT JOIN ai_agg ai ON u.product_id = ai.product_id " +
+            "LEFT JOIN crop_agg c ON u.registration_use_id = c.use_id " +
+            "LEFT JOIN target_agg t ON u.registration_use_id = t.use_id";
     }
 
     private List<EdgeData> queryEdges(Connection con, String sql, List<Object> params) {

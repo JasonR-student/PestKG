@@ -1,31 +1,36 @@
 # Multicountry Pesticide Knowledge Graph Portal
 
-An open, bilingual research portal for exploring the federated multicountry
-pesticide registration knowledge graph release `2026.08.3_federated`.
+An open, bilingual research portal for exploring a federated multicountry
+pesticide registration knowledge graph. The active data package is the
+`PestKG_A_Data_Release_v1.0` full release (1.1M canonical entities, 6.0M kg
+edges); the earlier `2026.08.3_federated` release remains the historical
+federated context.
 
-The repository contains the web application, read-only API, release validation
-and conversion pipeline, deployment configuration, and a small real-data
-sample. The 1.6 GiB research archive and full graph exports are intentionally
-kept outside Git and mounted at runtime.
+The repository contains the web application, the release-aware Java API
+(Spring Boot 3 / Java 21 / DuckDB over Parquet), the release validation and
+conversion pipeline, deployment configuration, and small real-data samples.
+The full research archive and graph exports are intentionally kept outside
+Git and mounted at runtime.
 
 ## Quick start
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\python -m pip install -e ".\apps\api[dev]"
-npm --prefix apps/web install
-
+# backend: Maven 3.9+ and JDK 21
 $env:PESTKG_DATA_DIR="data/releases"
-.\.venv\Scripts\python -m uvicorn pestkg_api.main:app --app-dir apps/api/src --reload --port 8000
-npm --prefix apps/web run dev -- --host 127.0.0.1
+$env:PESTKG_STATE_DIR="data/state"
+$env:PESTKG_RELEASE_ID="PestKG_A_Data_Release_v1.0"
+mvn -f apps/java/pom.xml spring-boot:run -pl pestkg-api -am   # API on http://127.0.0.1:18088
+
+# frontend: Node 18+
+npm --prefix apps/web install
+npm --prefix apps/web run dev -- --host 127.0.0.1            # Vite on http://127.0.0.1:5173
 ```
 
-Open `http://127.0.0.1:5173`. The Vite development server proxies `/api` and
-`/downloads` to the API on port 8000.
-
-The selected immutable release is stored in the URL as `?release=...`; every
-release-aware API request also sends `X-PestKG-Release`. Shared links, filters,
-tables, graph reads, and exports therefore stay on one request-scoped version.
+The API reads the full v1.0 Parquet release directly through DuckDB (no
+database required). Every release-aware API request sends `X-PestKG-Release`;
+shared links, filters, tables, graph reads, and exports stay on one
+request-scoped version. A full end-to-end verification script lives at
+`tools/verify.ps1`.
 
 ## Full release preparation
 
@@ -54,10 +59,9 @@ pipeline intentionally stops before publishing. See
 ## Repository layout
 
 - `apps/web`: React, TypeScript, ECharts and Cytoscape research interface.
-- `apps/api`: FastAPI, DuckDB and optional Neo4j query service.
-- `apps/java`: Java 21, Spring Boot 3, Vaadin 24 and the first release-aware
-  Java API/UI foundation. It runs against the tracked sample while the current
-  data package remains blocked for public distribution.
+- `apps/java`: Java 21, Spring Boot 3 and the release-aware API. It serves the
+  `PestKG_A_Data_Release_v1.0` full Parquet package in `full` mode (no database
+  needed). The legacy FastAPI service (`apps/api`) has been dropped.
 - `packages/api-contract`: versioned OpenAPI snapshot and generated contract tooling.
 - `tools/release-pipeline`: release extraction, validation, sampling and Parquet conversion.
 - `research/figures`: reproducible research-figure source and tests.

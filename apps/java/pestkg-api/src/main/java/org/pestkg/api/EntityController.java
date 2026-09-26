@@ -33,7 +33,7 @@ public class EntityController {
                                                  @RequestParam(required = false) String release,
                                                  @RequestHeader(name = "X-PestKG-Release", required = false) String header) {
         ReleaseContext context = catalog.resolve(release, header);
-        return envelopes.wrap(context, store.search(context, q, entityType, jurisdiction, limit));
+        return envelopes.wrap(context, store.search(context, q, entityType, jurisdiction, limit), store.mode(context));
     }
 
     @GetMapping("/{entityId}")
@@ -43,7 +43,7 @@ public class EntityController {
         ReleaseContext context = catalog.resolve(release, header);
         EntityData entity = store.entity(context, entityId);
         if (entity == null) throw new ReleaseException("entity_not_found", "Entity not found", 404, Map.of("entity_id", entityId));
-        return envelopes.wrap(context, entity);
+        return envelopes.wrap(context, entity, store.mode(context));
     }
 
     @GetMapping("/{entityId}/history")
@@ -66,7 +66,7 @@ public class EntityController {
         return envelopes.wrap(context, Map.of(
                 "entity_id", entityId,
                 "history_status", "snapshot-backed",
-                "versions", List.of(version)));
+                "versions", List.of(version)), store.mode(context));
     }
 
     @GetMapping("/{entityId}/provenance")
@@ -81,6 +81,6 @@ public class EntityController {
                 "source_record_id", entity.sourceRecordId(),
                 "source_url", entity.sourceUrl(),
                 "release_id", context.releaseId(),
-                "evidence_status", "source-record-linked"));
+                "evidence_status", "source-record-linked"), store.mode(context));
     }
 }
