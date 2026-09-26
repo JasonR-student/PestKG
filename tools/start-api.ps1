@@ -28,8 +28,13 @@ Start-Process java -ArgumentList '-jar', "`"$jar`"" -WorkingDirectory $root `
     -RedirectStandardOutput (Join-Path $env:TEMP 'pestkg-api.log') `
     -RedirectStandardError (Join-Path $env:TEMP 'pestkg-api.err.log') | Out-Null
 
-Start-Sleep -Seconds 8
-$ready = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
+$deadline = (Get-Date).AddSeconds(40)
+$ready = $null
+while ((Get-Date) -lt $deadline) {
+    $ready = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
+    if ($ready) { break }
+    Start-Sleep -Seconds 2
+}
 if ($ready) {
     Write-Host "API is up (PID $($ready.OwningProcess)). Frontend: npm run dev in apps\web (http://localhost:5173)." -ForegroundColor Green
 } else {
