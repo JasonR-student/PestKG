@@ -4,8 +4,7 @@
 
 - Keep `/api/v1` backward compatible. Additive response fields are allowed;
   renames, removals and semantic changes require a new API version.
-- Treat `packages/api-contract/openapi-v1.1.json` and the generated web types as
-  committed artifacts. Regenerate both whenever response models change.
+- Treat `packages/api-contract/openapi-v1.1.json` as the frozen historical contract and the generated web types as committed artifacts. When Java response models change, keep both the new contract paths and the legacy compatibility layer in sync, and update the API documentation.
 - Do not commit files under `artifacts/` or `runtime/`.
 - Keep release data immutable. New releases use a new directory under
   `data/releases/`; existing release contents are not edited in place.

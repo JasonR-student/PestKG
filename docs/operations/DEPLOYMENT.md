@@ -4,8 +4,10 @@ This runbook deploys the anonymous read-only portal on one Linux host. The
 reference capacity is 8 CPU cores, 32 GB RAM, and 500 GB SSD. Commands are run
 from the repository root unless stated otherwise.
 
-The application images contain code only. Immutable release data, the writable
-release registry, and release-specific Neo4j volumes remain outside the images.
+The application images contain code only. Immutable release data and the
+writable release registry remain outside the images. The API is a Java 21 /
+Spring Boot service (DuckDB reads the release Parquet directly; Neo4j and
+PostgreSQL are optional boundaries not wired in the current build).
 
 ## 1. Host requirements
 
@@ -13,8 +15,8 @@ release registry, and release-specific Neo4j volumes remain outside the images.
 - Docker Compose 2.24 or newer. The production override uses `!reset` to remove
   local build definitions.
 - At least 500 GB SSD for two full releases plus import headroom.
-- Ports 80 and 443 open; ports 7474 and 7687 should remain firewalled from the
-  public internet.
+- Ports 80 and 443 open. The API container listens on 18088 internally; it is
+  only reachable through the reverse proxy.
 - DNS for `SITE_ADDRESS` pointing to the host before public TLS activation.
 
 Create the runtime layout:
@@ -28,36 +30,28 @@ chmod 0600 .env
 ```
 
 Set at least `SITE_ADDRESS`, `PESTKG_RELEASE_ROOT`, `PESTKG_STATE_ROOT`, image
-namespace/tag, CORS origin, and strong Neo4j credentials in `.env`.
-
-For DuckDB/Parquet-only operation, leave `PESTKG_NEO4J_URI` and
-`PESTKG_NEO4J_PASSWORD` empty. For the full graph profile, set:
-
-```dotenv
-PESTKG_NEO4J_URI=bolt://neo4j:7687
-PESTKG_NEO4J_PASSWORD=replace-with-a-strong-password
-NEO4J_AUTH=neo4j/replace-with-the-same-strong-password
-```
+namespace/tag, and CORS origin in `.env`. The current build needs no database:
+leave `PESTKG_NEO4J_URI` and `PESTKG_NEO4J_PASSWORD` empty. Only the optional
+full-graph profile sets them (see below).
 
 ## 2. Prepare an immutable release
 
-The source RAR never enters Git or an application image. Prepare it on a
+The source archive never enters Git or an application image. Prepare it on a
 controlled workstation or staging host:
 
 ```bash
-python tools/release-pipeline/prepare_release.py \
-  --archive /srv/input/multicountry_pesticide_kg_research.rar \
+python tools/prepare_v1_release.py \
+  --archive /srv/input/PestKG_A_Data_Release_v1.0.parquet.tar \
   --output /srv/pestkg/releases
 ```
 
-The pipeline extracts only the federated release, verifies the manifest,
-materializes partitioned Parquet, exports supported graph formats, and rebuilds
-the versioned download catalog.
-
-The supplied `2026.08.3_federated` archive is currently blocked for public
-distribution because multiple text files differ from the top-level manifest.
-Do not use `ALLOW_BLOCKED=1` on a public host. That override is for private
-integration testing only. See `docs/releases/RELEASE_AUDIT_2026-08-28.md`.
+The tool materializes the immutable release directory (Parquet tables plus
+release metadata) and verifies integrity before it is registered. The active
+release is `PestKG_A_Data_Release_v1.0` (1.1M canonical entities, 6.0M kg
+edges). The earlier `2026.08.3_federated` archive remains blocked for public
+distribution per the manifest audit
+(`docs/releases/RELEASE_AUDIT_2026-08-28.md`); do not use `ALLOW_BLOCKED=1` on
+a public host.
 
 ## 3. Build and publish images
 
@@ -71,11 +65,11 @@ docker push ghcr.io/OWNER/pestkg/api:1.1.0
 docker push ghcr.io/OWNER/pestkg/web:1.1.0
 ```
 
-The API image builds dependency wheels in a separate stage and installs them
-offline into the runtime stage. The web image uses `npm ci` and the committed
-lockfile. Neither image contains `data/`, `runtime/`, or the source archive.
+The API image is a JVM image built with Maven; the web image uses `npm ci`
+and the committed lockfile. Neither image contains `data/`, `runtime/`, or the
+source archive.
 
-For an air-gapped server, export all four required images:
+For an air-gapped server, export all required images:
 
 ```bash
 PESTKG_IMAGE_NAMESPACE=ghcr.io/OWNER/pestkg \
@@ -94,23 +88,23 @@ Keep the generated manifest JSON and SHA-256 file with the delivery record.
 
 ## 4. Initial deployment
 
-### DuckDB/Parquet mode
+### DuckDB/Parquet mode (default)
 
 Production pulls prebuilt images and does not compile on the host:
 
 ```bash
-infra/scripts/release.sh 2026.08.3_federated --prod
+infra/scripts/release.sh PestKG_A_Data_Release_v1.0 --prod
 ```
 
 For local integration, omit `--prod`; the script builds the code images first.
 
-### Full Neo4j mode
+### Full Neo4j mode (optional, not wired in the current build)
 
 The full profile creates a Neo4j volume whose name contains
 `PESTKG_RELEASE_ID`. It imports into that empty volume before activation:
 
 ```bash
-infra/scripts/release.sh 2026.08.3_federated --prod --full
+infra/scripts/release.sh PestKG_A_Data_Release_v1.0 --prod --full
 ```
 
 The old release volume is not reused or deleted. The API uses Neo4j only when
@@ -123,7 +117,8 @@ falls back to the selected DuckDB/Parquet repository.
 
 1. Pull production images or build local images.
 2. Verify required metadata, JSON integrity, artifact sizes, and SHA-256 values.
-3. Register the release and run a repository smoke test.
+3. Register the release (`pestkg-release validate/register/smoke-test`) and run
+   a repository smoke test.
 4. Optionally import a new release-specific Neo4j volume.
 5. Atomically update `/srv/pestkg/state/active-release.json`.
 6. Start services and wait for health checks.
@@ -142,25 +137,30 @@ curl --fail https://pestkg.example.org/health/live
 curl --fail https://pestkg.example.org/health/ready
 curl --fail https://pestkg.example.org/health
 curl --fail \
-  -H 'X-PestKG-Release: 2026.08.3_federated' \
+  -H 'X-PestKG-Release: PestKG_A_Data_Release_v1.0' \
   https://pestkg.example.org/api/v1/stats/overview
+curl --fail \
+  https://pestkg.example.org/downloads/PestKG_A_Data_Release_v1.0/index.json
 ```
 
 - `/health/live` proves the process is serving.
 - `/health/ready` verifies the active release and, when configured, Neo4j.
 - `/health` reports API version, schema version, data mode, release count, and
-  graph connectivity.
-- `/openapi.json` must match `packages/api-contract/openapi-v1.1.json` for the deployed code tag.
+  graph connectivity (`/api/v1/health` and `/api/v1/health/live|ready` are
+  aliases served for the original frontend).
+- `/openapi.json` must match `packages/api-contract/openapi-v1.1.json` for the
+  deployed code tag.
 
 Use request IDs from `X-Request-ID` to correlate user reports with proxy and API
-logs.
+logs (the API logs method, URI, status and duration for every request).
 
 ## 7. Upgrade to a new data release
 
 1. Place the new immutable directory beside the old one under
    `/srv/pestkg/releases/<release_id>`.
 2. Do not edit an existing release directory in place.
-3. Keep at least the current and previous release plus both Neo4j volumes.
+3. Keep at least the current and previous release plus both Neo4j volumes (when
+   the full profile is used).
 4. Run the same release command with the new ID.
 5. After acceptance, update the default `PESTKG_RELEASE_ID` in `.env` for clean
    disaster recovery; runtime selection still comes from the atomic state file.
@@ -188,8 +188,8 @@ PESTKG_BASE_URL=https://pestkg.example.org \
 ```
 
 The CLI reads `previous_release_id`, atomically activates it, starts the matching
-release-specific Neo4j volume, and repeats HTTP smoke tests. A rollback never
-rewrites either release directory.
+release-specific Neo4j volume (full profile), and repeats HTTP smoke tests. A
+rollback never rewrites either release directory.
 
 ## 9. Backup and retention
 
@@ -227,7 +227,8 @@ docker stats --no-stream
   CLI operation and is never exposed over HTTP.
 - Monitor 5xx rate, readiness, response latency, disk use, container restarts,
   and Caddy certificate renewal. Alert before SSD use reaches 80%.
-- Redact Neo4j credentials and `.env` from support bundles and CI artifacts.
+- Redact any database credentials and `.env` from support bundles and CI
+  artifacts.
 
 ## 11. Performance acceptance
 

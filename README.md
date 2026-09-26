@@ -15,69 +15,75 @@ Git and mounted at runtime.
 ## Quick start
 
 ```powershell
-# backend: Maven 3.9+ and JDK 21
-$env:PESTKG_DATA_DIR="data/releases"
-$env:PESTKG_STATE_DIR="data/state"
-$env:PESTKG_RELEASE_ID="PestKG_A_Data_Release_v1.0"
-mvn -f apps/java/pom.xml spring-boot:run -pl pestkg-api -am   # API on http://127.0.0.1:18088
+# backend: Java 17+ (built with 21), Maven 3.9+ — one-shot launcher
+.\tools\start-api.ps1        # builds/uses apps\java jar and starts API on http://127.0.0.1:18088
 
 # frontend: Node 18+
 npm --prefix apps/web install
 npm --prefix apps/web run dev -- --host 127.0.0.1            # Vite on http://127.0.0.1:5173
 ```
 
-The API reads the full v1.0 Parquet release directly through DuckDB (no
-database required). Every release-aware API request sends `X-PestKG-Release`;
-shared links, filters, tables, graph reads, and exports stay on one
-request-scoped version. A full end-to-end verification script lives at
-`tools/verify.ps1`.
+The launcher sets the runtime environment (`PESTKG_DATA_DIR=data\releases`,
+`PESTKG_STATE_DIR=data\state`,
+`PESTKG_RELEASE_ID=PestKG_A_Data_Release_v1.0`) and polls port 18088 until the
+API is ready. The API reads the full v1.0 Parquet release directly through
+DuckDB (no database required). Every release-aware API request sends
+`X-PestKG-Release`; shared links, filters, tables, graph reads, and exports
+stay on one request-scoped version. A full end-to-end verification script
+lives at `tools/verify.ps1` (`tools/verify.sh` on Linux/macOS).
 
-## Full release preparation
+## Frontend and API contract
 
-```powershell
-.\.venv\Scripts\python tools/release-pipeline/prepare_release.py `
-  --archive "E:\下载\multicountry_pesticide_kg_research.rar" `
-  --output runtime/releases
-```
+The web application (`apps/web`) is the original MyPestKg-Beta frontend,
+restored verbatim from the project zip (the vite dev proxy is the only local
+deviation: `8000 -> 18088`). It speaks the original `/api/v1` contract
+(`/stats/overview`, `/stats/countries`, `/schema`, `/search`, `/compare/{q}`,
+`/graph/...` with `node_id`/`start_id`/`end_id`, single-step
+`POST /exports/registration-uses`, `/downloads/{release_id}/...`,
+`/releases/active`, `/health`).
 
-The command extracts only the immutable federated release, verifies every
-entry in `manifest_sha256.csv`, builds and revalidates jurisdiction-partitioned
-Parquet tables, creates sample JSON-LD/GraphML plus full N-Triples, and builds a
-versioned download index. Use `--skip-rdf` for a faster preflight run.
-
-On Windows, RAR preparation requires 7-Zip on `PATH` or through `SEVEN_ZIP`;
-Windows `bsdtar` does not preserve all filenames safely for this archive.
-
-## Current distribution gate
-
-The supplied archive dated 2026-08-26 is not yet eligible for public
-distribution: the Neo4j and Q1-Q5 machine files match their declared hashes,
-but multiple text entries differ from the top-level manifest. The strict
-pipeline intentionally stops before publishing. See
-`docs/releases/RELEASE_AUDIT_2026-08-28.md` and rebuild the archive plus manifest first.
+The Java backend serves **both** contracts on port 18088:
+- the new Java paths (`/datasets/*`, `/entities/search|{id}`, `/comparisons/q1..q5`,
+  `/registration-uses/query`, two-step `POST /exports` -> `/artifacts/{jobId}/download`,
+  `/releases/{id}/files/*`), and
+- a compatibility layer (`CompatibilityController`) exposing every legacy
+  path above with the original response shapes, so the original frontend runs
+  unchanged. `/stats/overview` returns the original `version` headline-metric
+  shape (`jurisdictions`, `source_records`, `country_nodes`, `country_edges`,
+  `shared_nodes`, `alignment_edges`) computed live from the Parquet graph.
+  The download index (`/downloads/{release_id}/index.json` + `SHA256SUMS`) is
+  generated at runtime; path traversal outside the release directory returns 404.
 
 ## Repository layout
 
-- `apps/web`: React, TypeScript, ECharts and Cytoscape research interface.
-- `apps/java`: Java 21, Spring Boot 3 and the release-aware API. It serves the
+- `apps/web`: React, TypeScript, ECharts and Cytoscape research interface
+  (original MyPestKg-Beta code).
+- `apps/java`: Java 21, Spring Boot 3 and the release-aware API
+  (`pestkg-domain`, `pestkg-release`, `pestkg-graph`, `pestkg-ingest`,
+  `pestkg-presentation`, `pestkg-admin`, `pestkg-api`). It serves the
   `PestKG_A_Data_Release_v1.0` full Parquet package in `full` mode (no database
   needed). The legacy FastAPI service (`apps/api`) has been dropped.
 - `packages/api-contract`: versioned OpenAPI snapshot and generated contract tooling.
-- `tools/release-pipeline`: release extraction, validation, sampling and Parquet conversion.
+- `tools`: `start-api.ps1` (launcher), `verify.ps1` / `verify.sh`
+  (end-to-end verification), `prepare_v1_release.py` (release preparation).
 - `research/figures`: reproducible research-figure source and tests.
 - `infra`: container, reverse-proxy, deployment and Neo4j configuration.
 - `data/releases`: tracked metadata and real-data sample only.
 - `docs`: architecture, API, design, operations and release documentation.
-- `artifacts`: ignored generated deliveries, images and migration evidence.
-- `runtime`: ignored mutable service state and caches.
+- `artifacts` / `runtime`: ignored generated deliveries, images, migration
+  evidence and mutable service state.
 
 The Java v1 migration contract and temporal schema are documented in
-`docs/architecture/JAVA_V1_MIGRATION.md` and
-`docs/api/API_CONTRACT_V1.md`. Run it from the repository root with Maven:
+`docs/architecture/JAVA_V1_MIGRATION.md` and `docs/api/API_CONTRACT_V1.md`.
 
-```powershell
-mvn -f apps/java/pom.xml spring-boot:run -pl pestkg-api -am
-```
+## Release history
+
+- `2026-08` Python/FastAPI + Neo4j prototype with the `2026.08.3_federated`
+  release; blocked from public distribution by the manifest audit
+  (`docs/releases/RELEASE_AUDIT_2026-08-28.md`).
+- `2026-09` Java rewrite (all Python backend code replaced), DuckDB direct
+  read of the v1.0 Parquet data package, original frontend restored from the
+  MyPestKg-Beta zip, legacy-contract compatibility layer, port 18088.
 
 ## Licensing
 

@@ -15,3 +15,10 @@ npm run api:generate
 
 Run the local checks with `npm run lint`, `npm run test`, and `npm run build`.
 The production build enforces a 500 KiB limit for every JavaScript chunk.
+
+## Backend
+
+This frontend is the original MyPestKg-Beta code and speaks the original /api/v1`r
+contract. The Java backend on port 18088 serves those paths through a
+compatibility layer plus the new Java contract paths; the vite dev proxy
+(ite.config.ts) targets http://127.0.0.1:18088.

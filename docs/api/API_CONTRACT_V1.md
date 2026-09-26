@@ -12,5 +12,4 @@ and path queries, Q1-Q5 comparisons, export jobs and artifact downloads.
 Errors use an `error` object with `code`, `message`, `details` and `requestId`.
 Every request receives `X-Request-ID`.
 
-The first implementation runs against the tracked sample data. Full Parquet
-and Neo4j adapters must preserve the same release and temporal filters.
+The current implementation (2026-09) runs against the full `PestKG_A_Data_Release_v1.0` Parquet package in `full` mode on port 18088; Parquet/Neo4j adapters preserve the same release and temporal filters. A compatibility layer additionally serves the original Python v1.1 wire paths for the restored MyPestKg-Beta frontend.

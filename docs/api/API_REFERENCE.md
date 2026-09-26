@@ -1,10 +1,19 @@
 # PestKG API 接口文档
 
 > **版本**: v1.1  
-> **Base URL**: `http://127.0.0.1:8000`（开发环境）  
+> **Base URL**: `http://127.0.0.1:18088`（开发环境；历史 Python 版为 8000，Java 后端统一为 18088）  
 > **协议**: HTTP/1.1, REST  
 > **数据格式**: JSON (UTF-8)  
 > **只读接口**: 所有端点均为 GET 或 POST 查询，不修改数据
+
+> **当前状态（2026-09-26）**：本文件描述 v1.1 契约。Java 后端（端口 18088）
+> 同时服务两套契约：本文件覆盖的 v1.1 路径由兼容层原样提供（前端为
+> MyPestKg-Beta 原版，逐字调用 `/stats/*`、`/schema`、`/search`、
+> `/compare/{q}`、`/graph/*`、`/exports/registration-uses`、`/downloads/*`、
+> `/releases/active`、`/health`），另有新契约路径（`/datasets/*`、
+> `/entities/*`、`/comparisons/q1..q5`、`/registration-uses/query`、两段式
+> 导出、`/releases/{id}/files/*`）。响应信封与错误结构两套契约一致；
+> 单步导出上限 100,000 行，超出返回 `export_too_large`。
 
 ---
 

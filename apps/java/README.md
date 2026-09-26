@@ -44,12 +44,11 @@ The Java service now serves the supplied full data package
 - The API needs no database: the PostgreSQL/Flyway deps in `pestkg-release`
   are optional and do not reach the API classpath (no DataSource
   auto-configuration), so startup requires no datasource URL.
-- The web app (`apps/web`) is fully switched to the Java contract: every
-  client call uses `/api/v1` Java paths (`/datasets/overview`,
-  `/entities/search`, `/registration-uses/query`, ...), the CSV export uses
-  the two-step job flow (`POST /api/v1/exports` -> GET
-  `/api/v1/artifacts/{jobId}/download`), and the pages render Java-only
-  fields (overview `inventory`, release `active`/`integrity`, ...).
+- The web app (pps/web) is the original MyPestKg-Beta frontend, restored
+  verbatim from the project zip (only the vite dev proxy changed: 8000 -> 18088).
+  It speaks the legacy contract; CompatibilityController serves those paths
+  unchanged, and the new Java contract paths (/datasets/*, /entities/*,
+  /comparisons/q1..q5, two-step exports) remain available on the same port.
 - The API listens on **port 18088** (`server.port: ${PORT:18088}` in
   `pestkg-api/src/main/resources/application.yml`); the Vite dev proxy
   (`apps/web/vite.config.ts`) targets `http://127.0.0.1:18088` and
