@@ -53,7 +53,8 @@ services:
     restart: unless-stopped
     read_only: true
     security_opt: [no-new-privileges:true]
-    tmpfs: [/tmp]
+    # DuckDB JDBC extracts and loads its native library from java.io.tmpdir.
+    tmpfs: [/tmp:exec,size=1g]
     environment:
       PESTKG_RELEASE_ID: PestKG_A_Data_Release_v1.0
       PESTKG_DATA_DIR: /data/releases
