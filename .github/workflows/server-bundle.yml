@@ -1,0 +1,63 @@
+name: Server Docker Bundle
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set image identity
+        run: |
+          echo "PESTKG_IMAGE_TAG=$(date -u +%Y%m%d)-${GITHUB_SHA:0:12}" >> "$GITHUB_ENV"
+          echo "VCS_REF=$GITHUB_SHA" >> "$GITHUB_ENV"
+          echo "BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+      - name: Build and export delivery
+        run: |
+          docker compose build api web
+          docker pull caddy:2.11.4-alpine
+          python tools/build_server_bundle.py --tag "$PESTKG_IMAGE_TAG"
+      - name: Load and start the packaged offline deployment
+        run: |
+          bundle="$PWD/artifacts/deploy/pestkg-server-$PESTKG_IMAGE_TAG-linux-amd64"
+          cd "$bundle"
+          sha256sum -c SHA256SUMS
+          docker image rm "pestkg/api:$PESTKG_IMAGE_TAG" "pestkg/web:$PESTKG_IMAGE_TAG" caddy:2.11.4-alpine
+          docker load -i images.tar
+          cp .env.example .env
+          export PESTKG_BIND_ADDRESS=127.0.0.1 PESTKG_HTTP_PORT=18080 PESTKG_HTTPS_PORT=18443
+          docker compose up -d --wait --wait-timeout 300
+      - name: Verify the delivered API and frontend
+        run: |
+          bash infra/scripts/smoke-test.sh http://127.0.0.1:18080 PestKG_A_Data_Release_v1.0
+          python tools/smoke_server_bundle.py http://127.0.0.1:18080
+      - name: Delivery logs
+        if: always()
+        run: |
+          bundle="$PWD/artifacts/deploy/pestkg-server-$PESTKG_IMAGE_TAG-linux-amd64"
+          if [ -f "$bundle/.env" ]; then
+            cd "$bundle"
+            docker compose ps
+            docker compose logs --no-color --tail 150
+            docker compose down
+          fi
+      - name: Upload verified server bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: pestkg-server-linux-amd64
+          path: |
+            artifacts/deploy/*.tar.gz
+            artifacts/deploy/*.tar.gz.sha256
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error

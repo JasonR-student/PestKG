@@ -49,6 +49,10 @@ services:
     build:
       context: apps/java
       dockerfile: pestkg-api/Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+        VCS_REF: ${VCS_REF:-unknown}
+        VERSION: ${PESTKG_IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       PESTKG_RELEASE_ID: ${PESTKG_RELEASE_ID:-PestKG_A_Data_Release_v1.0}

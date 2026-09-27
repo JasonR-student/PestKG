@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Database, Download, Expand, ExternalLink, Focus, ListFilter, Maximize2, Minus, Network, Pin, Play, Plus, RotateCcw, Search, Tag, Trash2 } from 'lucide-react'
+import { Database, Download, Expand, ExternalLink, Focus, ListFilter, Maximize2, Minus, Network, Pin, Plus, RotateCcw, Search, Tag, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
@@ -12,15 +12,9 @@ import { jurisdictionName } from '../../shared/lib/jurisdictions'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
 import { GraphCanvas, type GraphCanvasHandle } from '../explore/components/GraphCanvas'
 import { nodeColors } from '../explore/components/node-colors'
+import { categoryFromQuery, categoryLabel, categoryMatches } from './graph-categories'
 
 const emptyGraph: GraphData = { nodes: [], edges: [] }
-const typeNames: Record<string, string> = {
-  Jurisdiction: '辖区', CountryOrTerritory: '国家／地区', Source: '来源', SourceSnapshot: '来源快照',
-  RegistrationUse: '登记使用', Registration: '登记', PesticideProduct: '农药产品',
-  LocalActiveIngredient: '本地有效成分', CropTerm: '作物术语', TargetTerm: '防治对象',
-  FormulationTerm: '剂型', RegulatoryOrganization: '监管机构', ChEBITerm: 'ChEBI 本体术语',
-  AGROVOCConcept: 'AGROVOC 概念', MoAGroup: '作用机制组', ChemicalEntity: '参考化学实体',
-}
 
 export function GraphBrowserPage() {
   const { i18n } = useTranslation()
@@ -35,6 +29,7 @@ export function GraphBrowserPage() {
   const [relation, setRelation] = useState('')
   const [showLabels, setShowLabels] = useState(false)
   const [catalogOpen, setCatalogOpen] = useState(false)
+  const [categorySearch, setCategorySearch] = useState('')
   const [pinned, setPinned] = useState<string[]>([])
   const [error, setError] = useState('')
   const [expanding, setExpanding] = useState(false)
@@ -56,6 +51,12 @@ export function GraphBrowserPage() {
   const selected = selection?.key === key ? selection : null
   const visibleGraph = useMemo(() => relation ? { ...graph, edges: graph.edges.filter((edge) => edge.predicate === relation) } : graph, [graph, relation])
   const scope = catalog.data?.data.scopes.find((item) => item.id === applied.scope)
+  const categories = useMemo(() => {
+    if (scope) return Object.entries(scope.node_types).sort((a, b) => b[1] - a[1])
+    return [...new Set(catalog.data?.data.scopes.flatMap((item) => Object.keys(item.node_types)) ?? [])]
+      .sort().map((type): [string, number | undefined] => [type, undefined])
+  }, [scope, catalog.data])
+  const filteredCategories = categories.filter(([type]) => categoryMatches(type, categorySearch))
   const node = selected?.kind === 'node' ? graph.nodes.find((item) => item.id === selected.id) : undefined
   const edge = selected?.kind === 'edge' ? graph.edges.find((item) => item.id === selected.id) : undefined
   const selectNode = useCallback((id: string) => setSelection({ key, kind: 'node', id }), [key])
@@ -102,6 +103,18 @@ export function GraphBrowserPage() {
   const changeScope = (value: string) => {
     const query = { ...draft, scope: value, type: '', query: '' }
     setDraft(query)
+    setCategorySearch('')
+    run(undefined, query)
+  }
+  const search = (event: FormEvent) => {
+    const type = categoryFromQuery(draft.query ?? '', categories.map(([name]) => name))
+    const query = type ? { ...draft, type, query: '' } : draft
+    setDraft(query)
+    run(event, query)
+  }
+  const chooseCategory = (type: string) => {
+    const query = { ...draft, type, query: '' }
+    setDraft(query)
     run(undefined, query)
   }
   const downloadPng = () => {
@@ -135,12 +148,13 @@ export function GraphBrowserPage() {
         <div><span className="eyebrow">PESTKG / GRAPH</span><h1>{english ? 'Graph browser' : '图谱浏览器'}</h1></div>
         <div className="graph-release-note"><span>{releaseId}</span><small>{english ? 'Independent reference pack' : '独立参考数据包'} · {catalog.data?.data.reference_pack_id || '—'}</small></div>
       </header>
-      <form className="graph-query" onSubmit={(event) => run(event)}>
+      <form className="graph-query" onSubmit={search}>
         <Search size={18} aria-hidden="true" />
-        <input aria-label={english ? 'Graph query' : '图谱查询'} value={draft.query} onChange={(event) => setDraft({ ...draft, query: event.target.value })} placeholder={english ? 'Name or node / source identifier' : '节点名称、节点 ID 或来源标识'} />
-        <button type="submit" disabled={result.isFetching}><Play size={15} />{english ? 'Run' : '运行'}</button>
+        <input aria-label={english ? 'Graph query' : '图谱查询'} value={draft.query} onChange={(event) => setDraft({ ...draft, query: event.target.value })} placeholder={english ? 'Name, identifier, or category' : '名称、编号或类别'} />
+        <button type="submit" disabled={result.isFetching || catalog.isLoading}><Search size={15} />{english ? 'Search' : '搜索'}</button>
       </form>
       <div className="graph-query-options">
+        <label>{english ? 'Category' : '类别'}<select aria-label={english ? 'Category' : '类别'} value={draft.type} onChange={(event) => chooseCategory(event.target.value)} disabled={catalog.isLoading}><option value="">{english ? 'All categories' : '全部类别'}</option>{categories.map(([type]) => <option key={type} value={type}>{categoryLabel(type, english)}</option>)}</select></label>
         <label>{english ? 'Node limit' : '节点上限'}<select value={draft.limit} onChange={(event) => setDraft({ ...draft, limit: Number(event.target.value) })}>{[60, 120, 240, 300].map((value) => <option key={value}>{value}</option>)}</select></label>
         <label className="graph-check"><input type="checkbox" checked={draft.provenance} onChange={(event) => { const next = { ...draft, provenance: event.target.checked }; setDraft(next); run(undefined, next) }} />{english ? 'Provenance projection' : '溯源属性投影'}</label>
         <span>{english ? 'Read-only · bounded view' : '只读 · 有界视图'}</span>
@@ -160,9 +174,11 @@ export function GraphBrowserPage() {
           <dl className="graph-scope-counts"><div><dt>{english ? 'Nodes' : '节点'}</dt><dd>{scope ? formatInteger(scope.nodes) : '—'}</dd></div><div><dt>{english ? 'Stored relations' : '存储关系'}</dt><dd>{scope ? formatInteger(scope.edges) : '—'}</dd></div></dl>
           {scope?.kind === 'reference' ? <p className="graph-scope-status">{scope.coverage_status === 'BOUNDED_OFFICIAL_API_SUBGRAPH' ? (english ? 'Bounded official API subgraph' : '官方接口有界子图') : scope.coverage_status === 'LEGACY_DERIVED_REFERENCE_UNREVIEWED' ? (english ? 'Legacy reference import · unreviewed' : '旧参考子图导入 · 待审核') : (english ? 'Official ontology snapshot' : '官方本体文件快照')}<br />{english ? 'Regulatory identity links: 0' : '已审核监管身份连接：0'}</p> : null}
           <div id="graph-catalog" className={`graph-catalog-scroll${catalogOpen ? ' is-open' : ''}`}>
-            <h3>{english ? 'Node labels' : '节点标签'}<small>NODE LABELS</small></h3>
-            <button className="graph-label-row" type="button" aria-pressed={!applied.type} onClick={() => { const next = { ...draft, type: '' }; setDraft(next); run(undefined, next) }}><span>{english ? 'All labels' : '全部标签'}</span></button>
-            {Object.entries(scope?.node_types ?? {}).sort((a, b) => b[1] - a[1]).map(([type, count]) => <button key={type} className="graph-label-row" type="button" aria-pressed={applied.type === type} onClick={() => { const next = { ...draft, type }; setDraft(next); run(undefined, next) }}><i style={{ background: nodeColors[type] ?? '#87958b' }} /><span>{english ? type : typeNames[type] ?? type}</span><small>{formatInteger(count)}</small></button>)}
+            <h3>{english ? 'Categories' : '类别'}<small>CATEGORIES</small></h3>
+            <label className="graph-category-search"><Search size={14} aria-hidden="true" /><input aria-label={english ? 'Search categories' : '搜索类别'} placeholder={english ? 'Search categories' : '搜索类别'} value={categorySearch} onChange={(event) => setCategorySearch(event.target.value)} /></label>
+            <button className="graph-label-row" type="button" aria-pressed={!applied.type} onClick={() => chooseCategory('')}><span>{english ? 'All categories' : '全部类别'}</span></button>
+            {filteredCategories.map(([type, count]) => <button key={type} className="graph-label-row" type="button" title={type} aria-pressed={applied.type === type} onClick={() => chooseCategory(type)}><i style={{ background: nodeColors[type] ?? '#87958b' }} /><span>{categoryLabel(type, english)}</span>{count !== undefined ? <small>{formatInteger(count)}</small> : null}</button>)}
+            {!filteredCategories.length && categorySearch ? <p className="graph-category-empty" role="status">{english ? 'No matching categories' : '没有匹配的类别'}</p> : null}
             <h3>{english ? 'Relationship types' : '关系类型'}<small>RELATIONSHIP TYPES</small></h3>
             {Object.entries(scope?.relation_types ?? {}).sort((a, b) => b[1] - a[1]).map(([predicate, count]) => <button key={predicate} className="graph-label-row" type="button" aria-pressed={relation === predicate} onClick={() => setRelation((previous) => previous === predicate ? '' : predicate)}><i className="relation-swatch" /><span title={predicate}>{predicate}</span><small>{formatInteger(count)}</small></button>)}
             <details className="graph-loaded-nodes"><summary>{english ? 'Loaded nodes' : '当前节点'} · {graph.nodes.length}</summary><div>{graph.nodes.map((item) => <button key={item.id} type="button" onClick={() => selectNode(item.id)} title={item.id}>{preferredLabel(item, i18n.language)}</button>)}</div></details>
@@ -183,7 +199,7 @@ export function GraphBrowserPage() {
         </div>
         <aside className="graph-inspector">
           {!selected ? <div className="graph-inspector-empty"><Network size={32} /><span>{english ? 'No selection' : '暂无选中项'}</span></div> : <>
-            <header><span>{node ? (english ? 'NODE' : '节点') : (english ? 'RELATIONSHIP' : '关系')}</span><h2>{label}</h2><small>{node ? (english ? node.type : typeNames[node.type] ?? node.type) : edge?.predicate}</small></header>
+            <header><span>{node ? (english ? 'NODE' : '节点') : (english ? 'RELATIONSHIP' : '关系')}</span><h2>{label}</h2><small>{node ? categoryLabel(node.type, english) : edge?.predicate}</small>{node ? <small>{node.type}</small> : null}</header>
             <dl><div><dt>ID</dt><dd>{selected.id}</dd></div>{node?.jurisdiction ? <div><dt>{english ? 'Jurisdiction' : '辖区'}</dt><dd>{node.jurisdiction} · {jurisdictionName(node.jurisdiction, english)}</dd></div> : null}{Object.entries(properties).map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{typeof value === 'object' ? JSON.stringify(value) : String(value ?? '—')}</dd></div>)}</dl>
             <div className="graph-inspector-actions">
               {node ? <><button type="button" className="button button--primary" disabled={expanding} onClick={() => void expand(node.id)}><Expand size={15} />{english ? 'Expand' : '展开邻居'}</button><button type="button" className="icon-button" title={english ? 'Pin node' : '固定节点'} aria-label={english ? 'Pin node' : '固定节点'} aria-pressed={pinned.includes(node.id)} onClick={() => { canvas.current?.pin(node.id); setPinned((previous) => previous.includes(node.id) ? previous.filter((id) => id !== node.id) : [...previous, node.id]) }}><Pin size={16} /></button></> : null}

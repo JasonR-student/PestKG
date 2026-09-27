@@ -1,0 +1,79 @@
+name: pestkg-server
+
+services:
+  caddy:
+    image: ${CADDY_IMAGE:-caddy:2.11.4-alpine}
+    platform: linux/amd64
+    pull_policy: never
+    restart: unless-stopped
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp]
+    depends_on:
+      web:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-http://:80}
+    ports:
+      - "${PESTKG_BIND_ADDRESS:-0.0.0.0}:${PESTKG_HTTP_PORT:-80}:80"
+      - "${PESTKG_BIND_ADDRESS:-0.0.0.0}:${PESTKG_HTTPS_PORT:-443}:443"
+      - "${PESTKG_BIND_ADDRESS:-0.0.0.0}:${PESTKG_HTTPS_PORT:-443}:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    healthcheck:
+      test: [CMD, wget, --quiet, --spider, "http://127.0.0.1:2019/config/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  web:
+    image: ${PESTKG_IMAGE_NAMESPACE:-pestkg}/web:${PESTKG_IMAGE_TAG:?Set PESTKG_IMAGE_TAG in .env}
+    platform: linux/amd64
+    pull_policy: never
+    restart: unless-stopped
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp, /var/cache/nginx, /var/run]
+    healthcheck:
+      test: [CMD, wget, --quiet, --spider, "http://127.0.0.1/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    image: ${PESTKG_IMAGE_NAMESPACE:-pestkg}/api:${PESTKG_IMAGE_TAG:?Set PESTKG_IMAGE_TAG in .env}
+    platform: linux/amd64
+    pull_policy: never
+    restart: unless-stopped
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp]
+    environment:
+      PESTKG_RELEASE_ID: PestKG_A_Data_Release_v1.0
+      PESTKG_DATA_DIR: /data/releases
+      PESTKG_REFERENCE_DIR: /data/reference-graphs
+      PESTKG_STATE_DIR: /data/state
+      PESTKG_EXPORT_DIR: /data/exports
+    volumes:
+      - ./data/releases:/data/releases:ro
+      - ./data/reference-graphs:/data/reference-graphs:ro
+      - api_state:/data/state
+      - api_exports:/data/exports
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, "http://127.0.0.1:18088/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+
+volumes:
+  caddy_data:
+  caddy_config:
+  api_state:
+  api_exports:

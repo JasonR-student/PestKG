@@ -1,5 +1,11 @@
 # PestKG deployment and operations manual
 
+> For the current Java/Parquet delivery, use
+> [the verified Docker bundle guide](DEPLOYMENT_DOCKER_ZH.md).
+> This older runbook describes release CLI and optional Neo4j flows that are
+> not available in the current API image. Do not use its release/rollback scripts
+> for the offline bundle.
+
 This runbook deploys the anonymous read-only portal on one Linux host. The
 reference capacity is 8 CPU cores, 32 GB RAM, and 500 GB SSD. Commands are run
 from the repository root unless stated otherwise.

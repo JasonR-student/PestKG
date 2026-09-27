@@ -13,6 +13,13 @@ COPY pestkg-api pestkg-api
 RUN mvn -pl pestkg-api -am package -DskipTests -q
 
 FROM eclipse-temurin:21-jre
+ARG BUILD_DATE=unknown
+ARG VCS_REF=unknown
+ARG VERSION=dev
+LABEL org.opencontainers.image.title="PestKG API" \
+      org.opencontainers.image.version="$VERSION" \
+      org.opencontainers.image.created="$BUILD_DATE" \
+      org.opencontainers.image.revision="$VCS_REF"
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /src/pestkg-api/target/pestkg-api-1.0.0-SNAPSHOT.jar app.jar

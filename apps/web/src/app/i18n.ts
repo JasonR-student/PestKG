@@ -62,9 +62,15 @@ const resources = {
   },
 }
 
+i18n.on('languageChanged', (language) => {
+  const chinese = language.startsWith('zh')
+  document.documentElement.lang = chinese ? 'zh-CN' : 'en'
+  document.title = chinese ? 'PestKG | 多辖区农药知识图谱' : 'PestKG | Cross-Jurisdiction Pesticide Knowledge Graph'
+})
+
 void i18n.use(initReactI18next).init({
   resources,
-  lng: window.localStorage.getItem('pestkg-language') ?? 'zh',
+  lng: window.localStorage.getItem('pestkg-language') ?? 'en',
   fallbackLng: 'en',
   interpolation: { escapeValue: false },
 })

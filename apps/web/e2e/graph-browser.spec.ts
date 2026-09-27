@@ -5,6 +5,7 @@ import type { GraphData } from '../src/shared/api/models'
 const errors = new WeakMap<Page, string[]>()
 
 test.beforeEach(async ({ page }, info) => {
+  await page.addInitScript(() => localStorage.setItem('pestkg-language', 'zh'))
   if (info.project.name.startsWith('desktop')) await page.setViewportSize({ width: 1440, height: 1000 })
   const messages: string[] = []
   errors.set(page, messages)
@@ -58,7 +59,7 @@ test('APVMA business graph, provenance projection, inspector and PNG work', asyn
   await screenshot(page, 'graph-apvma', info.project.name)
 
   await page.getByLabel('图谱查询').fill('Frutor Fungicide')
-  const graph = await queryResult(page, () => page.getByRole('button', { name: '运行', exact: true }).click())
+  const graph = await queryResult(page, () => page.getByRole('button', { name: '搜索', exact: true }).click())
   expect(graph.nodes.length).toBeGreaterThan(2)
   expect(graph.edges.some((edge) => edge.predicate === 'FROM_SNAPSHOT' && edge.properties?.stored_fact === false)).toBe(true)
   await populated(page)
@@ -98,7 +99,7 @@ test('Taiwan region and independent ChEBI and AGROVOC graphs remain separate', a
     await queryResult(page, () => page.getByLabel('图谱范围').selectOption(scope))
     await populated(page)
     await page.getByLabel('图谱查询').fill(term)
-    const graph = await queryResult(page, () => page.getByRole('button', { name: '运行', exact: true }).click())
+    const graph = await queryResult(page, () => page.getByRole('button', { name: '搜索', exact: true }).click())
     expect(graph.nodes.length).toBeGreaterThan(0)
     expect(graph.nodes.every((node) => node.id.startsWith('REF_'))).toBe(true)
     expect(graph.edges.some((edge) => edge.predicate === 'EXACT_CHEMICAL_IDENTITY')).toBe(false)
@@ -112,12 +113,12 @@ test('graph browser empty queries can be reset', async ({ page }) => {
   await page.goto('/graph')
   await populated(page)
   await page.getByLabel('图谱查询').fill('PESTKG-NONEXISTENT-GRAPH-REGRESSION')
-  const graph = await queryResult(page, () => page.getByRole('button', { name: '运行', exact: true }).click())
+  const graph = await queryResult(page, () => page.getByRole('button', { name: '搜索', exact: true }).click())
   expect(graph.nodes).toEqual([])
   await expect(page.locator('.graph-no-results')).toHaveText('没有符合条件的节点')
   await expect(page.getByRole('button', { name: '导出 PNG', exact: true })).toBeDisabled()
   await page.getByLabel('图谱查询').fill('Frutor Fungicide')
-  await queryResult(page, () => page.getByRole('button', { name: '运行', exact: true }).click())
+  await queryResult(page, () => page.getByRole('button', { name: '搜索', exact: true }).click())
   await populated(page)
 })
 

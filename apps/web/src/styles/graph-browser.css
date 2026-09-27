@@ -6,14 +6,14 @@
 .graph-release-note small { font-size: 10px; }
 .graph-query { display: flex; min-height: 62px; align-items: center; gap: 14px; padding-left: 16px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); overflow: hidden; }
 .graph-query > svg { color: var(--green); flex-shrink: 0; }
-.graph-query input { flex: 1; min-width: 0; padding: 14px 0; border: 0; background: transparent; font-family: Consolas, monospace; font-size: 13px; }
+.graph-query input { flex: 1; min-width: 0; padding: 14px 0; border: 0; background: transparent; font-size: 13px; }
 .graph-query button { display: flex; align-items: center; justify-content: center; align-self: stretch; gap: 8px; min-width: 90px; padding: 12px; border: 0; color: white; background: var(--green); font-weight: 700; }
 .graph-query:focus-within { border-color: var(--green); }
 .graph-query button { cursor: pointer; }
 .graph-query button:disabled { opacity: 0.6; cursor: wait; }
-.graph-query-options { display: flex; align-items: center; gap: 20px; min-height: 32px; color: var(--muted); font-size: 11px; }
-.graph-query-options label { display: flex; align-items: center; gap: 8px; }
-.graph-query-options select { padding: 4px 24px 4px 8px; border: 1px solid var(--border); border-radius: 4px; background: white; font-size: 11px; }
+.graph-query-options { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; min-height: 32px; color: var(--muted); font-size: 11px; }
+.graph-query-options label { display: flex; min-width: 0; max-width: 100%; align-items: center; gap: 8px; }
+.graph-query-options select { min-width: 0; max-width: 210px; padding: 4px 24px 4px 8px; border: 1px solid var(--border); border-radius: 4px; background: white; font-size: 11px; }
 .graph-query-options > span { margin-left: auto; }
 .graph-check input { accent-color: var(--green); }
 .graph-workspace { display: grid; grid-template-columns: 218px minmax(0, 1fr) 248px; gap: 14px; align-items: start; }
@@ -32,10 +32,14 @@
 .graph-catalog-scroll { max-height: 494px; overflow-y: auto; }
 .graph-catalog-scroll h3 { display: grid; gap: 3px; margin: 20px 5px 8px; font-size: 11px; color: var(--muted); }
 .graph-catalog-scroll h3 small { font-size: 9px; color: var(--faint); }
+.graph-category-search { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; padding: 7px; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); }
+.graph-category-search svg { flex-shrink: 0; }
+.graph-category-search input { min-width: 0; width: 100%; padding: 0; border: 0; background: transparent; font-size: 11px; }
+.graph-category-empty { color: var(--muted); font-size: 11px; }
 .graph-label-row { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 5px; border: 0; border-radius: 4px; background: transparent; text-align: left; font-size: 12px; cursor: pointer; }
 .graph-label-row[aria-pressed=true] { background: var(--green-soft); color: var(--green); }
 .graph-label-row i { flex: 0 0 9px; height: 9px; border-radius: 50%; }
-.graph-label-row span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.graph-label-row span { min-width: 0; overflow-wrap: anywhere; }
 .graph-label-row small { margin-left: auto; flex-shrink: 0; font-size: 10px; color: var(--faint); font-variant-numeric: tabular-nums; }
 .graph-label-row .relation-swatch { background: #2a938c; }
 .graph-loaded-nodes { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 10px; }
@@ -57,7 +61,7 @@
 .graph-inspector header { padding: 16px; border-bottom: 1px solid var(--border); }
 .graph-inspector header > span { font-size: 9px; color: var(--green); font-weight: 700; }
 .graph-inspector h2 { margin: 8px 0; font-size: 17px; line-height: 1.4; overflow-wrap: anywhere; }
-.graph-inspector header small { font-size: 10px; color: var(--muted); }
+.graph-inspector header small { display: block; font-size: 10px; color: var(--muted); overflow-wrap: anywhere; }
 .graph-inspector dl { margin: 0; padding: 0 16px; max-height: 490px; overflow-y: auto; }
 .graph-inspector dl > div { padding: 10px 0; border-bottom: 1px solid var(--border); }
 .graph-inspector dt { margin-bottom: 6px; color: var(--muted); font-size: 10px; overflow-wrap: anywhere; }
