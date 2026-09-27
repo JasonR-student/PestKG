@@ -7,6 +7,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 import duckdb
+import pytest
 
 from export_graph_formats import export_ntriples, export_sample_formats
 
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[3]
 SAMPLE = ROOT / "data/releases/2026.08.3_federated/sample"
 
 
+@pytest.mark.skipif(not SAMPLE.is_dir(), reason="Historical 2026.08.3_federated sample is not mounted")
 def test_sample_jsonld_and_graphml_are_well_formed(tmp_path: Path) -> None:
     with (SAMPLE / "nodes.csv").open("r", encoding="utf-8-sig", newline="") as handle:
         node_count = sum(1 for _ in csv.DictReader(handle))

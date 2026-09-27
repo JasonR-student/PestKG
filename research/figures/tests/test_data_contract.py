@@ -19,6 +19,7 @@ def read_csv(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+@unittest.skipUnless(RELEASE_ROOT.is_dir(), "Historical 2026.08.3_federated release is not mounted")
 class PaperFigureDataContractTest(unittest.TestCase):
     def test_release_inventory_is_frozen(self) -> None:
         release = json.loads((RELEASE_ROOT / "release.json").read_text(encoding="utf-8"))

@@ -1,13 +1,13 @@
 {$SITE_ADDRESS:http://localhost} {
 	encode zstd gzip
 
-	@api path /api/* /health /health/* /docs* /openapi.json
+	@api path /api/* /health /health/* /swagger-ui* /v3/api-docs*
 	handle @api {
-		reverse_proxy api:8000
+		reverse_proxy api:18088
 	}
 
 	handle /downloads/* {
-		reverse_proxy api:8000
+		reverse_proxy api:18088
 	}
 
 	handle {

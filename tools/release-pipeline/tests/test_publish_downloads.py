@@ -4,11 +4,16 @@ import json
 import shutil
 from pathlib import Path
 
+import pytest
+
 from publish_downloads import publish_downloads
 
 
 ROOT = Path(__file__).resolve().parents[3]
 TRACKED_RELEASE = ROOT / "data/releases/2026.08.3_federated"
+pytestmark = pytest.mark.skipif(
+    not TRACKED_RELEASE.is_dir(), reason="Historical 2026.08.3_federated release is not mounted"
+)
 
 
 def load_json_without_duplicate_keys(path: Path) -> dict[str, object]:

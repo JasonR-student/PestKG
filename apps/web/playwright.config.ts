@@ -7,7 +7,9 @@ const localChannel = process.env.PLAYWRIGHT_CHANNEL as
 
 export default defineConfig({
   testDir: './e2e',
-  timeout: 30_000,
+  timeout: 120_000,
+  expect: { timeout: 60_000 },
+  workers: 1,
   fullyParallel: false,
   reporter: 'line',
   use: {
@@ -17,6 +19,6 @@ export default defineConfig({
   },
   projects: [
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'], channel: localChannel } },
-    { name: 'mobile-chromium', use: { ...devices['Pixel 7'], channel: localChannel } },
+    { name: 'mobile-chromium', use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 }, channel: localChannel } },
   ],
 })

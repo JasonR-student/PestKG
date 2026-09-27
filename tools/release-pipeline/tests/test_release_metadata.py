@@ -4,9 +4,14 @@ import json
 import csv
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[3]
 RELEASE = ROOT / "data/releases/2026.08.3_federated"
+pytestmark = pytest.mark.skipif(
+    not RELEASE.is_dir(), reason="Historical 2026.08.3_federated release is not mounted"
+)
 
 
 def test_release_metadata_matches_published_inventory() -> None:

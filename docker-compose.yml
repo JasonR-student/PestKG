@@ -60,7 +60,7 @@ services:
       - ${PESTKG_STATE_ROOT:-./data/state}:/data/state
       - java_exports:/data/exports
     healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --spider http://127.0.0.1:8081/health/ready || exit 1"]
+      test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:18088/health/ready"]
       interval: 15s
       timeout: 5s
       retries: 5

@@ -88,6 +88,25 @@ class SampleReleaseTest {
     }
 
     @Test
+    void searchFiltersByPublicJurisdictionCode() {
+        ReleaseContext context = catalog.resolve(null, null);
+        List<EntityData> results = store.search(context, "Frutor", "PesticideProduct", "AU", 10);
+        assertFalse(results.isEmpty(), "AU search should resolve canonical jurisdiction IDs");
+        assertTrue(results.stream().allMatch(entity -> "AU".equals(entity.jurisdiction())));
+    }
+
+    @Test
+    void registrationUsesFilterByPublicJurisdictionCode() {
+        ReleaseContext context = catalog.resolve(null, null);
+        CsvDataStore.UseQuery filter = new CsvDataStore.UseQuery(
+                List.of("AU"), null, "Frutor Fungicide", null, null, null, null, null, null);
+        DuckDbDataStore.UsesPage page = store.queryUses(context, filter, 0, 5);
+        assertEquals(1, page.total(), "AU product filter should match the real release");
+        assertEquals(1, page.rows().size());
+        assertEquals("AU", page.rows().get(0).jurisdiction());
+    }
+
+    @Test
     void cursorCannotCrossReleaseOrFilter() {
         CursorService cursors = new CursorService();
         String fingerprint = cursors.fingerprint(

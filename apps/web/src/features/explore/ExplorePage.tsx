@@ -47,6 +47,7 @@ export function ExplorePage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [depth, setDepth] = useState(1)
   const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string>()
   const countries = useQuery({ queryKey: ['countries', releaseId], queryFn: ({ signal }) => api.countries(releaseId, signal), enabled: Boolean(releaseId) })
   const results = useInfiniteQuery({
     queryKey: ['registration-uses', releaseId, filters],
@@ -99,6 +100,7 @@ export function ExplorePage() {
 
   const exportRows = async () => {
     setExporting(true)
+    setExportError(undefined)
     try {
       const blob = await api.exportRegistrationUses(filters, releaseId)
       const url = URL.createObjectURL(blob)
@@ -107,6 +109,8 @@ export function ExplorePage() {
       link.download = `registration-uses-${releaseId ?? 'active'}.csv`
       link.click()
       URL.revokeObjectURL(url)
+    } catch (error) {
+      setExportError(error instanceof Error ? error.message : t('common.error'))
     } finally {
       setExporting(false)
     }
@@ -185,6 +189,8 @@ export function ExplorePage() {
         </div>
       </section>
 
+      {exportError ? <ErrorState message={exportError} /> : null}
+
       <section className="explore-layout">
         <div className="section-panel results-panel">
           <div className="section-heading section-heading--compact">
@@ -241,7 +247,7 @@ export function ExplorePage() {
               {[1, 2].map((value) => <button key={value} type="button" className={depth === value ? 'is-active' : ''} onClick={() => setDepth(value)}>{value} hop</button>)}
             </div>
           </div>
-          {graph.isLoading ? <LoadingState compact /> : <GraphCanvas graph={graphData} language={i18n.language} onNodeSelect={onNodeSelect} />}
+          {graph.isLoading ? <LoadingState compact /> : graph.isError ? <ErrorState message={graph.error.message} /> : <GraphCanvas graph={graphData} language={i18n.language} onNodeSelect={onNodeSelect} />}
         </div>
       </section>
     </div>

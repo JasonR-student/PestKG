@@ -82,11 +82,15 @@ public class DuckDbDataStore {
 
     private void createV1Views(Connection con, String p, Path releaseDir) throws SQLException {
         con.createStatement().execute(
+            "CREATE VIEW jurisdiction_codes AS SELECT node_id AS id, display_label AS code " +
+            "FROM read_parquet('" + p + "/kg/nodes.parquet') WHERE node_type = 'Jurisdiction'");
+        con.createStatement().execute(
             "CREATE VIEW nodes AS SELECT " +
-            "node_id AS id, node_type AS type, display_label AS label_original, " +
-            "display_label AS label_en, jurisdiction_id AS jurisdiction, '' AS source_record_id, " +
-            "'' AS source_url, extension_properties AS properties_json " +
-            "FROM read_parquet('" + p + "/kg/nodes.parquet', hive_partitioning=true)");
+            "n.node_id AS id, n.node_type AS type, n.display_label AS label_original, " +
+            "n.display_label AS label_en, coalesce(j.code, n.jurisdiction_id) AS jurisdiction, '' AS source_record_id, " +
+            "'' AS source_url, n.extension_properties AS properties_json " +
+            "FROM read_parquet('" + p + "/kg/nodes.parquet', hive_partitioning=true) n " +
+            "LEFT JOIN jurisdiction_codes j ON n.jurisdiction_id = j.id");
         con.createStatement().execute(
             "CREATE VIEW edges AS SELECT " +
             "edge_id AS id, source_id AS start_id, predicate, target_id AS end_id, " +
@@ -98,7 +102,7 @@ public class DuckDbDataStore {
         if (Files.isRegularFile(regPath)) {
             con.createStatement().execute(
                 "CREATE VIEW registration_uses AS SELECT " +
-                "u.registration_use_id AS use_id, u.jurisdiction_id AS jurisdiction, u.product_id, " +
+                "u.registration_use_id AS use_id, coalesce(j.code, u.jurisdiction_id) AS jurisdiction, u.product_id, " +
                 "'' AS product_label_original, '' AS product_label_en, '' AS product_label_search, " +
                 "'' AS active_ingredients_search, u.crop_original AS crops_search, " +
                 "u.target_original AS targets_search, u.formulation_original AS formulations_search, " +
@@ -108,18 +112,20 @@ public class DuckDbDataStore {
                 "coalesce(r.expiry_date_normalized, '') AS expiry_date, u.source_record_id, '' AS source_url " +
                 "FROM read_parquet('" + p + "/canonical/registration_uses.parquet', hive_partitioning=true) u " +
                 "LEFT JOIN read_parquet('" + p + "/canonical/registrations.parquet', hive_partitioning=true) r " +
-                "ON u.registration_id = r.registration_id");
+                "ON u.registration_id = r.registration_id " +
+                "LEFT JOIN jurisdiction_codes j ON u.jurisdiction_id = j.id");
         } else {
             con.createStatement().execute(
                 "CREATE VIEW registration_uses AS SELECT " +
-                "registration_use_id AS use_id, jurisdiction_id AS jurisdiction, product_id, " +
+                "u.registration_use_id AS use_id, coalesce(j.code, u.jurisdiction_id) AS jurisdiction, u.product_id, " +
                 "'' AS product_label_original, '' AS product_label_en, '' AS product_label_search, " +
                 "'' AS active_ingredients_search, crop_original AS crops_search, " +
                 "target_original AS targets_search, formulation_original AS formulations_search, " +
                 "'[]' AS active_ingredients_json, '[]' AS crops_json, '[]' AS targets_json, '[]' AS formulations_json, " +
                 "'' AS registration_status, pairing_status, '' AS registration_date, '' AS expiry_date, " +
                 "source_record_id, '' AS source_url " +
-                "FROM read_parquet('" + p + "/canonical/registration_uses.parquet', hive_partitioning=true)");
+                "FROM read_parquet('" + p + "/canonical/registration_uses.parquet', hive_partitioning=true) u " +
+                "LEFT JOIN jurisdiction_codes j ON u.jurisdiction_id = j.id");
         }
     }
 
@@ -442,11 +448,11 @@ public class DuckDbDataStore {
         List<Map<String, Object>> result = new ArrayList<>();
         codes.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> result.add(countryRow(entry.getKey(), entry.getValue(), nodeCounts, edgeCounts)));
+                .forEach(entry -> result.add(countryRow(entry.getValue(), nodeCounts, edgeCounts)));
         return result;
     }
 
-    private Map<String, Object> countryRow(String jurisdictionId, String code, Map<String, Long> nodeCounts, Map<String, Long> edgeCounts) {
+    private Map<String, Object> countryRow(String code, Map<String, Long> nodeCounts, Map<String, Long> edgeCounts) {
         Map<String, Object> country = new LinkedHashMap<>();
         country.put("jurisdiction", code);
         country.put("jurisdiction_name", ISO_NAME.getOrDefault(code, code));
@@ -458,8 +464,8 @@ public class DuckDbDataStore {
         country.put("source_snapshot_eligible", Boolean.FALSE);
         country.put("source_rows", 0L);
         country.put("skipped_rows", 0L);
-        country.put("nodes", nodeCounts.getOrDefault(jurisdictionId, 0L));
-        country.put("edges", edgeCounts.getOrDefault(jurisdictionId, 0L));
+        country.put("nodes", nodeCounts.getOrDefault(code, 0L));
+        country.put("edges", edgeCounts.getOrDefault(code, 0L));
         country.put("broken_edges", 0L);
         country.put("graph_scope", "SINGLE_LINEAGE");
         country.put("language", "");
@@ -638,7 +644,7 @@ public class DuckDbDataStore {
             "           to_json(list_distinct(list({'id': n.id, 'label_original': n.label_original, 'label_en': n.label_en}))) AS refs " +
             "    FROM edges e JOIN nodes n ON e.end_id = n.id " +
             "    WHERE e.predicate = 'CONTAINS_ACTIVE_INGREDIENT' GROUP BY e.start_id) " +
-            "SELECT u.registration_use_id AS use_id, u.jurisdiction_id AS jurisdiction, u.product_id, " +
+            "SELECT u.registration_use_id AS use_id, coalesce(j.code, u.jurisdiction_id) AS jurisdiction, u.product_id, " +
             "       coalesce(p.label_original, '') AS product_label_original, " +
             "       coalesce(p.label_en, '') AS product_label_en, " +
             "       coalesce(p.label_original, '') AS product_label_search, " +
@@ -658,6 +664,7 @@ public class DuckDbDataStore {
             "FROM read_parquet('" + p + "/canonical/registration_uses.parquet', hive_partitioning=true) u " +
             "LEFT JOIN read_parquet('" + p + "/canonical/registrations.parquet', hive_partitioning=true) r " +
             "ON u.registration_id = r.registration_id " +
+            "LEFT JOIN jurisdiction_codes j ON u.jurisdiction_id = j.id " +
             "LEFT JOIN nodes p ON u.product_id = p.id " +
             "LEFT JOIN ai_agg ai ON u.product_id = ai.product_id " +
             "LEFT JOIN crop_agg c ON u.registration_use_id = c.use_id " +

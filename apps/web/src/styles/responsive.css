@@ -61,7 +61,7 @@
   }
 
   .release-band {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .release-band dl {
@@ -237,6 +237,19 @@
 
   .artifact-row .artifact-status {
     grid-column: 2 / -1;
+  }
+
+  .direct-download-row {
+    grid-template-columns: 26px minmax(0, 1fr) auto 28px;
+    gap: 8px;
+  }
+
+  .artifact-panel .section-heading {
+    display: grid;
+  }
+
+  .download-actions {
+    justify-content: flex-start;
   }
 
   .principle-strip {

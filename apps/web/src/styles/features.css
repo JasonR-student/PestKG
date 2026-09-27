@@ -1,5 +1,6 @@
 .page-stack {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 22px;
 }
 
@@ -890,6 +891,7 @@
 .release-band h2 {
   margin: 4px 0;
   font-size: 24px;
+  overflow-wrap: anywhere;
 }
 
 .release-band p {
@@ -916,6 +918,7 @@
   margin: 4px 0 0;
   font-size: 11px;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .release-warning {
