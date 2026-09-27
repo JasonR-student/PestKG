@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "api:generate": "openapi-ts -f openapi-ts.config.ts",
+    "api:generate:browser": "openapi-ts -f openapi-browser.config.ts",
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/check-bundle.mjs",
     "lint": "oxlint",

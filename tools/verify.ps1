@@ -74,6 +74,21 @@ finally {
 # ---------------------------------------------------------------------------
 if (Get-Command npm -ErrorAction SilentlyContinue) {
     if (Test-Path 'apps\web\node_modules') {
+        $generatedPaths = @(
+            'apps/web/src/shared/api/generated/types.gen.ts',
+            'apps/web/src/shared/api/generated/index.ts',
+            'apps/web/src/shared/api/browser-generated/types.gen.ts',
+            'apps/web/src/shared/api/browser-generated/index.ts'
+        )
+        $hashes = @{}
+        foreach ($path in $generatedPaths) { $hashes[$path] = (Get-FileHash -LiteralPath $path).Hash }
+        foreach ($script in @('api:generate', 'api:generate:browser')) {
+            npm --prefix apps/web run $script
+            if ($LASTEXITCODE -ne 0) { throw "API generation failed: $script" }
+        }
+        foreach ($path in $generatedPaths) {
+            if ((Get-FileHash -LiteralPath $path).Hash -ne $hashes[$path]) { throw "Generated contract drift: $path" }
+        }
         if (Test-Path 'apps\web\node_modules\.bin\oxlint.cmd') {
             Write-Output '[verify] running web lint...'
             npm --prefix apps/web run lint

@@ -83,8 +83,8 @@
 }
 
 .primary-nav a.active {
-  color: #ffffff;
-  background: var(--green);
+  color: #0c6b43;
+  background: var(--green-soft);
 }
 
 .sidebar-footer {

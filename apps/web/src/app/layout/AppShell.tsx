@@ -21,6 +21,7 @@ import { ReleaseSelector } from './ReleaseSelector'
 
 const navigation = [
   { to: '/', key: 'overview', icon: LayoutDashboard, end: true },
+  { to: '/graph', key: 'graph', icon: Network },
   { to: '/explore', key: 'explore', icon: Search },
   { to: '/compare', key: 'compare', icon: GitCompareArrows },
   { to: '/downloads', key: 'downloads', icon: Download },

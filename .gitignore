@@ -14,6 +14,9 @@ apps/web/test-results/
 
 artifacts/
 runtime/
+# Preserve the interrupted reference import locally, outside the published pack.
+data/reference-graphs/PestKG_Reference_Graphs_2026-09-27/
+data/reference-graphs/PestKG_Reference_Graphs_2026-09-27_r1/
 data/releases/*/analytics/
 data/releases/*/downloads/*
 !data/releases/*/downloads/README.md

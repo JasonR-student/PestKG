@@ -27,6 +27,7 @@ export type Edge = EdgeData
 export type GraphData = GeneratedGraphData
 export type RegistrationUse = RegistrationUseData
 export type Schema = SchemaData
+export type { GraphBrowserCatalog, GraphBrowserQuery, GraphBrowserResult, GraphScope } from './browser-generated'
 export type Release = ReleaseData
 
 type TextFilterKey =

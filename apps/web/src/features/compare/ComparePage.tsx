@@ -9,13 +9,14 @@ import { ReactEChartsCore } from '../../shared/charts/react-echarts-core'
 import { PageHeader } from '../../shared/ui/PageHeader'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
 import { useRelease } from '../../app/release/useRelease'
+import { jurisdictionName } from '../../shared/lib/jurisdictions'
 
 const questions = {
-  q1: { zh: '作物—有效成分跨国覆盖', en: 'Crop–ingredient coverage' },
+  q1: { zh: '作物—有效成分跨辖区覆盖', en: 'Crop–ingredient coverage' },
   q2: { zh: '相同防治对象的登记产品', en: 'Products for a shared target' },
   q3: { zh: '共享作物—防治对象组合', en: 'Shared crop–target pairs' },
   q4: { zh: '有效成分与剂型', en: 'Ingredient formulations' },
-  q5: { zh: '有效成分国家使用画像', en: 'Country use profiles' },
+  q5: { zh: '有效成分辖区使用画像', en: 'Jurisdiction use profiles' },
 }
 
 const chartFields: Record<string, { label: string; value: string }> = {
@@ -66,8 +67,8 @@ export function ComparePage() {
   return (
     <div className="page-stack">
       <PageHeader
-        title={english ? 'Cross-country competency questions' : '跨国研究问题比较'}
-        description={english ? 'Published Q1–Q5 results use shared semantic alignments without merging local regulatory entities.' : 'Q1–Q5 通过共享语义对齐进行比较，同时保留各司法辖区本地实体。'}
+        title={english ? 'Cross-jurisdiction competency questions' : '跨辖区研究问题比较'}
+        description={english ? 'Name-based aggregates over local regulatory terms; matching labels do not establish chemical identity.' : '基于本地监管术语名称的汇总比较；同名不代表已确认化学身份一致。'}
       />
       <div className="question-tabs" role="tablist">
         {Object.entries(questions).map(([key, label]) => (
@@ -76,7 +77,7 @@ export function ComparePage() {
       </div>
       <section className="comparison-toolbar">
         <label className="field field--wide"><span>{english ? 'Search result set' : '搜索结果集'}</span><div className="input-with-icon"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} /></div></label>
-        <label className="field"><span>{english ? 'Jurisdiction' : '司法辖区'}</span><select value={jurisdiction} onChange={(event) => setJurisdiction(event.target.value)}><option value="">All</option>{countries.data?.data.map((country) => <option key={country.jurisdiction} value={country.jurisdiction}>{country.jurisdiction} · {country.jurisdiction_name}</option>)}</select></label>
+        <label className="field"><span>{english ? 'Jurisdiction' : '监管辖区'}</span><select value={jurisdiction} onChange={(event) => setJurisdiction(event.target.value)}><option value="">{english ? 'All' : '全部'}</option>{countries.data?.data.map((country) => <option key={country.jurisdiction} value={country.jurisdiction}>{country.jurisdiction} · {jurisdictionName(country.jurisdiction, english)}</option>)}</select></label>
       </section>
       {comparison.isLoading ? <LoadingState /> : null}
       {comparison.isError ? <ErrorState message={comparison.error.message} /> : null}

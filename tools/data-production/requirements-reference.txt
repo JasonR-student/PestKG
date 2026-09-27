@@ -1,0 +1,3 @@
+pronto==2.7.3
+pyarrow>=18
+requests>=2.31

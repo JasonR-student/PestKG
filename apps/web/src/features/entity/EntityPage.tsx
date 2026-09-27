@@ -45,7 +45,7 @@ export function EntityPage() {
         <div className="entity-heading-main">
           <span className="entity-symbol"><Fingerprint size={24} /></span>
           <div>
-            <span className="entity-type-label">{record.type} · {record.jurisdiction || 'Shared'}</span>
+            <span className="entity-type-label">{record.type} · {record.jurisdiction || (english ? 'Release metadata' : '版本元数据')}</span>
             <h1>{preferredLabel(record, i18n.language)}</h1>
             {record.label_en && record.label_en !== record.label_original ? <p>{record.label_en}</p> : null}
           </div>
@@ -60,7 +60,7 @@ export function EntityPage() {
             <div><dt>ID</dt><dd>{record.id}</dd></div>
             <div><dt>{english ? 'Original label' : '原始名称'}</dt><dd>{record.label_original || '—'}</dd></div>
             <div><dt>{english ? 'English label' : '英文名称'}</dt><dd>{record.label_en || '—'}</dd></div>
-            <div><dt>{english ? 'Jurisdiction' : '司法辖区'}</dt><dd>{record.jurisdiction || 'Shared graph'}</dd></div>
+            <div><dt>{english ? 'Jurisdiction' : '监管辖区'}</dt><dd>{record.jurisdiction || (english ? 'Release metadata' : '版本元数据')}</dd></div>
             <div><dt>source_record_id</dt><dd>{record.source_record_id || '—'}</dd></div>
           </dl>
           <div className="property-block">

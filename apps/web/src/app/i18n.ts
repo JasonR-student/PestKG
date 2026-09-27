@@ -8,8 +8,9 @@ const resources = {
       brandShort: 'PestKG',
       nav: {
         overview: '研究概览',
+        graph: '图谱浏览器',
         explore: '数据探索',
-        compare: '跨国比较',
+        compare: '跨辖区比较',
         downloads: '数据下载',
         methods: '方法与质量',
       },
@@ -36,6 +37,7 @@ const resources = {
       brandShort: 'PestKG',
       nav: {
         overview: 'Overview',
+        graph: 'Graph',
         explore: 'Explore',
         compare: 'Compare',
         downloads: 'Downloads',

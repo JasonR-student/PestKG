@@ -9,6 +9,7 @@ import { GraphCanvas } from './components/GraphCanvas'
 import { PageHeader } from '../../shared/ui/PageHeader'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
 import { preferredLabel } from '../../shared/lib/format'
+import { jurisdictionName } from '../../shared/lib/jurisdictions'
 import { useRelease } from '../../app/release/useRelease'
 import type { RegistrationUseFilters } from '../../shared/api/models'
 
@@ -159,11 +160,11 @@ export function ExplorePage() {
           </div>
         </label>
         <label className="field">
-          <span>{english ? 'Jurisdiction' : '司法辖区'}</span>
+          <span>{english ? 'Jurisdiction' : '监管辖区'}</span>
           <select value={draft.jurisdictions[0] ?? ''} onChange={(event) => update('jurisdictions', event.target.value ? [event.target.value] : [])}>
             <option value="">{t('common.all')}</option>
             {countryOptions.map((country) => (
-              <option key={country.jurisdiction} value={country.jurisdiction}>{country.jurisdiction} · {country.jurisdiction_name}</option>
+              <option key={country.jurisdiction} value={country.jurisdiction}>{country.jurisdiction} · {jurisdictionName(country.jurisdiction, english)}</option>
             ))}
           </select>
         </label>
@@ -205,7 +206,7 @@ export function ExplorePage() {
             <>
               <div className="data-table-wrap">
                 <table className="data-table">
-                  <thead><tr><th>{english ? 'Country' : '国家'}</th><th>{english ? 'Product / ingredient' : '产品 / 有效成分'}</th><th>{english ? 'Crop / target' : '作物 / 防治对象'}</th><th>{english ? 'Source' : '来源'}</th></tr></thead>
+                  <thead><tr><th>{english ? 'Jurisdiction' : '辖区'}</th><th>{english ? 'Product / ingredient' : '产品 / 有效成分'}</th><th>{english ? 'Crop / target' : '作物 / 防治对象'}</th><th>{english ? 'Source' : '来源'}</th></tr></thead>
                   <tbody>
                     {resultRows.map((row) => (
                       <tr key={row.use_id} className={selected?.use_id === row.use_id ? 'is-selected' : ''} onClick={() => setSelectedId(row.use_id)}>

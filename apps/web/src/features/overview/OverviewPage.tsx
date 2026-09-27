@@ -8,6 +8,7 @@ import { CoverageChart } from './components/CoverageChart'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
 import { WorldMap } from './components/WorldMap'
 import { formatCompact, formatInteger } from '../../shared/lib/format'
+import { jurisdictionName } from '../../shared/lib/jurisdictions'
 import { useRelease } from '../../app/release/useRelease'
 
 export function OverviewPage() {
@@ -28,22 +29,22 @@ export function OverviewPage() {
   const distributionBlocked = data.distribution_status !== 'ready'
 
   const metrics = [
-    { label: english ? 'Jurisdictions' : '司法辖区', value: data.jurisdictions, icon: Database },
-    { label: english ? 'Source records' : '源记录', value: data.source_records, icon: Rows3 },
-    { label: english ? 'Country nodes' : '国家图谱节点', value: data.country_nodes, icon: Network },
+    { label: english ? 'Jurisdictions' : '监管辖区', value: data.jurisdictions, icon: Database },
+    { label: english ? 'Official sources' : '官方来源', value: data.source_records, icon: Rows3 },
+    { label: english ? 'Jurisdiction nodes' : '辖区图谱节点', value: data.country_nodes, icon: Network },
     { label: english ? 'Relations' : '登记关系', value: data.country_edges, icon: GitBranch },
-    { label: english ? 'Shared semantic nodes' : '共享语义节点', value: data.shared_nodes, icon: Network },
+    { label: english ? 'Reviewed global chemicals' : '已审核共有化学实体', value: data.shared_nodes, icon: Network },
   ]
 
   return (
     <div className="page-stack">
       <section className="overview-heading">
         <div>
-          <h1>{english ? 'Multicountry pesticide registration knowledge graph' : '多国农药登记知识图谱'}</h1>
+          <h1>{english ? 'Cross-jurisdiction pesticide registration knowledge graph' : '多辖区农药登记知识图谱'}</h1>
           <p>
             {english
               ? 'A traceable, federated research resource for cross-jurisdiction registration comparison.'
-              : '面向跨司法辖区登记比较的可追溯联邦知识图谱研究资源。'}
+              : '面向跨监管辖区登记比较的可追溯知识图谱研究资源。'}
           </p>
         </div>
         <div className={distributionBlocked ? 'release-summary release-summary--blocked' : 'release-summary'}>
@@ -67,10 +68,10 @@ export function OverviewPage() {
         <div className="section-panel map-panel">
           <div className="section-heading">
             <div>
-              <h2>{english ? 'Jurisdiction coverage' : '司法辖区覆盖'}</h2>
-              <p>{english ? 'Select a country to open filtered registration uses.' : '点击国家进入对应登记使用数据。'}</p>
+              <h2>{english ? 'Jurisdiction coverage' : '监管辖区覆盖'}</h2>
+              <p>{english ? 'Regulatory source coverage in this release.' : '当前版本的监管来源覆盖范围。'}</p>
             </div>
-            <span>{formatInteger(data.alignment_edges)} alignments</span>
+            <span>{formatInteger(data.alignment_edges)} {english ? 'reviewed identity links' : '已审核身份连接'}</span>
           </div>
           <WorldMap
             countries={countryRows}
@@ -81,8 +82,8 @@ export function OverviewPage() {
         <div className="section-panel country-panel">
           <div className="section-heading">
             <div>
-              <h2>{english ? 'Country graph scale' : '国家图谱规模'}</h2>
-              <p>{english ? 'Independent regulatory graphs, ranked by nodes.' : '按节点量排列的独立监管图谱。'}</p>
+              <h2>{english ? 'Jurisdiction graph scale' : '辖区图谱规模'}</h2>
+              <p>{english ? 'Jurisdiction slices, ranked by nodes.' : '按节点量排列的监管辖区子图。'}</p>
             </div>
           </div>
           <div className="country-ranking">
@@ -94,8 +95,8 @@ export function OverviewPage() {
               >
                 <span className="rank-number">{String(index + 1).padStart(2, '0')}</span>
                 <span className="country-name">
-                  <strong>{country.jurisdiction_name}</strong>
-                  <small>{formatInteger(country.source_rows)} source records</small>
+                  <strong>{jurisdictionName(country.jurisdiction, english)}</strong>
+                  <small>{country.jurisdiction}</small>
                 </span>
                 <span className="country-volume">{formatCompact(country.nodes)}</span>
                 <ArrowRight size={15} aria-hidden="true" />

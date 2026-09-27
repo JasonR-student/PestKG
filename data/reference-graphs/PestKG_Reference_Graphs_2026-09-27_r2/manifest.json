@@ -1,0 +1,740 @@
+{
+  "pack_id": "PestKG_Reference_Graphs_2026-09-27_r2",
+  "base_release_id": "PestKG_A_Data_Release_v1.0",
+  "created_at": "2026-09-27T13:25:34.865430+00:00",
+  "status": "INTERNAL_REFERENCE_PACK",
+  "exact_regulatory_identity_links": 0,
+  "sources": [
+    {
+      "id": "reference:AGROVOC",
+      "name": "AGROVOC",
+      "kind": "reference",
+      "snapshot_id": "official-api-2026-09-27",
+      "coverage_status": "BOUNDED_OFFICIAL_API_SUBGRAPH",
+      "rights_status": "INTERNAL_DISPLAY; PUBLIC_DISTRIBUTION_UNREVIEWED",
+      "source_sha256": "a15da6631dcb10f78f63434fe12bbad979a3c2712d98010bf01398483fd6116b",
+      "queries": [
+        "cucum*",
+        "pear*",
+        "rice*",
+        "wheat*",
+        "tomato*",
+        "grape*",
+        "aphid*",
+        "fungicid*",
+        "pesticid*",
+        "glyphosat*",
+        "botrytis*"
+      ],
+      "max_search_results_per_query": 10,
+      "inputs": [
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=cucum%2A&lang=en&maxhits=10",
+          "sha256": "34168961bdac8f6f118899ce433b8d453a92d3664086e952ee5bd092943a8618",
+          "captured_at": "2026-09-27T13:14:08.096415+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=pear%2A&lang=en&maxhits=10",
+          "sha256": "5eed69f396afa3e0a565315e2c88269f122f76fb470515d6fcb6cab3343c264c",
+          "captured_at": "2026-09-27T13:14:08.979018+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=rice%2A&lang=en&maxhits=10",
+          "sha256": "6e6489c998cd53a6e6206bbb8eb91fd845a1f5d43e98c2f8a621e83f6c37a4e9",
+          "captured_at": "2026-09-27T13:14:10.274510+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=wheat%2A&lang=en&maxhits=10",
+          "sha256": "085cd8070f0dcc0c9a883f0a363c7a07c263ad737ef7b0c72ec13a614bcaafc6",
+          "captured_at": "2026-09-27T13:14:10.737489+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=tomato%2A&lang=en&maxhits=10",
+          "sha256": "ec86261f814fdb7932bad2094ba3f891734dd1c5e6c812165c77067e63ab2797",
+          "captured_at": "2026-09-27T13:14:11.192238+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=grape%2A&lang=en&maxhits=10",
+          "sha256": "b3291334c63029460187737ff55b7c34ac7b5be28013cbdacee478491878c551",
+          "captured_at": "2026-09-27T13:14:11.675520+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=aphid%2A&lang=en&maxhits=10",
+          "sha256": "6ca8113699ed02fcffcc7f6bceec3289e28460badbc99823b1f285fbf036600b",
+          "captured_at": "2026-09-27T13:14:12.160752+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=fungicid%2A&lang=en&maxhits=10",
+          "sha256": "b27c905507bbd080e8e5d646ae2177f954e92a083e9b09c12562c7e643944f93",
+          "captured_at": "2026-09-27T13:14:12.819106+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=pesticid%2A&lang=en&maxhits=10",
+          "sha256": "b45ea8ec211467f7aa96c4d2f01129096552baf2710d023377599d82c2879051",
+          "captured_at": "2026-09-27T13:14:13.531852+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=glyphosat%2A&lang=en&maxhits=10",
+          "sha256": "98e3e26439aba3ce4a85d766d6a23119b33467285e1e878557f1223163cb5d7c",
+          "captured_at": "2026-09-27T13:14:13.988096+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/search?query=botrytis%2A&lang=en&maxhits=10",
+          "sha256": "d61e96d0ea22812b65005aecdcdcc0a6ef0bfdf75bf8d98183fe2f3c84fbb091",
+          "captured_at": "2026-09-27T13:14:14.477410+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_019ee1cc&format=application%2Fld%2Bjson",
+          "sha256": "dcfb05b6f34eb49dadabe2239533d97c1c4fcd74ceb689afba04224d63c8fee7",
+          "captured_at": "2026-09-27T13:14:15.582973+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_10195&format=application%2Fld%2Bjson",
+          "sha256": "da8cf187d535d84972027df2ddf8308537105b013c394f134e7ef4e900865131",
+          "captured_at": "2026-09-27T13:14:17.098834+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_1029&format=application%2Fld%2Bjson",
+          "sha256": "05ec1c6546064fb4143423c68928f13836c02e0b80ca501b523ccd19b5c80f8a",
+          "captured_at": "2026-09-27T13:14:18.658078+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_10fe5826&format=application%2Fld%2Bjson",
+          "sha256": "fcbd2397f3b5e6187340e055649d7ae67eebd86da628381b4bb79ed124aa5fd4",
+          "captured_at": "2026-09-27T13:14:19.479772+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_11131&format=application%2Fld%2Bjson",
+          "sha256": "535de62abdf5d7f15dec2753a0fb3161fc61ceede39607e1f9f8694af3df7473",
+          "captured_at": "2026-09-27T13:14:20.324452+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_13199&format=application%2Fld%2Bjson",
+          "sha256": "c7ecbef899de662d3bebba3c41fb647951d8bc78bf8d9020d53360abc5c9c283",
+          "captured_at": "2026-09-27T13:14:23.196735+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_13263&format=application%2Fld%2Bjson",
+          "sha256": "3cb84f424c2f40d7d44dd645a224322b45dc7ccd0e775415afc4bb49a9e05b2f",
+          "captured_at": "2026-09-27T13:14:24.608488+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_152ac092&format=application%2Fld%2Bjson",
+          "sha256": "240635b7ac3c71f97e51911c75a25750ce1579ce432d53338a470c7ce2c82ab9",
+          "captured_at": "2026-09-27T13:14:25.528944+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_15959&format=application%2Fld%2Bjson",
+          "sha256": "8b5125b4a3000d68b56cb57507448beab6d181a0ac158bf2027f7386cec475af",
+          "captured_at": "2026-09-27T13:14:26.671551+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_16381&format=application%2Fld%2Bjson",
+          "sha256": "a138bb39ca5c2e27c17f1205f894bb5506c918e11168c1f00d3bc25fc1b7f82b",
+          "captured_at": "2026-09-27T13:14:28.553509+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_2000&format=application%2Fld%2Bjson",
+          "sha256": "6acf4d2f32d36375402795c9c8950cf9d9bbb1cecf19d47ac627663f1ad148f2",
+          "captured_at": "2026-09-27T13:14:29.393184+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_2001&format=application%2Fld%2Bjson",
+          "sha256": "286dac255f6e39eff514981fe1dc2d915272fc047b16fb8b21ff61700a1fb5a1",
+          "captured_at": "2026-09-27T13:14:30.303404+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_2002&format=application%2Fld%2Bjson",
+          "sha256": "b83aab566c6b576b8c74d73efc85971342cf63e74bff3d1ae94491a396c4d378",
+          "captured_at": "2026-09-27T13:14:31.746152+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_2003&format=application%2Fld%2Bjson",
+          "sha256": "6624a2a8d40f75bf89b85a1373561174bb301dde8d4c453c957225b5fc6d02c8",
+          "captured_at": "2026-09-27T13:14:32.890566+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_2004&format=application%2Fld%2Bjson",
+          "sha256": "016004745aa99fcad7f3e4988d245ed2ed4982171903789dafd1314e4d454c8c",
+          "captured_at": "2026-09-27T13:14:34.344945+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_213&format=application%2Fld%2Bjson",
+          "sha256": "c86746a9cfd6b1782a4d0f8c43d6301abbad0e210581263aba54537eeb16c361",
+          "captured_at": "2026-09-27T13:14:35.353605+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_24231&format=application%2Fld%2Bjson",
+          "sha256": "02b3a2a2700fb0e9bc5173587d3e22a83ff45c027a048a8f4f4cd8e622868762",
+          "captured_at": "2026-09-27T13:14:39.535929+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_24849&format=application%2Fld%2Bjson",
+          "sha256": "2696d7131093fe6e51bab570c710ac13a1e7f8bc76aa61acb3adc11ba526c64d",
+          "captured_at": "2026-09-27T13:14:40.581133+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_25511&format=application%2Fld%2Bjson",
+          "sha256": "e35f774adff9e31a0991fa1a01d4b53a3eafc9d8d8132a79cb7ea443f61ed759",
+          "captured_at": "2026-09-27T13:14:42.410270+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_25533&format=application%2Fld%2Bjson",
+          "sha256": "4de363dc3be40a0834635b1d7aff398e51f4fe2b9c760d7ed312bf7727089e9b",
+          "captured_at": "2026-09-27T13:14:44.045462+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_26357&format=application%2Fld%2Bjson",
+          "sha256": "a6bdc3cd098e8075892f959436a3a9e480e92e5b44d326a3b9a0050b88b1fc99",
+          "captured_at": "2026-09-27T13:14:45.210792+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_26358&format=application%2Fld%2Bjson",
+          "sha256": "490287b5cb343d3ed982136173ef5237cb94bf15c5500271d9a185376ad5dd6f",
+          "captured_at": "2026-09-27T13:14:46.427811+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_26359&format=application%2Fld%2Bjson",
+          "sha256": "f41b87aadb675b90255e12ab2eb3b9405bbbb8fdbce5feac98cc22c863ba3572",
+          "captured_at": "2026-09-27T13:14:47.511283+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_26360&format=application%2Fld%2Bjson",
+          "sha256": "ff0e479c44c648cbec44d2a17be0e22b169018fbb8034a444aea5f804462e8f3",
+          "captured_at": "2026-09-27T13:14:48.949725+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_26412&format=application%2Fld%2Bjson",
+          "sha256": "44c593160d455c49d09bed55274dbe73d30a9200c3c7a6b3255f9e68f274e646",
+          "captured_at": "2026-09-27T13:14:50.236013+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_26413&format=application%2Fld%2Bjson",
+          "sha256": "b1c2f690966ff391bd55233cd2f74046b268c13fbca867c5d0d927a358268b63",
+          "captured_at": "2026-09-27T13:14:54.427746+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_26414&format=application%2Fld%2Bjson",
+          "sha256": "e4e6ff4069f2ed0d89c5ea6e95d5e964689bd9f6567ee38a8827b96987119c70",
+          "captured_at": "2026-09-27T13:14:55.661497+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_26495&format=application%2Fld%2Bjson",
+          "sha256": "3af42b2005f3afdd7cc8cae86f9969d9a65835c5b3242ac8d1950d20208ad641",
+          "captured_at": "2026-09-27T13:14:57.011401+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_27879&format=application%2Fld%2Bjson",
+          "sha256": "b13887a91c29d314cca932360c5fda0d0a10f17e0aad29fa23296d8edd8cb403",
+          "captured_at": "2026-09-27T13:14:57.758411+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_28472&format=application%2Fld%2Bjson",
+          "sha256": "ed20455a5036bd3319e13e34fa3c05c7bebdf1e8e65cf6c7042ee9b6daa7978b",
+          "captured_at": "2026-09-27T13:14:59.527210+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_29830&format=application%2Fld%2Bjson",
+          "sha256": "6a497e33042b52626a2cd49f49571c80f8984711921c7c3c30563cffa94640d3",
+          "captured_at": "2026-09-27T13:15:01.626971+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_30457&format=application%2Fld%2Bjson",
+          "sha256": "4978d26d2a2a25159aa14b7f9410090e31d458ecb8fda2ce6e412177974824cf",
+          "captured_at": "2026-09-27T13:15:02.474520+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_3050fd41&format=application%2Fld%2Bjson",
+          "sha256": "a2e06e94831202fd8f7f41b2956eaa471589591c4041afc7eed02e2f84c9108f",
+          "captured_at": "2026-09-27T13:15:03.323598+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_30757&format=application%2Fld%2Bjson",
+          "sha256": "66fd3175d36cad1e9fc7e95d1ce71d0f10d753e928ac2b2f34d7493e72dea841",
+          "captured_at": "2026-09-27T13:15:04.800925+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_30798&format=application%2Fld%2Bjson",
+          "sha256": "942e5145fd3b847d0fc7befb7ede22f2648b3c13d6c62be3265fee7fe397ec0b",
+          "captured_at": "2026-09-27T13:15:07.158767+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_3146&format=application%2Fld%2Bjson",
+          "sha256": "adc2d0dcb13bdd8b2a4a3738d9c0968097c9436c043f038aeafde0f7292839c4",
+          "captured_at": "2026-09-27T13:22:19.003638+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_32611&format=application%2Fld%2Bjson",
+          "sha256": "5ce0f94e8d3bc03b359aae5079a1febf1a1a47500dfe01e9b06a604b07144fed",
+          "captured_at": "2026-09-27T13:22:21.905295+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_3358&format=application%2Fld%2Bjson",
+          "sha256": "0ac13c400f052f394c519c388e87ea0d378fbb462bd2b06a2351df33062e0e7e",
+          "captured_at": "2026-09-27T13:22:24.743455+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_3360&format=application%2Fld%2Bjson",
+          "sha256": "ea42201b7ff42a3a3e432cf63e2e2f2087f04f5cb4795fb74e620086f6f58f6a",
+          "captured_at": "2026-09-27T13:22:27.219101+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_34133&format=application%2Fld%2Bjson",
+          "sha256": "c2b04c4eb7ca6400da3b2d9047b4198f21cf2e7c54d0e2ad180316e0b7ac03d8",
+          "captured_at": "2026-09-27T13:22:30.034345+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_34432&format=application%2Fld%2Bjson",
+          "sha256": "654c81c8d220cc1afc2edd5771811fa1d9f212ae4125559fcc21ae8fba5fde7e",
+          "captured_at": "2026-09-27T13:22:34.467438+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_34891&format=application%2Fld%2Bjson",
+          "sha256": "1117c66fa3808cfaac7c604eeef72a4a11b3f4d3f5f32fca7dfc165e1cb6caa3",
+          "captured_at": "2026-09-27T13:22:36.645191+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_36129&format=application%2Fld%2Bjson",
+          "sha256": "57ff95a52458895a68a5b9dd7be5f926086d2d71e18d2ef0f57e7a0b917ba6c8",
+          "captured_at": "2026-09-27T13:22:39.079046+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_36813&format=application%2Fld%2Bjson",
+          "sha256": "a6d11163f92e0ec3f763d532830f979c57d32210b42e74912c0f62fc43ef25b6",
+          "captured_at": "2026-09-27T13:22:39.948680+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_36818&format=application%2Fld%2Bjson",
+          "sha256": "5ad3e899b1d056d36441134e93252de23a95cfaae800aca86490d06de5a0a768",
+          "captured_at": "2026-09-27T13:22:40.933676+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_36933&format=application%2Fld%2Bjson",
+          "sha256": "e2f56c7cbebe00469ff5e46e8c9d34c2acd43edc89e4c403dbab8cc82986b05f",
+          "captured_at": "2026-09-27T13:22:42.665291+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_36db7de8&format=application%2Fld%2Bjson",
+          "sha256": "83fb37a6b74f9156a83abd9c77cbf8c3bd3381a38b4be422097eca45404d6de9",
+          "captured_at": "2026-09-27T13:22:44.251173+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_37635&format=application%2Fld%2Bjson",
+          "sha256": "0272126a7a22e9b7af72d4a86cb14afe8ad15c5652fb9bfc24d3ec5e07ac3ebe",
+          "captured_at": "2026-09-27T13:22:46.217407+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_41e84b9f&format=application%2Fld%2Bjson",
+          "sha256": "fcf0b9b7fb5e96088d074a11fa5b7f4c6b1ca0244a35eb662b220e86dbee02e0",
+          "captured_at": "2026-09-27T13:22:47.821822+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_42dbf484&format=application%2Fld%2Bjson",
+          "sha256": "99912e492dead6bfdd84e46b01432c59c0445c5c6c5ab5516ef65821cbb88de9",
+          "captured_at": "2026-09-27T13:22:48.979749+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_4467&format=application%2Fld%2Bjson",
+          "sha256": "45408997bea04b32b9f1f811a4ce82e144e3c3cf7e0bd57dd9c3d28b19448754",
+          "captured_at": "2026-09-27T13:22:50.404991+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_4475&format=application%2Fld%2Bjson",
+          "sha256": "ca3549afbfa0a6f0bc22709cf9c670d7a32675744903935dd39435af7d6a3e6c",
+          "captured_at": "2026-09-27T13:22:52.521024+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_4af38577&format=application%2Fld%2Bjson",
+          "sha256": "77a1d18ce35634d874d6c6f60f5286d7d4d672f7a6c3986eab4f3522ac32a85f",
+          "captured_at": "2026-09-27T13:22:54.178410+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_5000&format=application%2Fld%2Bjson",
+          "sha256": "4c5e7e9cc80784f1cc10906c289bd6e138fd1629937d468decbfb2a4faaeb388",
+          "captured_at": "2026-09-27T13:22:55.772340+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_525&format=application%2Fld%2Bjson",
+          "sha256": "09d8ce493e839b795e081b458aea6c60232bf78d4e2f4ed1c41ca559aef7b055",
+          "captured_at": "2026-09-27T13:22:57.937672+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_5435&format=application%2Fld%2Bjson",
+          "sha256": "a32db06a5bd1aff35e768953eebe8641bea349b99fece63c36a039f0acb15350",
+          "captured_at": "2026-09-27T13:22:59.039692+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_54a41ad1&format=application%2Fld%2Bjson",
+          "sha256": "9da3c9e57c498be7ee6ce05fb117735dae997f1e678fee23cedd8eb38e39f32b",
+          "captured_at": "2026-09-27T13:23:00.214109+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_5641&format=application%2Fld%2Bjson",
+          "sha256": "b83a71170ad636199d8e97543f37257f6eb28c0cda0f5a6cf51d133a94861968",
+          "captured_at": "2026-09-27T13:23:01.389515+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_5642&format=application%2Fld%2Bjson",
+          "sha256": "dcd4b44d6619bb531cb36d248c7558bb0dac308f74f2100ab56b52d7e1a3ca7c",
+          "captured_at": "2026-09-27T13:23:02.093885+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_5643&format=application%2Fld%2Bjson",
+          "sha256": "4375a961952731198e10a83e6007d9a313dda17d0a92ddeb8b4aa0429c17b706",
+          "captured_at": "2026-09-27T13:23:02.918881+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_5732&format=application%2Fld%2Bjson",
+          "sha256": "65ba18279d6358b8e84b32c02d0edff6c18ce7791761f6231629e588bde846df",
+          "captured_at": "2026-09-27T13:23:04.263612+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_5733&format=application%2Fld%2Bjson",
+          "sha256": "12e31326409d318698244a785119c3c453f16ff697bad6c485f3296ef470e068",
+          "captured_at": "2026-09-27T13:23:06.666328+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_5734&format=application%2Fld%2Bjson",
+          "sha256": "128984148d0e16b6c1dcf06b98a419a1bf1d73f835b1152ca45512ca5b2d9761",
+          "captured_at": "2026-09-27T13:23:08.154165+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_5a5d4e2c&format=application%2Fld%2Bjson",
+          "sha256": "609d7a9a302dd31a4ba258e137615d5056c5d270ae13f2bbb04ad43e8d313869",
+          "captured_at": "2026-09-27T13:23:09.378665+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_5ff64c8e&format=application%2Fld%2Bjson",
+          "sha256": "a539983721062564dc96023d05f20db8d59b3efeabb4ca8c536895f1f2b69062",
+          "captured_at": "2026-09-27T13:23:10.238932+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_6162f8fc&format=application%2Fld%2Bjson",
+          "sha256": "cb0404d996d98f8f031daec51390ef60b06d065b93252c45a2ec5b34ad82a7ae",
+          "captured_at": "2026-09-27T13:23:10.852378+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_6599&format=application%2Fld%2Bjson",
+          "sha256": "141c989c41cce2654bc60daf5f4841a0482033a8c54d07f131a708d9e07bbdd0",
+          "captured_at": "2026-09-27T13:23:12.124235+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_77d35680&format=application%2Fld%2Bjson",
+          "sha256": "d36304747af298b2213a5629f90a662e3539d43f20ff0965d261cb785ee7d3b3",
+          "captured_at": "2026-09-27T13:23:13.483058+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_7805&format=application%2Fld%2Bjson",
+          "sha256": "b335bb9866afbd694c887ae57350a13094b3a9ac1f2e87ff29b3797d356da0f1",
+          "captured_at": "2026-09-27T13:23:14.545990+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_7e8b0137&format=application%2Fld%2Bjson",
+          "sha256": "d3ba8a0056e22c6df78e2fad32975aa555d9bf56e7ab801d2653f90509d5c0d5",
+          "captured_at": "2026-09-27T13:23:15.678228+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_7f6d9219&format=application%2Fld%2Bjson",
+          "sha256": "d972cbf4f2318fd197d89d09d183136871429c4d11193f81ca707f767ea773a4",
+          "captured_at": "2026-09-27T13:23:16.574321+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_8115c998&format=application%2Fld%2Bjson",
+          "sha256": "d52011142e10588c7d687d832301aece868cd91a726f90a297c2ca1d9e17c890",
+          "captured_at": "2026-09-27T13:23:17.552550+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_8246&format=application%2Fld%2Bjson",
+          "sha256": "6de6d0c54a6b4f8306bd23092cdcc1d8441f79ad006ac605f05a73797fdd3501",
+          "captured_at": "2026-09-27T13:23:20.906722+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_8373&format=application%2Fld%2Bjson",
+          "sha256": "88ed372cad6fa6dab35efa7c11e2c34eb6a5be0f1b826b38151963d12dd0f091",
+          "captured_at": "2026-09-27T13:23:22.526038+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_89a3ed9f&format=application%2Fld%2Bjson",
+          "sha256": "b1d881a8bae3ca94f928796713d2b208f9a2b3bb78fba40224307b9d4aef3554",
+          "captured_at": "2026-09-27T13:23:24.864669+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_8b2a6437&format=application%2Fld%2Bjson",
+          "sha256": "bf33f34e9f08571bff7df626d7153393f41a2a0894a1108870b161589d711b00",
+          "captured_at": "2026-09-27T13:23:26.311207+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_909cff15&format=application%2Fld%2Bjson",
+          "sha256": "7c61520edb8dfe5ea79ab6c06320a9fcd56af731856cc3738cd3950ea2d61611",
+          "captured_at": "2026-09-27T13:23:27.366354+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_981e72f7&format=application%2Fld%2Bjson",
+          "sha256": "f8753f78cb751061cba6cd3e6b0109a28c1abd3b4e733b89f71d6ada4f4d3023",
+          "captured_at": "2026-09-27T13:23:28.457977+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_ac049aab&format=application%2Fld%2Bjson",
+          "sha256": "9f03d5f714c8b3b1ba21fb84abd234af09548719de9f094d56d166a6efcca7e8",
+          "captured_at": "2026-09-27T13:23:29.721991+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_c153956a&format=application%2Fld%2Bjson",
+          "sha256": "b01b6633bb887156cdbeeae49cbcaf3447e6dd7638b24b15ad30efc369a67fd0",
+          "captured_at": "2026-09-27T13:23:30.950418+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_cc9bdffa&format=application%2Fld%2Bjson",
+          "sha256": "609d8213dbf17bf23ecb4313d3b45ce340acf1d0f48404be67381b8417a0db85",
+          "captured_at": "2026-09-27T13:23:32.978081+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_d12efd88&format=application%2Fld%2Bjson",
+          "sha256": "576103cff7d2f90a32846a747e65d8594d327dfd5bf3b6f982cc5bad9c82b0a0",
+          "captured_at": "2026-09-27T13:23:33.757949+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_d7a914cf&format=application%2Fld%2Bjson",
+          "sha256": "7544591054deb831699a027c8116c509c94943c13f565c7992e884ace6c7b077",
+          "captured_at": "2026-09-27T13:23:34.752919+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_d8d92acf&format=application%2Fld%2Bjson",
+          "sha256": "40094be87c606131a03dfb86b0d7f3f0e22839d21bef2b70aa4b771c3adcdefc",
+          "captured_at": "2026-09-27T13:23:36.442306+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_e2aeba86&format=application%2Fld%2Bjson",
+          "sha256": "cefd41bb4b1ef041fa1f8d2ffaf60d7da45efb4cb7e6d4bcfdaa465c5ecb8931",
+          "captured_at": "2026-09-27T13:23:37.410557+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_e4e17d1b&format=application%2Fld%2Bjson",
+          "sha256": "9505c32c543374578ea2c08c517fec48d0516ca4e49b9b3b6da194e4f500a473",
+          "captured_at": "2026-09-27T13:23:38.557379+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_e6f21eca&format=application%2Fld%2Bjson",
+          "sha256": "9c1966448e30a6f615e327044b90c296dfb5817d8fe4ebdc46bc67aba6098eb1",
+          "captured_at": "2026-09-27T13:23:40.156754+00:00"
+        },
+        {
+          "request_url": "https://agrovoc.fao.org/browse/rest/v1/agrovoc/data?uri=http%3A%2F%2Faims.fao.org%2Faos%2Fagrovoc%2Fc_fcbd0045&format=application%2Fld%2Bjson",
+          "sha256": "70c89b6870ae54c2e7de3fcf6f6d327b3cb87c6581754cbbacb5fba76b61e9d3",
+          "captured_at": "2026-09-27T13:23:41.338448+00:00"
+        }
+      ],
+      "nodes": 593,
+      "edges": 572,
+      "node_types": {
+        "AGROVOCConcept": 593
+      },
+      "relation_types": {
+        "SKOS_BROADER": 276,
+        "SKOS_NARROWER": 276,
+        "SKOS_RELATED": 20
+      }
+    },
+    {
+      "id": "reference:CHEBI",
+      "name": "ChEBI",
+      "kind": "reference",
+      "snapshot_id": "chebi/254",
+      "coverage_status": "LOCAL_OFFICIAL_ONTOLOGY_FILE",
+      "source_sha256": "09e138726a6cc5cf6ae6dce13129c387436345c5a87f74dbcfefdb0d44214644",
+      "inputs": [
+        {
+          "file": "chebi_lite.obo",
+          "sha256": "09e138726a6cc5cf6ae6dce13129c387436345c5a87f74dbcfefdb0d44214644"
+        }
+      ],
+      "rights_status": "SOURCE_HEADER_CC_BY_4_0; INTERNAL_DISPLAY",
+      "nodes": 218726,
+      "edges": 408781,
+      "node_types": {
+        "ChEBITerm": 218726
+      },
+      "relation_types": {
+        "CHEBI_IS_A": 299691,
+        "RO:0000087": 59102,
+        "RO:0018039": 2802,
+        "RO:0018038": 20466,
+        "BFO:0000051": 4121,
+        "RO:0018034": 8709,
+        "RO:0018040": 1860,
+        "RO:0018033": 8772,
+        "RO:0018036": 1956,
+        "RO:0018037": 1302
+      }
+    },
+    {
+      "id": "reference:BCPC",
+      "name": "BCPC",
+      "kind": "reference",
+      "snapshot_id": "legacy-reference-9710c231aef3",
+      "coverage_status": "LEGACY_DERIVED_REFERENCE_UNREVIEWED",
+      "source_sha256": "9710c231aef3057d38c3958828babb920049c792c53bbc9cbdd7ba9f2d0f3315",
+      "excluded_identity_edges": 0,
+      "rights_status": "INTERNAL_ONLY; SOURCE_RIGHTS_REVIEW_REQUIRED",
+      "inputs": [
+        {
+          "file": "BCPC/nodes.csv",
+          "sha256": "9710c231aef3057d38c3958828babb920049c792c53bbc9cbdd7ba9f2d0f3315"
+        },
+        {
+          "file": "BCPC/edges.csv",
+          "sha256": "ddbbe80763587d7c34a56583454513f61e99e46ff57ae2404604fb6360ff0b6f"
+        }
+      ],
+      "nodes": 9525,
+      "edges": 7574,
+      "node_types": {
+        "ActiveIngredient": 1951,
+        "Synonym": 7574
+      },
+      "relation_types": {
+        "has_synonym": 7574
+      }
+    },
+    {
+      "id": "reference:EPPO",
+      "name": "EPPO",
+      "kind": "reference",
+      "snapshot_id": "legacy-reference-5f76e4972825",
+      "coverage_status": "LEGACY_DERIVED_REFERENCE_UNREVIEWED",
+      "source_sha256": "5f76e49728257264952b31fe3994285d56360235113ba05664dba5bf1c7e4137",
+      "excluded_identity_edges": 0,
+      "rights_status": "INTERNAL_ONLY; SOURCE_RIGHTS_REVIEW_REQUIRED",
+      "inputs": [
+        {
+          "file": "EPPO/nodes.csv",
+          "sha256": "5f76e49728257264952b31fe3994285d56360235113ba05664dba5bf1c7e4137"
+        },
+        {
+          "file": "EPPO/edges.csv",
+          "sha256": "85f7d6a233e38b4f991ef307000e0894455b2497c40dc2900f5f0e4fe0188731"
+        }
+      ],
+      "nodes": 691532,
+      "edges": 685707,
+      "node_types": {
+        "MicroorganismTaxon": 13011,
+        "AnimalTaxon": 29338,
+        "TaxonOrCommodity": 23685,
+        "CropOrPlantTaxon": 61956,
+        "MultilingualLabel": 563542
+      },
+      "relation_types": {
+        "has_label": 563542,
+        "has_parent": 120956,
+        "related_to": 1209
+      }
+    },
+    {
+      "id": "reference:FRAC",
+      "name": "FRAC",
+      "kind": "reference",
+      "snapshot_id": "legacy-reference-503aebfb868b",
+      "coverage_status": "LEGACY_DERIVED_REFERENCE_UNREVIEWED",
+      "source_sha256": "503aebfb868b372d5c05846c68205f9da811f28f65e52805c64bc4bade31719e",
+      "excluded_identity_edges": 0,
+      "rights_status": "INTERNAL_ONLY; SOURCE_RIGHTS_REVIEW_REQUIRED",
+      "inputs": [
+        {
+          "file": "FRAC/nodes.csv",
+          "sha256": "503aebfb868b372d5c05846c68205f9da811f28f65e52805c64bc4bade31719e"
+        },
+        {
+          "file": "FRAC/edges.csv",
+          "sha256": "1b5cef5a0dfd4f0b08c9d84b25a973463bbd4fd077668bb9b3016a6ac91df9c1"
+        }
+      ],
+      "nodes": 603,
+      "edges": 606,
+      "node_types": {
+        "ClassificationDocument": 1,
+        "MoAGroup": 99,
+        "ChemicalClass": 153,
+        "ActiveIngredient": 350
+      },
+      "relation_types": {
+        "defined_in": 99,
+        "classified_in": 157,
+        "has_moa_group": 350
+      }
+    },
+    {
+      "id": "reference:HRAC",
+      "name": "HRAC",
+      "kind": "reference",
+      "snapshot_id": "legacy-reference-49cb07f915a2",
+      "coverage_status": "LEGACY_DERIVED_REFERENCE_UNREVIEWED",
+      "source_sha256": "49cb07f915a2b14d3d43ed60d8feee3285768c80bf54e43cc25b8bd93e154ae4",
+      "excluded_identity_edges": 0,
+      "rights_status": "INTERNAL_ONLY; SOURCE_RIGHTS_REVIEW_REQUIRED",
+      "inputs": [
+        {
+          "file": "HRAC/nodes.csv",
+          "sha256": "49cb07f915a2b14d3d43ed60d8feee3285768c80bf54e43cc25b8bd93e154ae4"
+        },
+        {
+          "file": "HRAC/edges.csv",
+          "sha256": "cc91bd1e3029fe2d44b41bba333e9d03087dc17a55d4298237df9ad5b40eb0c3"
+        }
+      ],
+      "nodes": 478,
+      "edges": 847,
+      "node_types": {
+        "ClassificationDocument": 1,
+        "MoAGroup": 28,
+        "ChemicalClass": 84,
+        "ActiveIngredient": 365
+      },
+      "relation_types": {
+        "defined_in": 28,
+        "classified_in": 89,
+        "has_moa_group": 365,
+        "belongs_to_chemical_class": 365
+      }
+    },
+    {
+      "id": "reference:IRAC",
+      "name": "IRAC",
+      "kind": "reference",
+      "snapshot_id": "legacy-reference-333356e458f7",
+      "coverage_status": "LEGACY_DERIVED_REFERENCE_UNREVIEWED",
+      "source_sha256": "333356e458f7008abe96ca4747f2fa6ef7c349550faea008c42740a079fef025",
+      "excluded_identity_edges": 0,
+      "rights_status": "INTERNAL_ONLY; SOURCE_RIGHTS_REVIEW_REQUIRED",
+      "inputs": [
+        {
+          "file": "IRAC/nodes.csv",
+          "sha256": "333356e458f7008abe96ca4747f2fa6ef7c349550faea008c42740a079fef025"
+        },
+        {
+          "file": "IRAC/edges.csv",
+          "sha256": "241c63021637a126bb263e68fce49e7641bb85df4226acc0d8f4ec6789a07203"
+        }
+      ],
+      "nodes": 91,
+      "edges": 96,
+      "node_types": {
+        "ClassificationDocument": 1,
+        "DocumentPage": 31,
+        "MoAGroup": 59
+      },
+      "relation_types": {
+        "part_of": 31,
+        "mentioned_on": 65
+      }
+    }
+  ],
+  "artifacts": {
+    "nodes.parquet": {
+      "sha256": "c004869af638378494ac907c4974171d6101db1b00e1179db58edf119c947e48"
+    },
+    "edges.parquet": {
+      "sha256": "b169aab8c01f7fea54844b8faf4f8c8dfc254614c092c73eb092c612425fa3c2"
+    }
+  }
+}

@@ -11,6 +11,9 @@ const OverviewPage = lazy(() =>
 const ExplorePage = lazy(() =>
   import('../features/explore/ExplorePage').then((module) => ({ default: module.ExplorePage })),
 )
+const GraphBrowserPage = lazy(() =>
+  import('../features/graph/GraphBrowserPage').then((module) => ({ default: module.GraphBrowserPage })),
+)
 const ComparePage = lazy(() =>
   import('../features/compare/ComparePage').then((module) => ({ default: module.ComparePage })),
 )
@@ -32,6 +35,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<OverviewPage />} />
             <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/graph" element={<GraphBrowserPage />} />
             <Route path="/compare" element={<ComparePage />} />
             <Route path="/entity/:nodeId" element={<EntityPage />} />
             <Route path="/downloads" element={<DownloadsPage />} />

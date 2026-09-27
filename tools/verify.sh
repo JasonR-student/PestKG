@@ -8,13 +8,19 @@ contract_temp="$(mktemp -d)"
 trap 'rm -rf "$contract_temp"' EXIT
 cp apps/web/src/shared/api/generated/types.gen.ts "$contract_temp/types.gen.ts"
 cp apps/web/src/shared/api/generated/index.ts "$contract_temp/index.ts"
+cp apps/web/src/shared/api/browser-generated/types.gen.ts "$contract_temp/browser-types.gen.ts"
+cp apps/web/src/shared/api/browser-generated/index.ts "$contract_temp/browser-index.ts"
 
 mvn -B -f apps/java/pom.xml -pl pestkg-api -am clean package
 npm --prefix apps/web run api:generate
 cmp "$contract_temp/types.gen.ts" apps/web/src/shared/api/generated/types.gen.ts
 cmp "$contract_temp/index.ts" apps/web/src/shared/api/generated/index.ts
+npm --prefix apps/web run api:generate:browser
+cmp "$contract_temp/browser-types.gen.ts" apps/web/src/shared/api/browser-generated/types.gen.ts
+cmp "$contract_temp/browser-index.ts" apps/web/src/shared/api/browser-generated/index.ts
 
 python -m pytest tools/release-pipeline/tests
+python -m unittest discover -s tools/data-production/tests -v
 python -m unittest discover -s research/figures/tests -v
 python -m compileall tools/release-pipeline tools/data-production research/figures
 npm --prefix apps/web run lint

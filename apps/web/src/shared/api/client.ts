@@ -4,6 +4,9 @@ import type {
   Country,
   Entity,
   GraphData,
+  GraphBrowserCatalog,
+  GraphBrowserQuery,
+  GraphBrowserResult,
   Overview,
   RegistrationUse,
   RegistrationUseFilters,
@@ -98,6 +101,14 @@ function nullableFilters(filters: RegistrationUseFilters) {
 }
 
 export const api = {
+  graphCatalog: (releaseId?: string | null, signal?: AbortSignal) =>
+    request<GraphBrowserCatalog>('/graph/catalog', { releaseId, signal }),
+  graphQuery: (query: GraphBrowserQuery, releaseId?: string | null, signal?: AbortSignal) =>
+    request<GraphBrowserResult>('/graph/query', { method: 'POST', releaseId, signal, body: JSON.stringify(query) }),
+  graphExpand: (nodeId: string, query: GraphBrowserQuery, releaseId?: string | null, signal?: AbortSignal) =>
+    request<GraphBrowserResult>(`/graph/expand?node_id=${encodeURIComponent(nodeId)}`, {
+      method: 'POST', releaseId, signal, body: JSON.stringify(query),
+    }),
   overview: (releaseId?: string | null, signal?: AbortSignal) =>
     request<Overview>('/stats/overview', { releaseId, signal }),
   countries: (releaseId?: string | null, signal?: AbortSignal) =>

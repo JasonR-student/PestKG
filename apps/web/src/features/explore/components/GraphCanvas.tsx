@@ -1,27 +1,39 @@
 import { Maximize2, Network } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import type { Core } from 'cytoscape'
+import { useEffect, useRef, type RefObject } from 'react'
 
 import { preferredLabel } from '../../../shared/lib/format'
 import type { GraphData } from '../../../shared/api/models'
+import { nodeColors } from './node-colors'
 
-const nodeColors: Record<string, string> = {
-  RegistrationUse: '#205b4f',
-  PesticideProduct: '#c06144',
-  ActiveIngredientLocal: '#3c6e97',
-  CropLocal: '#7b964f',
-  TargetLocal: '#a87c2c',
-  Registration: '#7b5d91',
-  FormulationLocal: '#6d7772',
+export type GraphCanvasHandle = {
+  zoom: (factor: number) => void
+  fit: () => void
+  relayout: () => void
+  png: () => string
+  pin: (id: string) => void
 }
 
 type Props = {
   graph: GraphData
   language: string
   onNodeSelect?: (nodeId: string) => void
+  onEdgeSelect?: (edgeId: string) => void
+  onExpand?: (nodeId: string) => void
+  canvasRef?: RefObject<GraphCanvasHandle | null>
+  browser?: boolean
+  showLabels?: boolean
 }
 
-export function GraphCanvas({ graph, language, onNodeSelect }: Props) {
+export function GraphCanvas({ graph, language, onNodeSelect, onEdgeSelect, onExpand, canvasRef, browser = false, showLabels = false }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const instanceRef = useRef<Core | null>(null)
+  const labelsRef = useRef(showLabels)
+
+  useEffect(() => {
+    labelsRef.current = showLabels
+    instanceRef.current?.style().selector('edge').style('label', showLabels ? 'data(label)' : '').update()
+  }, [showLabels])
 
   useEffect(() => {
     let disposed = false
@@ -42,7 +54,7 @@ export function GraphCanvas({ graph, language, onNodeSelect }: Props) {
             data: {
               id: node.id,
               label:
-                graph.nodes.length <= 10 || labelTypes.has(node.type)
+                browser || graph.nodes.length <= 10 || labelTypes.has(node.type)
                   ? preferredLabel(node, language)
                   : '',
               fullLabel: preferredLabel(node, language),
@@ -56,6 +68,7 @@ export function GraphCanvas({ graph, language, onNodeSelect }: Props) {
               source: edge.start_id,
               target: edge.end_id,
               label: edge.predicate,
+              projected: edge.properties?.stored_fact === false ? 1 : 0,
             },
           })),
         ],
@@ -65,14 +78,14 @@ export function GraphCanvas({ graph, language, onNodeSelect }: Props) {
             style: {
               'background-color': 'data(color)',
               label: 'data(label)',
-              color: '#17201d',
-              'font-size': 10,
+              color: browser ? '#ffffff' : '#17201d',
+              'font-size': browser ? 8 : 10,
               'text-wrap': 'ellipsis',
-              'text-max-width': '95px',
-              'text-valign': 'bottom',
-              'text-margin-y': 8,
-              width: 24,
-              height: 24,
+              'text-max-width': browser ? '30px' : '95px',
+              'text-valign': browser ? 'center' : 'bottom',
+              'text-margin-y': browser ? 0 : 8,
+              width: browser ? 34 : 24,
+              height: browser ? 34 : 24,
               'border-width': 2,
               'border-color': '#ffffff',
             },
@@ -81,7 +94,10 @@ export function GraphCanvas({ graph, language, onNodeSelect }: Props) {
             selector: 'node.hovered',
             style: {
               label: 'data(fullLabel)',
+              'text-max-width': '240px',
+              'text-wrap': 'wrap',
               'text-background-color': '#ffffff',
+              color: '#17201d',
               'text-background-opacity': 0.94,
               'text-background-padding': '4px',
               'text-border-color': '#d8dfdb',
@@ -98,8 +114,13 @@ export function GraphCanvas({ graph, language, onNodeSelect }: Props) {
               'target-arrow-shape': 'triangle',
               'curve-style': 'bezier',
               opacity: 0.78,
+              label: labelsRef.current ? 'data(label)' : '',
+              'font-size': 7,
+              'text-background-color': '#ffffff',
+              'text-background-opacity': 0.9,
             },
           },
+          { selector: 'edge[projected = 1]', style: { 'line-style': 'dashed', 'line-color': '#9fbcae' } },
           {
             selector: 'node:selected',
             style: {
@@ -114,20 +135,30 @@ export function GraphCanvas({ graph, language, onNodeSelect }: Props) {
           fit: true,
           padding: 36,
         },
-        minZoom: 0.25,
-        maxZoom: 2.5,
+        minZoom: 0.08,
+        maxZoom: 4,
       })
+      instanceRef.current = instance
       instance.on('mouseover', 'node', (event) => event.target.addClass('hovered'))
       instance.on('mouseout', 'node', (event) => event.target.removeClass('hovered'))
       instance.on('tap', 'node', (event) => onNodeSelect?.(event.target.id()))
-      destroy = () => instance.destroy()
+      instance.on('tap', 'edge', (event) => onEdgeSelect?.(event.target.id()))
+      instance.on('dbltap', 'node', (event) => onExpand?.(event.target.id()))
+      if (canvasRef) canvasRef.current = {
+        zoom: (factor) => instance.zoom({ level: instance.zoom() * factor, renderedPosition: { x: instance.width() / 2, y: instance.height() / 2 } }),
+        fit: () => instance.fit(undefined, 36),
+        relayout: () => { instance.nodes().unlock(); instance.layout({ name: 'cose', animate: false, padding: 36 }).run() },
+        png: () => instance.png({ full: true, bg: '#fbfdfb', scale: 2 }),
+        pin: (id) => { const node = instance.getElementById(id); if (node.locked()) node.unlock(); else node.lock() },
+      }
+      destroy = () => { if (canvasRef) canvasRef.current = null; instanceRef.current = null; instance.destroy() }
     })
 
     return () => {
       disposed = true
       destroy?.()
     }
-  }, [graph, language, onNodeSelect])
+  }, [graph, language, onNodeSelect, onEdgeSelect, onExpand, canvasRef, browser])
 
   if (!graph.nodes.length) {
     const english = language.startsWith('en')

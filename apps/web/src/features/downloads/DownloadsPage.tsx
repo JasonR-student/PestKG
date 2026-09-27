@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { AlertTriangle, CheckCircle2, Download, FileArchive, FileJson2, FileSpreadsheet, Quote, ShieldCheck } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Download, FileArchive, FileJson2, Quote, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { api } from '../../shared/api/client'
@@ -7,13 +7,6 @@ import { PageHeader } from '../../shared/ui/PageHeader'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
 import { formatBytes, formatInteger } from '../../shared/lib/format'
 import { useRelease } from '../../app/release/useRelease'
-
-const artifacts = [
-  { name: 'Country graph CSV.gz', detail: 'Nodes, relations and alignment edges by jurisdiction', format: 'CSV.gz', icon: FileSpreadsheet, status: 'production' },
-  { name: 'Analytical tables', detail: 'Partitioned registration-use search and aggregate tables', format: 'Parquet', icon: FileArchive, status: 'production' },
-  { name: 'Neo4j bulk import', detail: 'Typed nodes, relationships, indexes and validation queries', format: 'CSV.gz', icon: FileArchive, status: 'production' },
-  { name: 'RDF release', detail: 'Streaming-friendly semantic graph export with relationship provenance', format: 'N-Triples.gz', icon: FileJson2, status: 'production' },
-]
 
 export function DownloadsPage() {
   const { i18n } = useTranslation()
@@ -39,12 +32,9 @@ export function DownloadsPage() {
         <div><span>{english ? 'Current release' : '当前版本'}</span><h2>{release.release_id}</h2><p>{release.title}</p></div>
         <dl><div><dt>{english ? 'Published' : '发布日期'}</dt><dd>{release.published_at}</dd></div><div><dt>{english ? 'Source cutoff' : '来源截止'}</dt><dd>{release.cutoff}</dd></div><div><dt>{english ? 'License' : '许可证'}</dt><dd>{release.license}</dd></div></dl>
       </section>
-      {release.distribution_status !== 'ready' ? <section className="release-warning"><AlertTriangle size={19} /><div><strong>{english ? 'Public distribution is blocked' : '公开分发暂未放行'}</strong><p>{english ? release.known_limitations[0] : '当前 RAR 的 Neo4j 与 Q1–Q5 机器数据哈希正确，但多份文本文件与顶层 SHA-256 清单不一致；必须重建归档与清单后再公开发布。'}</p></div></section> : null}
+      {release.distribution_status !== 'ready' ? <section className="release-warning"><AlertTriangle size={19} /><div><strong>{english ? 'Public distribution is blocked' : '公开分发暂未放行'}</strong><p>{english ? 'Internal research use only; source redistribution rights remain unverified. Independent reference graphs do not establish regulatory identity.' : '仅限内部研究使用，来源再分发权利尚未核实；独立参考子图不代表已确认监管实体身份。'}</p></div></section> : null}
       <section className="section-panel artifact-panel">
-        <div className="section-heading"><div><h2>{english ? 'Release artifacts' : '发布数据包'}</h2><p>{english ? 'The local repository exposes a real-data sample; production mounts the complete bundles.' : '本地仓库提供真实数据样例，生产服务器挂载完整数据包。'}</p></div><div className="download-actions"><a className="button button--secondary" href={`${downloadRoot}/README.md`} target="_blank"><Download size={16} />README</a><a className="button button--secondary" href={`${downloadRoot}/index.json`} target="_blank"><FileJson2 size={16} />INDEX</a><a className="button button--secondary" href={`${downloadRoot}/SHA256SUMS`} target="_blank"><ShieldCheck size={16} />SHA-256</a></div></div>
-        <div className="artifact-table">
-          {artifacts.map(({ name, detail, format, icon: Icon, status }) => <div className="artifact-row" key={name}><Icon size={20} /><span><strong>{name}</strong><small>{detail}</small></span><code>{format}</code><span className={status === 'production' ? 'artifact-status artifact-status--ready' : 'artifact-status'}>{status === 'production' ? <CheckCircle2 size={14} /> : null}{status === 'production' ? (english ? 'Prepared by pipeline' : '流水线已支持') : (english ? 'Next release' : '下一版本')}</span></div>)}
-        </div>
+        <div className="section-heading"><div><h2>{english ? 'Release artifacts' : '发布数据包'}</h2><p>{english ? 'Frozen regulatory Parquet data and metadata; independent reference packs are versioned separately.' : '冻结的监管 Parquet 数据与元数据；独立参考数据包单独记录版本。'}</p></div><div className="download-actions"><a className="button button--secondary" href={`${downloadRoot}/README.md`} target="_blank"><Download size={16} />README</a><a className="button button--secondary" href={`${downloadRoot}/index.json`} target="_blank"><FileJson2 size={16} />INDEX</a><a className="button button--secondary" href={`${downloadRoot}/SHA256SUMS`} target="_blank"><ShieldCheck size={16} />SHA-256</a></div></div>
       </section>
       {release.artifacts.length ? (
         <section className="section-panel artifact-panel">
@@ -56,7 +46,7 @@ export function DownloadsPage() {
       ) : null}
       <section className="download-grid">
         <div className="section-panel citation-panel"><div className="section-heading section-heading--compact"><div><h2>{english ? 'Citation' : '引用信息'}</h2></div><Quote size={18} /></div><pre>{`Multicountry Pesticide KG contributors (2026).\nMulticountry Pesticide Registration Knowledge Graph,\nrelease ${release.release_id}.`}</pre><p>{english ? 'The repository includes CITATION.cff; the final DOI is added after Zenodo publication.' : '仓库已包含 CITATION.cff；Zenodo 发布后补充正式 DOI。'}</p></div>
-        <div className="section-panel integrity-panel"><div className="section-heading section-heading--compact"><div><h2>{english ? 'Integrity report' : '完整性报告'}</h2></div><CheckCircle2 size={18} /></div><strong>{release.integrity.passed ? 'PASSED' : 'FAILED'}</strong><dl className="detail-list detail-list--compact"><div><dt>Country nodes</dt><dd>{formatInteger(release.inventory.country_nodes)}</dd></div><div><dt>Country edges</dt><dd>{formatInteger(release.inventory.country_edges)}</dd></div><div><dt>Alignment edges</dt><dd>{formatInteger(release.inventory.alignment_edges)}</dd></div></dl></div>
+        <div className="section-panel integrity-panel"><div className="section-heading section-heading--compact"><div><h2>{english ? 'Integrity report' : '完整性报告'}</h2></div><CheckCircle2 size={18} /></div><strong>{release.integrity.passed ? 'PASSED' : 'FAILED'}</strong><dl className="detail-list detail-list--compact"><div><dt>{english ? 'KG nodes' : '主图节点'}</dt><dd>{formatInteger(release.inventory.kg_nodes)}</dd></div><div><dt>{english ? 'KG edges' : '主图关系'}</dt><dd>{formatInteger(release.inventory.kg_edges)}</dd></div><div><dt>{english ? 'Reviewed global chemicals' : '已审核共有化学实体'}</dt><dd>{formatInteger(release.inventory.global_chemicals)}</dd></div></dl></div>
       </section>
     </div>
   )

@@ -412,9 +412,8 @@ public class DuckDbDataStore {
                 nodeTypes.getOrDefault("Jurisdiction", 0L),
                 nodeTypes.getOrDefault("Source", 0L),
                 countryNodes, countryEdges,
-                nodeTypes.getOrDefault("CropTerm", 0L) + nodeTypes.getOrDefault("TargetTerm", 0L)
-                        + nodeTypes.getOrDefault("FormulationTerm", 0L) + nodeTypes.getOrDefault("LocalActiveIngredient", 0L),
-                relationTypes.getOrDefault("IN_TERRITORY", 0L),
+                nodeTypes.getOrDefault("GlobalChemical", 0L),
+                relationTypes.getOrDefault("EXACT_CHEMICAL_IDENTITY", 0L),
                 nodeTypes, relationTypes,
                 coverage);
         } catch (Exception e) {

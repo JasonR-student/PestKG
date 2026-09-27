@@ -55,10 +55,12 @@ services:
       PESTKG_DATA_DIR: /data/releases
       PESTKG_STATE_DIR: /data/state
       PESTKG_EXPORT_DIR: /data/exports
+      PESTKG_REFERENCE_DIR: /data/reference-graphs
     volumes:
       - ${PESTKG_RELEASE_ROOT:-./data/releases}:/data/releases:ro
       - ${PESTKG_STATE_ROOT:-./data/state}:/data/state
       - java_exports:/data/exports
+      - ${PESTKG_REFERENCE_ROOT:-./data/reference-graphs}:/data/reference-graphs:ro
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:18088/health/ready"]
       interval: 15s

@@ -1,0 +1,143 @@
+openapi: 3.1.0
+info:
+  title: PestKG Read-Only Graph Browser
+  version: 1.0.0
+paths:
+  /graph/catalog:
+    get:
+      responses:
+        '200':
+          description: Regulatory scopes and independent reference scopes
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GraphBrowserCatalog'
+  /graph/query:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphBrowserQuery'
+      responses:
+        '200':
+          description: Bounded graph with optional, explicitly marked provenance projection
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GraphBrowserResult'
+  /graph/expand:
+    post:
+      parameters:
+        - in: query
+          name: node_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphBrowserQuery'
+      responses:
+        '200':
+          description: A bounded neighborhood in the selected scope
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GraphBrowserResult'
+components:
+  schemas:
+    GraphBrowserQuery:
+      type: object
+      required: [scope, limit, provenance]
+      properties:
+        scope:
+          type: string
+        type:
+          type: string
+        query:
+          type: string
+        limit:
+          type: integer
+          minimum: 10
+          maximum: 300
+        provenance:
+          type: boolean
+    GraphScope:
+      type: object
+      required: [id, name, kind, nodes, edges, node_types, relation_types]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+          enum: [jurisdiction, source, reference]
+        jurisdiction:
+          type: string
+        nodes:
+          type: integer
+        edges:
+          type: integer
+        node_types:
+          type: object
+          additionalProperties:
+            type: integer
+        relation_types:
+          type: object
+          additionalProperties:
+            type: integer
+        snapshot_id:
+          type: string
+        source_sha256:
+          type: string
+        coverage_status:
+          type: string
+        rights_status:
+          type: string
+    GraphBrowserCatalog:
+      type: object
+      required: [base_release_id, reference_pack_id, scopes, exact_identity_links, primary_graphs]
+      properties:
+        base_release_id:
+          type: string
+        reference_pack_id:
+          type: string
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/GraphScope'
+        exact_identity_links:
+          type: integer
+        primary_graphs:
+          type: integer
+    GraphBrowserResult:
+      allOf:
+        - $ref: './openapi-v1.1.json#/components/schemas/GraphData'
+        - type: object
+          required: [scope, matched_nodes, node_limit, truncated]
+          properties:
+            scope:
+              type: string
+            matched_nodes:
+              type: integer
+            node_limit:
+              type: integer
+            truncated:
+              type: boolean

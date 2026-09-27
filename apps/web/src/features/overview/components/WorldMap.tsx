@@ -5,6 +5,7 @@ import { feature } from 'topojson-client'
 import world from 'world-atlas/countries-110m.json'
 
 import { formatCompact } from '../../../shared/lib/format'
+import { jurisdictionName } from '../../../shared/lib/jurisdictions'
 import type { Country } from '../../../shared/api/models'
 
 type Props = {
@@ -40,7 +41,7 @@ export function WorldMap({ countries, onSelect }: Props) {
 
   return (
     <div className="world-map">
-      <svg viewBox="0 0 900 430" role="img" aria-label={english ? 'Knowledge graph coverage map' : '知识图谱司法辖区覆盖地图'}>
+      <svg viewBox="0 0 900 430" role="img" aria-label={english ? 'Knowledge graph jurisdiction coverage map' : '知识图谱监管辖区覆盖地图'}>
         {geometry.features.map((countryFeature, featureIndex) => {
           const mapId = String(Number(countryFeature.id))
           const mapped = byMapId.get(mapId)
@@ -52,7 +53,7 @@ export function WorldMap({ countries, onSelect }: Props) {
               )
             : 0
           const label = mapped
-            ? `${mapped.map((item) => item.jurisdiction_name).join(' / ')}: ${formatCompact(nodes)} nodes`
+            ? `${mapped.map((item) => jurisdictionName(item.jurisdiction, english)).join(' / ')}: ${formatCompact(nodes)} nodes`
             : english ? 'No release data' : '当前版本无数据'
           const selectMappedCountry = () => mapped && onSelect(mapped[0].jurisdiction)
           return (
