@@ -23,7 +23,7 @@ services:
     pull_policy: always
     read_only: true
     tmpfs:
-      - /tmp
+      - /tmp:exec,size=1g
     security_opt:
       - no-new-privileges:true
     pids_limit: 256
