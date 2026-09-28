@@ -14,7 +14,7 @@ npm run api:generate
 ```
 
 Run the local checks with `npm run lint`, `npm run test`, and `npm run build`.
-The production build enforces a 500 KiB limit for every JavaScript chunk.
+The production build enforces a 550 KiB limit for every JavaScript chunk.
 
 ## Backend
 

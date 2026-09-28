@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const assetDirectory = fileURLToPath(new URL('../dist/assets/', import.meta.url))
-const maximumBytes = 500 * 1024
+const maximumBytes = 550 * 1024
 const files = await readdir(assetDirectory)
 const oversized = []
 

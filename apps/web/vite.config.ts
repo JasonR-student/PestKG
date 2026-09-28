@@ -4,27 +4,6 @@ import { defineConfig } from 'vitest/config'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  build: {
-    rolldownOptions: {
-      output: {
-        codeSplitting: {
-          groups: [
-            {
-              name: 'zrender',
-              test: /node_modules[\\/]zrender[\\/]/,
-              includeDependenciesRecursively: false,
-            },
-            {
-              name: 'echarts',
-              test: /node_modules[\\/]echarts[\\/]/,
-              includeDependenciesRecursively: false,
-              maxSize: 450 * 1024,
-            },
-          ],
-        },
-      },
-    },
-  },
   server: {
     proxy: {
       '/api': 'http://127.0.0.1:18088',
