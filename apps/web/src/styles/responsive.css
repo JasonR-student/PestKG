@@ -308,6 +308,13 @@
     align-items: flex-start;
   }
 
+  .section-heading > span,
+  .section-heading > a {
+    max-width: 100%;
+    white-space: normal;
+    text-align: right;
+  }
+
   .entity-heading-main {
     align-items: flex-start;
   }
@@ -315,6 +322,62 @@
   .entity-symbol {
     width: 40px;
     height: 40px;
+  }
+
+  .graph-browser-heading {
+    display: grid;
+    gap: 9px;
+  }
+
+  .graph-browser-heading h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .graph-release-note {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .graph-query-options {
+    align-items: stretch;
+  }
+
+  .graph-query-options label {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .graph-query-options select {
+    flex: 1;
+    max-width: none;
+  }
+
+  .graph-view-status {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .question-tabs {
+    display: flex;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .question-tabs button {
+    flex: 0 0 160px;
+    min-height: 68px;
+  }
+
+  .question-tabs span {
+    overflow: visible;
+    white-space: normal;
+    line-height: 1.3;
+  }
+
+  .comparison-table .data-table-wrap {
+    overflow-x: auto;
   }
 }
 

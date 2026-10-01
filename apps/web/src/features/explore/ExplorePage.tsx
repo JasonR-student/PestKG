@@ -8,7 +8,7 @@ import { api } from '../../shared/api/client'
 import { GraphCanvas } from './components/GraphCanvas'
 import { PageHeader } from '../../shared/ui/PageHeader'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
-import { preferredLabel } from '../../shared/lib/format'
+import { formatInteger, preferredLabel } from '../../shared/lib/format'
 import { jurisdictionName } from '../../shared/lib/jurisdictions'
 import { useRelease } from '../../app/release/useRelease'
 import type { RegistrationUseFilters } from '../../shared/api/models'
@@ -123,7 +123,8 @@ export function ExplorePage() {
   )
 
   const total = Number(results.data?.pages[0]?.meta?.total ?? 0)
-  const english = i18n.language.startsWith('en')
+  const language = i18n.language
+  const english = language.startsWith('en')
   const graphData = graph.data?.data ?? { nodes: [], edges: [] }
   const countryOptions = useMemo(
     () => countries.data?.data.toSorted((a, b) => a.jurisdiction.localeCompare(b.jurisdiction)) ?? [],
@@ -133,34 +134,30 @@ export function ExplorePage() {
   return (
     <div className="page-stack">
       <PageHeader
-        title={english ? 'Registration-use explorer' : '登记使用数据探索'}
-        description={
-          english
-            ? 'Filter the research release, inspect official provenance, and open a bounded local graph.'
-            : '组合筛选研究数据、核对官方来源，并查看受限规模的局部关系图。'
-        }
+        title={t('explore.title')}
+        description={t('explore.description')}
         actions={
           <button className="button button--secondary" type="button" onClick={() => void exportRows()} disabled={exporting}>
             <Download size={16} />
-            {exporting ? 'Exporting…' : english ? 'Export filtered CSV' : '导出筛选 CSV'}
+            {exporting ? t('explore.exporting') : t('explore.exportFiltered')}
           </button>
         }
       />
 
-      <section className="filter-band" aria-label="Registration filters">
+      <section className="filter-band" aria-label={t('explore.filtersAria')}>
         <div className="filter-title">
           <Filter size={17} aria-hidden="true" />
-          <strong>{english ? 'Filters' : '组合筛选'}</strong>
+          <strong>{t('explore.filters')}</strong>
         </div>
         <label className="field field--wide">
-          <span>{english ? 'Any field' : '任意字段'}</span>
+          <span>{t('explore.anyField')}</span>
           <div className="input-with-icon">
             <Search size={15} />
-            <input value={draft.query} onChange={(event) => update('query', event.target.value)} placeholder={english ? 'Product, ingredient, crop or target' : '产品、有效成分、作物或防治对象'} />
+            <input value={draft.query} onChange={(event) => update('query', event.target.value)} placeholder={t('explore.anyFieldPlaceholder')} />
           </div>
         </label>
         <label className="field">
-          <span>{english ? 'Jurisdiction' : '监管辖区'}</span>
+          <span>{t('explore.jurisdiction')}</span>
           <select value={draft.jurisdictions[0] ?? ''} onChange={(event) => update('jurisdictions', event.target.value ? [event.target.value] : [])}>
             <option value="">{t('common.all')}</option>
             {countryOptions.map((country) => (
@@ -169,19 +166,19 @@ export function ExplorePage() {
           </select>
         </label>
         <label className="field">
-          <span>{english ? 'Active ingredient' : '有效成分'}</span>
+          <span>{t('explore.activeIngredient')}</span>
           <input value={draft.active_ingredient} onChange={(event) => update('active_ingredient', event.target.value)} />
         </label>
         <label className="field">
-          <span>{english ? 'Crop' : '作物'}</span>
+          <span>{t('explore.crop')}</span>
           <input value={draft.crop} onChange={(event) => update('crop', event.target.value)} />
         </label>
         <label className="field">
-          <span>{english ? 'Target' : '防治对象'}</span>
+          <span>{t('explore.target')}</span>
           <input value={draft.target} onChange={(event) => update('target', event.target.value)} />
         </label>
         <label className="field">
-          <span>{english ? 'Formulation' : '剂型'}</span>
+          <span>{t('explore.formulation')}</span>
           <input value={draft.formulation} onChange={(event) => update('formulation', event.target.value)} />
         </label>
         <div className="filter-actions">
@@ -196,8 +193,8 @@ export function ExplorePage() {
         <div className="section-panel results-panel">
           <div className="section-heading section-heading--compact">
             <div>
-              <h2>{english ? 'Registration uses' : '登记使用记录'}</h2>
-              <p>{total.toLocaleString()} {t('common.rows')}</p>
+              <h2>{t('explore.registrationUses')}</h2>
+              <p>{formatInteger(total, language)} {t('common.rows')}</p>
             </div>
           </div>
           {results.isLoading ? <LoadingState compact /> : null}
@@ -206,14 +203,14 @@ export function ExplorePage() {
             <>
               <div className="data-table-wrap">
                 <table className="data-table">
-                  <thead><tr><th>{english ? 'Jurisdiction' : '辖区'}</th><th>{english ? 'Product / ingredient' : '产品 / 有效成分'}</th><th>{english ? 'Crop / target' : '作物 / 防治对象'}</th><th>{english ? 'Source' : '来源'}</th></tr></thead>
+                  <thead><tr><th>{t('explore.jurisdiction')}</th><th>{t('explore.productIngredient')}</th><th>{t('explore.cropTarget')}</th><th>{t('common.source')}</th></tr></thead>
                   <tbody>
                     {resultRows.map((row) => (
                       <tr key={row.use_id} className={selected?.use_id === row.use_id ? 'is-selected' : ''} onClick={() => setSelectedId(row.use_id)}>
                         <td><span className="jurisdiction-code">{row.jurisdiction}</span></td>
                         <td><strong>{preferredLabel({ label_original: row.product_label_original, label_en: row.product_label_en }, i18n.language)}</strong><small>{entityList(row.active_ingredients, i18n.language)}</small></td>
                         <td><span>{entityList(row.crops, i18n.language)}</span><small>{entityList(row.targets, i18n.language)}</small></td>
-                        <td><a href={row.source_url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} aria-label={english ? 'Open official source' : '打开官方来源'}><ExternalLink size={15} /></a></td>
+                        <td><a href={row.source_url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} aria-label={t('common.officialSource')}><ExternalLink size={15} /></a></td>
                       </tr>
                     ))}
                   </tbody>
@@ -221,16 +218,14 @@ export function ExplorePage() {
               </div>
               {results.hasNextPage ? (
                 <div className="results-footer">
-                  <span>{resultRows.length.toLocaleString()} / {total.toLocaleString()}</span>
+                  <span>{formatInteger(resultRows.length, language)} / {formatInteger(total, language)}</span>
                   <button
                     className="button button--secondary"
                     type="button"
                     disabled={results.isFetchingNextPage}
                     onClick={() => void results.fetchNextPage()}
                   >
-                    {results.isFetchingNextPage
-                      ? english ? 'Loading…' : '正在加载…'
-                      : english ? 'Load more' : '加载更多'}
+                    {results.isFetchingNextPage ? t('explore.loadingMore') : t('explore.loadMore')}
                   </button>
                 </div>
               ) : null}
@@ -241,11 +236,11 @@ export function ExplorePage() {
         <div className="section-panel graph-panel">
           <div className="section-heading section-heading--compact">
             <div>
-              <h2>{english ? 'Local graph' : '局部关系图'}</h2>
-              <p>{selected ? selected.use_id : english ? 'Select a row' : '请选择一条记录'}</p>
+              <h2>{t('explore.localGraph')}</h2>
+              <p>{selected ? selected.use_id : t('explore.selectRow')}</p>
             </div>
-            <div className="segmented-control" aria-label="Graph depth">
-              {[1, 2].map((value) => <button key={value} type="button" className={depth === value ? 'is-active' : ''} onClick={() => setDepth(value)}>{value} hop</button>)}
+            <div className="segmented-control" aria-label={t('explore.graphDepth')}>
+              {[1, 2].map((value) => <button key={value} type="button" className={depth === value ? 'is-active' : ''} onClick={() => setDepth(value)}>{t('explore.hop', { count: value })}</button>)}
             </div>
           </div>
           {graph.isLoading ? <LoadingState compact /> : graph.isError ? <ErrorState message={graph.error.message} /> : <GraphCanvas graph={graphData} language={i18n.language} onNodeSelect={onNodeSelect} />}

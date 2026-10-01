@@ -16,8 +16,9 @@ type Props = {
 const palette = ['#dce4e0', '#b9cec7', '#75a69a', '#356f62', '#17493f']
 
 export function WorldMap({ countries, onSelect }: Props) {
-  const { i18n } = useTranslation()
-  const english = i18n.language.startsWith('en')
+  const { i18n, t } = useTranslation()
+  const language = i18n.language
+  const english = language.startsWith('en')
   const geometry = useMemo(() => {
     const collection = feature(
       world as never,
@@ -41,7 +42,7 @@ export function WorldMap({ countries, onSelect }: Props) {
 
   return (
     <div className="world-map">
-      <svg viewBox="0 0 900 430" role="img" aria-label={english ? 'Knowledge graph jurisdiction coverage map' : '知识图谱监管辖区覆盖地图'}>
+      <svg viewBox="0 0 900 430" role="img" aria-label={t('overview.jurisdictionCoverage')}>
         {geometry.features.map((countryFeature, featureIndex) => {
           const mapId = String(Number(countryFeature.id))
           const mapped = byMapId.get(mapId)
@@ -53,8 +54,8 @@ export function WorldMap({ countries, onSelect }: Props) {
               )
             : 0
           const label = mapped
-            ? `${mapped.map((item) => jurisdictionName(item.jurisdiction, english)).join(' / ')}: ${formatCompact(nodes)} nodes`
-            : english ? 'No release data' : '当前版本无数据'
+            ? `${mapped.map((item) => jurisdictionName(item.jurisdiction, english)).join(' / ')}: ${formatCompact(nodes, language)} ${t('common.nodes')}`
+            : t('overview.noReleaseData')
           const selectMappedCountry = () => mapped && onSelect(mapped[0].jurisdiction)
           return (
             <path
@@ -80,11 +81,11 @@ export function WorldMap({ countries, onSelect }: Props) {
         })}
       </svg>
       <div className="map-legend" aria-hidden="true">
-        <span>{english ? 'Lower' : '较低'}</span>
+        <span>{t('overview.lower')}</span>
         {palette.slice(1).map((color) => (
           <i key={color} style={{ backgroundColor: color }} />
         ))}
-        <span>{english ? 'Higher node volume' : '较高节点量'}</span>
+        <span>{t('overview.higherNodeVolume')}</span>
       </div>
     </div>
   )

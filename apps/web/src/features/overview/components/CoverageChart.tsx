@@ -1,9 +1,10 @@
 import { echarts } from '../../../shared/charts/echarts'
 import { ReactEChartsCore } from '../../../shared/charts/react-echarts-core'
 import type { CoverageRecord } from '../../../shared/api/models'
+import { useTranslation } from 'react-i18next'
 
-export function CoverageChart({ coverage, language }: { coverage: CoverageRecord[]; language: string }) {
-  const english = language.startsWith('en')
+export function CoverageChart({ coverage, language: _language }: { coverage: CoverageRecord[]; language: string }) {
+  const { t } = useTranslation()
   const option = {
     animationDuration: 500,
     color: ['#205b4f', '#c06144', '#3c6e97', '#a87c2c'],
@@ -25,22 +26,22 @@ export function CoverageChart({ coverage, language }: { coverage: CoverageRecord
     },
     series: [
       {
-        name: english ? 'Crop' : '作物',
+        name: t('fieldLabels.crop'),
         type: 'bar',
         data: coverage.map((item) => Number(item.crop_english_given_source || 0)),
       },
       {
-        name: english ? 'Target' : '防治对象',
+        name: t('fieldLabels.target'),
         type: 'bar',
         data: coverage.map((item) => Number(item.target_english_given_source || 0)),
       },
       {
-        name: english ? 'Active ingredient' : '有效成分',
+        name: t('fieldLabels.activeIngredient'),
         type: 'bar',
         data: coverage.map((item) => Number(item.active_english_given_source || 0)),
       },
       {
-        name: english ? 'Formulation' : '剂型',
+        name: t('fieldLabels.formulation'),
         type: 'bar',
         data: coverage.map((item) => Number(item.formulation_english_given_source || 0)),
       },

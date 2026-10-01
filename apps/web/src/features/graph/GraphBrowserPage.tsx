@@ -8,16 +8,17 @@ import { useRelease } from '../../app/release/useRelease'
 import { api } from '../../shared/api/client'
 import type { GraphBrowserQuery, GraphData } from '../../shared/api/models'
 import { formatInteger, preferredLabel } from '../../shared/lib/format'
+import { fieldLabel, nodeTypeLabel, relationLabel } from '../../shared/lib/labels'
 import { jurisdictionName } from '../../shared/lib/jurisdictions'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
 import { GraphCanvas, type GraphCanvasHandle } from '../explore/components/GraphCanvas'
 import { nodeColors } from '../explore/components/node-colors'
-import { categoryFromQuery, categoryLabel, categoryMatches } from './graph-categories'
+import { categoryFromQuery, categoryMatches } from './graph-categories'
 
 const emptyGraph: GraphData = { nodes: [], edges: [] }
 
 export function GraphBrowserPage() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const english = i18n.language.startsWith('en')
   const { releaseId } = useRelease()
   const [params, setParams] = useSearchParams()
@@ -144,67 +145,68 @@ export function GraphBrowserPage() {
   const label = node ? preferredLabel(node, i18n.language) : edge?.predicate
   return (
     <div className="graph-browser">
-      <header className="graph-browser-heading">
-        <div><span className="eyebrow">PESTKG / GRAPH</span><h1>{english ? 'Graph browser' : '图谱浏览器'}</h1></div>
-        <div className="graph-release-note"><span>{releaseId}</span><small>{english ? 'Independent reference pack' : '独立参考数据包'} · {catalog.data?.data.reference_pack_id || '—'}</small></div>
+       <header className="graph-browser-heading">
+        <div><span className="eyebrow">PESTKG / GRAPH</span><h1>{t('graph.title')}</h1></div>
+        <div className="graph-release-note"><span title={releaseId ?? undefined}>{releaseId}</span><small>{t('graph.referencePack')} · <span title={catalog.data?.data.reference_pack_id || undefined}>{catalog.data?.data.reference_pack_id || '—'}</span></small></div>
       </header>
       <form className="graph-query" onSubmit={search}>
         <Search size={18} aria-hidden="true" />
-        <input aria-label={english ? 'Graph query' : '图谱查询'} value={draft.query} onChange={(event) => setDraft({ ...draft, query: event.target.value })} placeholder={english ? 'Name, identifier, or category' : '名称、编号或类别'} />
-        <button type="submit" disabled={result.isFetching || catalog.isLoading}><Search size={15} />{english ? 'Search' : '搜索'}</button>
+        <input aria-label={t('graph.graphQuery')} value={draft.query} onChange={(event) => setDraft({ ...draft, query: event.target.value })} placeholder={t('graph.queryPlaceholder')} />
+        <button type="submit" disabled={result.isFetching || catalog.isLoading}><Search size={15} />{t('common.search')}</button>
       </form>
       <div className="graph-query-options">
-        <label>{english ? 'Category' : '类别'}<select aria-label={english ? 'Category' : '类别'} value={draft.type} onChange={(event) => chooseCategory(event.target.value)} disabled={catalog.isLoading}><option value="">{english ? 'All categories' : '全部类别'}</option>{categories.map(([type]) => <option key={type} value={type}>{categoryLabel(type, english)}</option>)}</select></label>
-        <label>{english ? 'Node limit' : '节点上限'}<select value={draft.limit} onChange={(event) => setDraft({ ...draft, limit: Number(event.target.value) })}>{[60, 120, 240, 300].map((value) => <option key={value}>{value}</option>)}</select></label>
-        <label className="graph-check"><input type="checkbox" checked={draft.provenance} onChange={(event) => { const next = { ...draft, provenance: event.target.checked }; setDraft(next); run(undefined, next) }} />{english ? 'Provenance projection' : '溯源属性投影'}</label>
-        <span>{english ? 'Read-only · bounded view' : '只读 · 有界视图'}</span>
+        <label>{t('graph.category')}<select aria-label={t('graph.category')} value={draft.type} onChange={(event) => chooseCategory(event.target.value)} disabled={catalog.isLoading}><option value="">{t('graph.allCategories')}</option>{categories.map(([type]) => <option key={type} value={type}>{nodeTypeLabel(type, i18n.language)}</option>)}</select></label>
+        <label>{t('graph.nodeLimit')}<select aria-label={t('graph.nodeLimit')} value={draft.limit} onChange={(event) => setDraft({ ...draft, limit: Number(event.target.value) })}>{[60, 120, 240, 300].map((value) => <option key={value}>{value}</option>)}</select></label>
+        <label className="graph-check"><input type="checkbox" checked={draft.provenance} onChange={(event) => { const next = { ...draft, provenance: event.target.checked }; setDraft(next); run(undefined, next) }} />{t('graph.provenanceProjection')}</label>
+        <span>{t('graph.readOnlyBounded')}</span>
       </div>
       {error || catalog.isError || result.isError ? <ErrorState message={error || catalog.error?.message || result.error?.message} /> : null}
       <div className="graph-workspace">
         <aside className="graph-database">
-          <div className="graph-database-heading"><Database size={34} /><div><h2>{english ? 'Graph scope' : '图谱范围'}</h2><span>{english ? 'Jurisdictions & websites' : '辖区与独立网站'}</span></div><button className="icon-button graph-catalog-toggle" type="button" title={english ? 'Labels and relationships' : '标签与关系'} aria-label={english ? 'Labels and relationships' : '标签与关系'} aria-controls="graph-catalog" aria-expanded={catalogOpen} onClick={() => setCatalogOpen((value) => !value)}><ListFilter size={18} /></button></div>
-          <label className="graph-scope-label">{english ? 'Scope' : '辖区／来源'}
-            <select aria-label={english ? 'Graph scope' : '图谱范围'} value={draft.scope} onChange={(event) => changeScope(event.target.value)} disabled={catalog.isLoading}>
-              <option value="all">{english ? 'All loaded scopes' : '全部已加载子图'}</option>
-              {(['jurisdiction', 'source', 'reference'] as const).map((kind) => <optgroup key={kind} label={kind === 'jurisdiction' ? (english ? 'Jurisdictions' : '监管辖区') : kind === 'source' ? (english ? 'Official websites' : '官方来源网站') : (english ? 'Independent reference websites' : '独立补充网站')}>
+          <div className="graph-database-heading"><Database size={34} /><div><h2>{t('graph.graphScope')}</h2><span>{t('graph.scope')}</span></div><button className="icon-button graph-catalog-toggle" type="button" title={t('graph.labelsAndRelationships')} aria-label={t('graph.labelsAndRelationships')} aria-controls="graph-catalog" aria-expanded={catalogOpen} onClick={() => setCatalogOpen((value) => !value)}><ListFilter size={18} /></button></div>
+          <label className="graph-scope-label">{t('graph.scope')}
+            <select aria-label={t('graph.graphScope')} value={draft.scope} onChange={(event) => changeScope(event.target.value)} disabled={catalog.isLoading}>
+              <option value="all">{t('graph.allLoadedScopes')}</option>
+              {draft.scope !== 'all' && !catalog.data?.data.scopes.some((item) => item.id === draft.scope) ? <option value={draft.scope}>{draft.scope}</option> : null}
+              {(['jurisdiction', 'source', 'reference'] as const).map((kind) => <optgroup key={kind} label={kind === 'jurisdiction' ? t('graph.jurisdictions') : kind === 'source' ? t('graph.officialWebsites') : t('graph.independentWebsites')}>
                 {catalog.data?.data.scopes.filter((item) => item.kind === kind).map((item) => <option value={item.id} key={item.id}>{item.kind === 'jurisdiction' ? `${item.name} · ${jurisdictionName(item.name, english)}` : item.name}</option>)}
               </optgroup>)}
             </select>
           </label>
-          <dl className="graph-scope-counts"><div><dt>{english ? 'Nodes' : '节点'}</dt><dd>{scope ? formatInteger(scope.nodes) : '—'}</dd></div><div><dt>{english ? 'Stored relations' : '存储关系'}</dt><dd>{scope ? formatInteger(scope.edges) : '—'}</dd></div></dl>
-          {scope?.kind === 'reference' ? <p className="graph-scope-status">{scope.coverage_status === 'BOUNDED_OFFICIAL_API_SUBGRAPH' ? (english ? 'Bounded official API subgraph' : '官方接口有界子图') : scope.coverage_status === 'LEGACY_DERIVED_REFERENCE_UNREVIEWED' ? (english ? 'Legacy reference import · unreviewed' : '旧参考子图导入 · 待审核') : (english ? 'Official ontology snapshot' : '官方本体文件快照')}<br />{english ? 'Regulatory identity links: 0' : '已审核监管身份连接：0'}</p> : null}
+          <dl className="graph-scope-counts"><div><dt>{t('graph.nodes')}</dt><dd title={scope ? formatInteger(scope.nodes, i18n.language) : undefined}>{scope ? formatInteger(scope.nodes, i18n.language) : '—'}</dd></div><div><dt>{t('graph.storedRelations')}</dt><dd title={scope ? formatInteger(scope.edges, i18n.language) : undefined}>{scope ? formatInteger(scope.edges, i18n.language) : '—'}</dd></div></dl>
+          {scope?.kind === 'reference' ? <p className="graph-scope-status">{scope.coverage_status === 'BOUNDED_OFFICIAL_API_SUBGRAPH' ? t('graph.boundedOfficialApiSubgraph') : scope.coverage_status === 'LEGACY_DERIVED_REFERENCE_UNREVIEWED' ? t('graph.legacyReferenceImport') : t('graph.officialOntologySnapshot')}<br />{t('graph.regulatoryIdentityLinks')}{english ? ': 0' : '：0'}</p> : null}
           <div id="graph-catalog" className={`graph-catalog-scroll${catalogOpen ? ' is-open' : ''}`}>
-            <h3>{english ? 'Categories' : '类别'}<small>CATEGORIES</small></h3>
-            <label className="graph-category-search"><Search size={14} aria-hidden="true" /><input aria-label={english ? 'Search categories' : '搜索类别'} placeholder={english ? 'Search categories' : '搜索类别'} value={categorySearch} onChange={(event) => setCategorySearch(event.target.value)} /></label>
-            <button className="graph-label-row" type="button" aria-pressed={!applied.type} onClick={() => chooseCategory('')}><span>{english ? 'All categories' : '全部类别'}</span></button>
-            {filteredCategories.map(([type, count]) => <button key={type} className="graph-label-row" type="button" title={type} aria-pressed={applied.type === type} onClick={() => chooseCategory(type)}><i style={{ background: nodeColors[type] ?? '#87958b' }} /><span>{categoryLabel(type, english)}</span>{count !== undefined ? <small>{formatInteger(count)}</small> : null}</button>)}
-            {!filteredCategories.length && categorySearch ? <p className="graph-category-empty" role="status">{english ? 'No matching categories' : '没有匹配的类别'}</p> : null}
-            <h3>{english ? 'Relationship types' : '关系类型'}<small>RELATIONSHIP TYPES</small></h3>
-            {Object.entries(scope?.relation_types ?? {}).sort((a, b) => b[1] - a[1]).map(([predicate, count]) => <button key={predicate} className="graph-label-row" type="button" aria-pressed={relation === predicate} onClick={() => setRelation((previous) => previous === predicate ? '' : predicate)}><i className="relation-swatch" /><span title={predicate}>{predicate}</span><small>{formatInteger(count)}</small></button>)}
-            <details className="graph-loaded-nodes"><summary>{english ? 'Loaded nodes' : '当前节点'} · {graph.nodes.length}</summary><div>{graph.nodes.map((item) => <button key={item.id} type="button" onClick={() => selectNode(item.id)} title={item.id}>{preferredLabel(item, i18n.language)}</button>)}</div></details>
+            <h3>{t('graph.categories')}<small>CATEGORIES</small></h3>
+            <label className="graph-category-search"><Search size={14} aria-hidden="true" /><input aria-label={t('graph.searchCategories')} placeholder={t('graph.searchCategories')} value={categorySearch} onChange={(event) => setCategorySearch(event.target.value)} /></label>
+            <button className="graph-label-row" type="button" aria-pressed={!applied.type} onClick={() => chooseCategory('')}><span>{t('graph.allCategories')}</span></button>
+            {filteredCategories.map(([type, count]) => <button key={type} className="graph-label-row" type="button" title={type} aria-pressed={applied.type === type} onClick={() => chooseCategory(type)}><i style={{ background: nodeColors[type] ?? '#87958b' }} /><span>{nodeTypeLabel(type, i18n.language)}</span>{count !== undefined ? <small title={formatInteger(count, i18n.language)}>{formatInteger(count, i18n.language)}</small> : null}</button>)}
+            {!filteredCategories.length && categorySearch ? <p className="graph-category-empty" role="status">{t('graph.noMatchingCategories')}</p> : null}
+            <h3>{t('graph.relationshipTypes')}<small>RELATIONSHIP TYPES</small></h3>
+            {Object.entries(scope?.relation_types ?? {}).sort((a, b) => b[1] - a[1]).map(([predicate, count]) => <button key={predicate} className="graph-label-row" type="button" aria-pressed={relation === predicate} onClick={() => setRelation((previous) => previous === predicate ? '' : predicate)}><i className="relation-swatch" /><span title={predicate}>{relationLabel(predicate, i18n.language)}</span><small title={formatInteger(count, i18n.language)}>{formatInteger(count, i18n.language)}</small></button>)}
+            <details className="graph-loaded-nodes"><summary>{t('graph.loadedNodes')} · {formatInteger(graph.nodes.length, i18n.language)}</summary><div>{graph.nodes.map((item) => <button key={item.id} type="button" onClick={() => selectNode(item.id)} title={item.id}>{preferredLabel(item, i18n.language)}</button>)}</div></details>
           </div>
         </aside>
         <div className="graph-main-canvas" ref={canvasPanel}>
-          <div className="graph-toolbar" role="toolbar" aria-label={english ? 'Graph tools' : '图谱工具'}>
-            <button className="icon-button" type="button" title={english ? 'Zoom in' : '放大'} aria-label={english ? 'Zoom in' : '放大'} disabled={!graph.nodes.length} onClick={() => canvas.current?.zoom(1.25)}><Plus size={17} /></button>
-            <button className="icon-button" type="button" title={english ? 'Zoom out' : '缩小'} aria-label={english ? 'Zoom out' : '缩小'} disabled={!graph.nodes.length} onClick={() => canvas.current?.zoom(0.8)}><Minus size={17} /></button>
-            <button className="icon-button" type="button" title={english ? 'Fit graph' : '适应画布'} aria-label={english ? 'Fit graph' : '适应画布'} disabled={!graph.nodes.length} onClick={() => canvas.current?.fit()}><Focus size={17} /></button>
-            <button className="icon-button" type="button" title={english ? 'Relayout' : '重新布局'} aria-label={english ? 'Relayout' : '重新布局'} disabled={!graph.nodes.length} onClick={() => { canvas.current?.relayout(); setPinned([]) }}><RotateCcw size={17} /></button>
-            <button className="icon-button" type="button" title={english ? 'Relationship labels' : '关系标签'} aria-label={english ? 'Relationship labels' : '关系标签'} aria-pressed={showLabels} disabled={!graph.nodes.length} onClick={() => setShowLabels((value) => !value)}><Tag size={17} /></button>
-            <button className="icon-button" type="button" title={english ? 'Export PNG' : '导出 PNG'} aria-label={english ? 'Export PNG' : '导出 PNG'} disabled={!graph.nodes.length} onClick={downloadPng}><Download size={17} /></button>
-            <button className="icon-button" type="button" title={english ? 'Fullscreen' : '全屏'} aria-label={english ? 'Fullscreen' : '全屏'} disabled={!graph.nodes.length} onClick={() => void fullscreen()}><Maximize2 size={17} /></button>
+          <div className="graph-toolbar" role="toolbar" aria-label={t('graph.tools')}>
+            <button className="icon-button" type="button" title={t('graph.zoomIn')} aria-label={t('graph.zoomIn')} disabled={!graph.nodes.length} onClick={() => canvas.current?.zoom(1.25)}><Plus size={17} /></button>
+            <button className="icon-button" type="button" title={t('graph.zoomOut')} aria-label={t('graph.zoomOut')} disabled={!graph.nodes.length} onClick={() => canvas.current?.zoom(0.8)}><Minus size={17} /></button>
+            <button className="icon-button" type="button" title={t('graph.fitGraph')} aria-label={t('graph.fitGraph')} disabled={!graph.nodes.length} onClick={() => canvas.current?.fit()}><Focus size={17} /></button>
+            <button className="icon-button" type="button" title={t('graph.relayout')} aria-label={t('graph.relayout')} disabled={!graph.nodes.length} onClick={() => { canvas.current?.relayout(); setPinned([]) }}><RotateCcw size={17} /></button>
+            <button className="icon-button" type="button" title={t('graph.relationshipLabels')} aria-label={t('graph.relationshipLabels')} aria-pressed={showLabels} disabled={!graph.nodes.length} onClick={() => setShowLabels((value) => !value)}><Tag size={17} /></button>
+            <button className="icon-button" type="button" title={t('graph.exportPng')} aria-label={t('graph.exportPng')} disabled={!graph.nodes.length} onClick={downloadPng}><Download size={17} /></button>
+            <button className="icon-button" type="button" title={t('graph.fullscreen')} aria-label={t('graph.fullscreen')} disabled={!graph.nodes.length} onClick={() => void fullscreen()}><Maximize2 size={17} /></button>
           </div>
-          {result.isFetching || catalog.isLoading ? <LoadingState /> : graph.nodes.length ? <GraphCanvas key={key} graph={visibleGraph} language={i18n.language} browser showLabels={showLabels} canvasRef={canvas} onNodeSelect={selectNode} onEdgeSelect={selectEdge} onExpand={expand} /> : <div className="graph-no-results"><Network size={32} /><span>{english ? 'No matching nodes' : '没有符合条件的节点'}</span></div>}
-          <footer className="graph-view-status"><span>{graph.nodes.length} {english ? 'nodes' : '节点'} · {visibleGraph.edges.length} {english ? 'relations' : '关系'}</span><span>{expanding ? (english ? 'Expanding…' : '正在展开…') : result.data?.data.truncated ? (english ? 'Bounded sample' : '有界采样') : (english ? 'Query results' : '查询结果')}</span></footer>
+          {result.isFetching || catalog.isLoading ? <LoadingState /> : graph.nodes.length ? <GraphCanvas key={key} graph={visibleGraph} language={i18n.language} browser showLabels={showLabels} canvasRef={canvas} onNodeSelect={selectNode} onEdgeSelect={selectEdge} onExpand={expand} /> : <div className="graph-no-results"><Network size={32} /><span>{t('graph.noMatchingNodes')}</span></div>}
+          <footer className="graph-view-status"><span>{formatInteger(graph.nodes.length, i18n.language)} {t('graph.nodes').toLowerCase()} · {formatInteger(visibleGraph.edges.length, i18n.language)} {t('graph.relationship').toLowerCase()}</span><span>{expanding ? t('graph.expanding') : result.data?.data.truncated ? t('graph.boundedSample') : t('graph.queryResults')}</span></footer>
         </div>
         <aside className="graph-inspector">
-          {!selected ? <div className="graph-inspector-empty"><Network size={32} /><span>{english ? 'No selection' : '暂无选中项'}</span></div> : <>
-            <header><span>{node ? (english ? 'NODE' : '节点') : (english ? 'RELATIONSHIP' : '关系')}</span><h2>{label}</h2><small>{node ? categoryLabel(node.type, english) : edge?.predicate}</small>{node ? <small>{node.type}</small> : null}</header>
-            <dl><div><dt>ID</dt><dd>{selected.id}</dd></div>{node?.jurisdiction ? <div><dt>{english ? 'Jurisdiction' : '辖区'}</dt><dd>{node.jurisdiction} · {jurisdictionName(node.jurisdiction, english)}</dd></div> : null}{Object.entries(properties).map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{typeof value === 'object' ? JSON.stringify(value) : String(value ?? '—')}</dd></div>)}</dl>
+          {!selected ? <div className="graph-inspector-empty"><Network size={32} /><span>{t('graph.noSelection')}</span></div> : <>
+            <header><span>{node ? t('graph.nodeLabel').toUpperCase() : t('graph.relationshipLabel').toUpperCase()}</span><h2>{label}</h2><small title={node ? node.type : edge?.predicate}>{node ? nodeTypeLabel(node.type, i18n.language) : relationLabel(edge?.predicate ?? '', i18n.language)}</small>{node ? <small>{node.type}</small> : <small title={edge?.predicate}>{edge?.predicate}</small>}</header>
+            <dl><div><dt>ID</dt><dd>{selected.id}</dd></div>{node?.jurisdiction ? <div><dt>{t('fieldLabels.jurisdiction')}</dt><dd>{node.jurisdiction} · {jurisdictionName(node.jurisdiction, english)}</dd></div> : null}{Object.entries(properties).map(([name, value]) => <div key={name}><dt title={name}>{fieldLabel(name, i18n.language)}</dt><dd>{typeof value === 'object' ? JSON.stringify(value) : String(value ?? '—')}</dd></div>)}</dl>
             <div className="graph-inspector-actions">
-              {node ? <><button type="button" className="button button--primary" disabled={expanding} onClick={() => void expand(node.id)}><Expand size={15} />{english ? 'Expand' : '展开邻居'}</button><button type="button" className="icon-button" title={english ? 'Pin node' : '固定节点'} aria-label={english ? 'Pin node' : '固定节点'} aria-pressed={pinned.includes(node.id)} onClick={() => { canvas.current?.pin(node.id); setPinned((previous) => previous.includes(node.id) ? previous.filter((id) => id !== node.id) : [...previous, node.id]) }}><Pin size={16} /></button></> : null}
-              <button type="button" className="icon-button" title={english ? 'Remove from view' : '从视图移除'} aria-label={english ? 'Remove from view' : '从视图移除'} onClick={remove}><Trash2 size={16} /></button>
-              {node?.source_url && /^https?:\/\//.test(node.source_url) ? <a className="icon-button" href={node.source_url} target="_blank" rel="noreferrer" title={english ? 'Source' : '来源'}><ExternalLink size={16} /></a> : null}
+              {node ? <><button type="button" className="button button--primary" disabled={expanding} onClick={() => void expand(node.id)}><Expand size={15} />{t('graph.expand')}</button><button type="button" className="icon-button" title={t('graph.pinNode')} aria-label={t('graph.pinNode')} aria-pressed={pinned.includes(node.id)} onClick={() => { canvas.current?.pin(node.id); setPinned((previous) => previous.includes(node.id) ? previous.filter((id) => id !== node.id) : [...previous, node.id]) }}><Pin size={16} /></button></> : null}
+              <button type="button" className="icon-button" title={t('graph.removeFromView')} aria-label={t('graph.removeFromView')} onClick={remove}><Trash2 size={16} /></button>
+              {node?.source_url && /^https?:\/\//.test(node.source_url) ? <a className="icon-button" href={node.source_url} target="_blank" rel="noreferrer" title={t('graph.source')}><ExternalLink size={16} /></a> : null}
             </div>
           </>}
         </aside>

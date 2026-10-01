@@ -1,8 +1,10 @@
 import { Maximize2, Network } from 'lucide-react'
 import type { Core } from 'cytoscape'
 import { useEffect, useRef, type RefObject } from 'react'
+import { useTranslation } from 'react-i18next'
 
-import { preferredLabel } from '../../../shared/lib/format'
+import { formatInteger, preferredLabel } from '../../../shared/lib/format'
+import { relationLabel } from '../../../shared/lib/labels'
 import type { GraphData } from '../../../shared/api/models'
 import { nodeColors } from './node-colors'
 
@@ -26,6 +28,7 @@ type Props = {
 }
 
 export function GraphCanvas({ graph, language, onNodeSelect, onEdgeSelect, onExpand, canvasRef, browser = false, showLabels = false }: Props) {
+  const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
   const instanceRef = useRef<Core | null>(null)
   const labelsRef = useRef(showLabels)
@@ -45,7 +48,7 @@ export function GraphCanvas({ graph, language, onNodeSelect, onEdgeSelect, onExp
         'RegistrationUse',
         'Registration',
         'PesticideProduct',
-        'ActiveIngredientLocal',
+        'LocalActiveIngredient',
       ])
       const instance = cytoscape({
         container: containerRef.current,
@@ -67,7 +70,7 @@ export function GraphCanvas({ graph, language, onNodeSelect, onEdgeSelect, onExp
               id: edge.id,
               source: edge.start_id,
               target: edge.end_id,
-              label: edge.predicate,
+              label: relationLabel(edge.predicate, language),
               projected: edge.properties?.stored_fact === false ? 1 : 0,
             },
           })),
@@ -161,11 +164,10 @@ export function GraphCanvas({ graph, language, onNodeSelect, onEdgeSelect, onExp
   }, [graph, language, onNodeSelect, onEdgeSelect, onExpand, canvasRef, browser])
 
   if (!graph.nodes.length) {
-    const english = language.startsWith('en')
     return (
       <div className="graph-empty">
         <Network size={28} aria-hidden="true" />
-        <span>{english ? 'Select a registration-use row to inspect its local graph.' : '选择一条登记使用记录以查看局部关系图。'}</span>
+        <span>{t('explore.selectRow')}</span>
       </div>
     )
   }
@@ -173,8 +175,8 @@ export function GraphCanvas({ graph, language, onNodeSelect, onEdgeSelect, onExp
   return (
     <div className="graph-canvas-wrap">
       <div className="graph-counts">
-        <span>{graph.nodes.length} nodes</span>
-        <span>{graph.edges.length} relations</span>
+        <span>{formatInteger(graph.nodes.length, language)} {t('common.nodes')}</span>
+        <span>{formatInteger(graph.edges.length, language)} {t('common.relations')}</span>
         <Maximize2 size={14} aria-hidden="true" />
       </div>
       <div ref={containerRef} className="graph-canvas" />

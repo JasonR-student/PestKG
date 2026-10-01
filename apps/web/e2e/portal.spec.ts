@@ -39,7 +39,7 @@ test('overview map opens a filtered exploration flow', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /多辖区农药登记知识图谱|Cross-jurisdiction pesticide/ })).toBeVisible()
   await expect(page.locator('.metric-item strong')).toHaveCount(5)
   await expect(page.locator('.data-mode')).toHaveText(/全量数据模式|Full release/)
-  await expect(page.getByText(/暂未公开发布|Distribution blocked/)).toBeVisible()
+  await expect(page.getByText(/暂未公开发布|Distribution (?:blocked|restricted)/)).toBeVisible()
 
   await page.getByRole('button', { name: /澳大利亚: .* nodes|Australia: .* nodes/ }).click()
   await expect(page).toHaveURL(/\/explore\?.*jurisdiction=AU/)

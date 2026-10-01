@@ -9,7 +9,7 @@ import { preferredLabel } from '../../shared/lib/format'
 import { useRelease } from '../release/useRelease'
 
 export function GlobalSearch() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const navigate = useNavigate()
   const { releaseId, buildUrl } = useRelease()
   const [query, setQuery] = useState('')
@@ -33,16 +33,16 @@ export function GlobalSearch() {
     <div className="global-search">
       <Search size={17} aria-hidden="true" />
       <input
-        aria-label={i18n.language.startsWith('en') ? 'Search entities' : '搜索实体'}
+        aria-label={t('common.entitySearch')}
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder={i18n.language.startsWith('en') ? 'Search entity or ID' : '搜索实体或 ID'}
+        placeholder={t('common.searchEntityOrId')}
       />
       {query ? (
         <button
           className="icon-button icon-button--quiet"
           type="button"
-          aria-label={i18n.language.startsWith('en') ? 'Clear search' : '清空搜索'}
+          aria-label={t('common.clearSearch')}
           onClick={() => setQuery('')}
         >
           <X size={15} />
@@ -51,7 +51,7 @@ export function GlobalSearch() {
       {deferredQuery.length >= 2 ? (
         <div className="search-results" role="listbox">
           {result.isLoading ? (
-            <div className="search-result-note">Searching…</div>
+            <div className="search-result-note">{t('common.searching')}</div>
           ) : result.data?.data.length ? (
             result.data.data.map((entity) => (
               <button
@@ -68,7 +68,7 @@ export function GlobalSearch() {
               </button>
             ))
           ) : (
-            <div className="search-result-note">No results</div>
+            <div className="search-result-note">{t('common.noResults')}</div>
           )}
         </div>
       ) : null}

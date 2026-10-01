@@ -46,7 +46,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
-        Skip to content
+        {t('common.skipToContent', { defaultValue: i18n.language.startsWith('en') ? 'Skip to content' : '跳转到正文' })}
       </a>
       <aside className={menuOpen ? 'sidebar sidebar--open' : 'sidebar'}>
         <div className="brand-block">
@@ -60,14 +60,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           <button
             type="button"
             className="icon-button sidebar-close"
-            aria-label="Close menu"
+            aria-label={t('common.close')}
             onClick={() => setMenuOpen(false)}
           >
             <X size={18} />
           </button>
         </div>
 
-        <nav className="primary-nav" aria-label="Primary">
+        <nav className="primary-nav" aria-label={t('common.primaryNavigation')}>
           {navigation.map((item) => {
             const Icon = item.icon
             return (
@@ -92,7 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <strong>{release?.release_id ?? overview.data?.data.version ?? '—'}</strong>
             </span>
           </div>
-          <div className="language-control" aria-label="Language">
+          <div className="language-control" aria-label={t('common.language')}>
             <Languages size={16} aria-hidden="true" />
             <button
               type="button"
@@ -116,7 +116,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <button
           type="button"
           className="sidebar-scrim"
-          aria-label="Close menu"
+          aria-label={t('common.close')}
           onClick={() => setMenuOpen(false)}
         />
       ) : null}
