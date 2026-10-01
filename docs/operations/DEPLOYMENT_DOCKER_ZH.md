@@ -75,20 +75,26 @@ chmod 600 .env
 
 ## 3. 启动 HTTP 研究审核站点
 
-默认 `.env` 使用 `SITE_ADDRESS=http://:80`，可通过服务器 IP 访问。
-若 80 / 443 已被占用，先调整 `.env` 中的 `PESTKG_HTTP_PORT` /
-`PESTKG_HTTPS_PORT`，例如 8080 / 8443。不要改变容器内部端口。
+本包默认适配已有反向代理的服务器：Caddy 容器内部使用 `80`，宿主机绑定
+`127.0.0.1:18088`，HTTPS 备用端口为 `127.0.0.1:18443`。外层 Nginx、
+Caddy 或云负载均衡转发到 `http://127.0.0.1:18088`，不会占用宿主机的
+`80/443`。不要把 `SITE_ADDRESS` 改成 `http://:18088`，它描述的是
+Caddy 容器内部监听地址，不是宿主机映射端口。
+
+若需要直接从公网暴露 Caddy，再将 `PESTKG_BIND_ADDRESS` 改为 `0.0.0.0`，
+并把 `PESTKG_HTTP_PORT` / `PESTKG_HTTPS_PORT` 改成未被占用的宿主机端口。
+不要改变 Compose 右侧的容器端口 `:80`、`:443`。
 
 ```bash
 docker compose config --quiet
 docker compose up -d --wait --wait-timeout 300
 docker compose ps
-curl --fail http://127.0.0.1/health/ready
-curl --fail http://127.0.0.1/api/v1/graph/catalog
+curl --fail http://127.0.0.1:18088/health/ready
+curl --fail http://127.0.0.1:18088/api/v1/graph/catalog
 ```
 
-修改了 HTTP 端口时，在 curl 地址中相应加端口。浏览器打开
-`http://服务器IP/graph`（或 `http://服务器IP:8080/graph`）。
+浏览器通过外层反向代理访问正式域名；在服务器本机可直接打开
+`http://127.0.0.1:18088/graph` 做验收。
 首次查询会读取 Parquet，冷启动较慢；就绪检查与首次大查询应预留时间。
 
 仅 Caddy 发布端口；API 的 18088 和前端容器的 80 不直接暴露到公网。
@@ -99,7 +105,7 @@ curl --fail http://127.0.0.1/api/v1/graph/catalog
 ## 4. 验证类别搜索和数据版本
 
 ```bash
-curl --fail http://127.0.0.1/api/v1/graph/query \
+curl --fail http://127.0.0.1:18088/api/v1/graph/query \
   -H 'Content-Type: application/json' \
   -d '{"scope":"jurisdiction:AU","type":"PesticideProduct","query":"","limit":60,"provenance":true}'
 ```
@@ -158,7 +164,47 @@ docker compose up -d --wait --wait-timeout 300
 备份中包含 TLS 私钥等敏感信息，应控制权限并另存到受保护的位置。
 以上卷名基于包中的固定 Compose 项目名 `pestkg-server`；不要随意更改项目名。
 
-## 7. 升级和回滚
+## 7. 替换部署（已有旧包时）
+
+不要在旧目录上直接覆盖解压，也不要让新旧两套 Compose 同时启动。新旧包
+固定使用同一个 Compose 项目名 `pestkg-server`，需要先停止旧容器，再启动
+新目录中的容器；命名卷会被保留，`down` 不会删除卷。
+
+```bash
+cd /srv/pestkg
+sha256sum -c pestkg-server-NEW_TAG-linux-amd64.tar.gz.sha256
+tar -xzf pestkg-server-NEW_TAG-linux-amd64.tar.gz
+cd pestkg-server-NEW_TAG-linux-amd64
+sha256sum -c SHA256SUMS
+docker load -i images.tar
+cp .env.example .env
+chmod 600 .env
+```
+
+记录旧包目录后停止旧版本：
+
+```bash
+cd /srv/pestkg/pestkg-server-OLD_TAG-linux-amd64
+docker compose ps
+docker compose down
+```
+
+启动新版本并验证：
+
+```bash
+cd /srv/pestkg/pestkg-server-NEW_TAG-linux-amd64
+docker compose up -d --wait --wait-timeout 300
+docker compose ps
+curl --fail http://127.0.0.1:18088/health/ready
+curl --fail http://127.0.0.1:18088/api/v1/graph/catalog
+```
+
+确认外层反向代理仍指向 `http://127.0.0.1:18088` 后，再访问正式域名。
+若新版本异常，执行 `docker compose down`，回到旧目录运行同样的
+`docker compose up -d --wait --wait-timeout 300` 即可回滚。日常停止和回滚
+不要使用 `docker compose down -v`。
+
+## 8. 升级和回滚
 
 升级前记录旧目录、旧镜像标签和 `.env`，备份状态。校验并解压新包到
 另一个目录，执行 `docker load`；停止旧目录下的服务，把域名、端口和
@@ -172,7 +218,7 @@ Compose 项目名保持一致，避免两套服务争抢端口。
 旧教程中的 `pestkg-release`、`release.sh --full` 和 Neo4j 导入流程不适用
 这个 Java/Parquet 离线包。
 
-## 8. 常见故障
+## 9. 常见故障
 
 - `image not found`：执行 `docker load -i images.tar`，检查 `.env` 的镜像标签。
 - 端口占用：更改 `.env` 的主机端口，再执行 `up -d`。
