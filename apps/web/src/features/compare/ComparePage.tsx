@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { api } from '../../shared/api/client'
+import { liveAggregateQueryOptions } from '../../shared/api/query-options'
 import { echarts } from '../../shared/charts/echarts'
 import { ReactEChartsCore } from '../../shared/charts/react-echarts-core'
 import { PageHeader } from '../../shared/ui/PageHeader'
@@ -30,11 +31,12 @@ export function ComparePage() {
   const [question, setQuestion] = useState<typeof questions[number]>('q1')
   const [query, setQuery] = useState('')
   const [jurisdiction, setJurisdiction] = useState('')
-  const countries = useQuery({ queryKey: ['countries', releaseId], queryFn: ({ signal }) => api.countries(releaseId, signal), enabled: Boolean(releaseId) })
+  const countries = useQuery({ queryKey: ['countries', releaseId], queryFn: ({ signal }) => api.countries(releaseId, signal), enabled: Boolean(releaseId), ...liveAggregateQueryOptions })
   const comparison = useQuery({
     queryKey: ['comparison', releaseId, question, query, jurisdiction],
     queryFn: ({ signal }) => api.comparison(question, query, jurisdiction, releaseId, signal),
     enabled: Boolean(releaseId),
+    ...liveAggregateQueryOptions,
   })
   const rows = useMemo(() => comparison.data?.data ?? [], [comparison.data])
   const columns = rows.length ? Object.keys(rows[0]).slice(0, 8) : []
@@ -61,7 +63,7 @@ export function ComparePage() {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     xAxis: { type: 'value', axisLabel: { formatter: (value: number) => formatInteger(value, i18n.language) }, splitLine: { lineStyle: { color: '#e8ece9' } } },
     yAxis: { type: 'category', data: chartLabels, axisLabel: { width: 130, overflow: 'truncate' } },
-    series: [{ type: 'bar', data: chartRows.map((row) => Number(row[chart.value] || 0)), barMaxWidth: 18, label: { show: true, position: 'right', color: '#44534e', fontSize: 9 } }],
+    series: [{ type: 'bar', data: chartRows.map((row) => Number(row[chart.value] || 0)), barMaxWidth: 18, label: { show: true, position: 'right', color: '#44534e', fontSize: 9, formatter: (params: { value: number }) => formatInteger(params.value, i18n.language) } }],
     media: [{ query: { maxWidth: 520 }, option: { grid: { left: 72, right: 42 }, yAxis: { axisLabel: { width: 62, overflow: 'truncate' } } } }],
   }
 
@@ -84,7 +86,7 @@ export function ComparePage() {
       {comparison.isError ? <ErrorState message={comparison.error.message} /> : null}
       {comparison.isSuccess ? (
         <section className="comparison-layout">
-          <div className="section-panel comparison-chart"><div className="section-heading section-heading--compact"><div><h2>{t(`compare.${question}`)}</h2><p>{t('compare.chartSummary', { chartCount: chartRows.length, rowCount: rows.length, tableCount: Math.min(rows.length, 100) })}</p></div></div><ReactEChartsCore echarts={echarts} option={option} style={{ height: 410 }} /></div>
+          <div className="section-panel comparison-chart"><div className="section-heading section-heading--compact"><div><h2>{t(`compare.${question}`)}</h2><p>{t('compare.chartSummary', { chartCount: formatInteger(chartRows.length, i18n.language), rowCount: formatInteger(rows.length, i18n.language), tableCount: formatInteger(Math.min(rows.length, 100), i18n.language) })}</p></div></div><ReactEChartsCore echarts={echarts} option={option} style={{ height: 410 }} /></div>
           <div className="section-panel comparison-table"><div className="data-table-wrap"><table className="data-table"><thead><tr>{columns.map((column) => <th key={column} title={column}>{fieldLabel(column, i18n.language)}</th>)}</tr></thead><tbody>{rows.slice(0, 100).map((row, index) => <tr key={`${question}-${index}`}>{columns.map((column) => <td key={column} title={row[column] ?? undefined}>{formatCell(column, row[column])}</td>)}</tr>)}</tbody></table></div></div>
         </section>
       ) : null}

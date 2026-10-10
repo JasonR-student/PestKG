@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { feature } from 'topojson-client'
 import world from 'world-atlas/countries-110m.json'
 
-import { formatCompact } from '../../../shared/lib/format'
+import { formatInteger } from '../../../shared/lib/format'
 import { jurisdictionName } from '../../../shared/lib/jurisdictions'
 import type { Country } from '../../../shared/api/models'
 
@@ -54,7 +54,7 @@ export function WorldMap({ countries, onSelect }: Props) {
               )
             : 0
           const label = mapped
-            ? `${mapped.map((item) => jurisdictionName(item.jurisdiction, english)).join(' / ')}: ${formatCompact(nodes, language)} ${t('common.nodes')}`
+            ? `${mapped.map((item) => jurisdictionName(item.jurisdiction, english)).join(' / ')}: ${formatInteger(nodes, language)} ${t('common.nodes')}`
             : t('overview.noReleaseData')
           const selectMappedCountry = () => mapped && onSelect(mapped[0].jurisdiction)
           return (

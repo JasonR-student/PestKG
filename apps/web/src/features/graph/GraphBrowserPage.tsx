@@ -6,6 +6,7 @@ import { useSearchParams } from 'react-router-dom'
 
 import { useRelease } from '../../app/release/useRelease'
 import { api } from '../../shared/api/client'
+import { liveAggregateQueryOptions } from '../../shared/api/query-options'
 import type { GraphBrowserQuery, GraphData } from '../../shared/api/models'
 import { formatInteger, preferredLabel } from '../../shared/lib/format'
 import { fieldLabel, nodeTypeLabel, relationLabel } from '../../shared/lib/labels'
@@ -39,8 +40,8 @@ export function GraphBrowserPage() {
   const expansion = useRef<AbortController | null>(null)
   const key = JSON.stringify([releaseId, applied])
   const currentKey = useRef(key)
-  const catalog = useQuery({ queryKey: ['graph-catalog', releaseId], queryFn: ({ signal }) => api.graphCatalog(releaseId, signal), enabled: Boolean(releaseId) })
-  const result = useQuery({ queryKey: ['graph-browser', releaseId, applied], queryFn: ({ signal }) => api.graphQuery(applied, releaseId, signal), enabled: Boolean(releaseId) })
+  const catalog = useQuery({ queryKey: ['graph-catalog', releaseId], queryFn: ({ signal }) => api.graphCatalog(releaseId, signal), enabled: Boolean(releaseId), ...liveAggregateQueryOptions })
+  const result = useQuery({ queryKey: ['graph-browser', releaseId, applied], queryFn: ({ signal }) => api.graphQuery(applied, releaseId, signal), enabled: Boolean(releaseId), ...liveAggregateQueryOptions })
 
   useEffect(() => {
     currentKey.current = key
@@ -146,7 +147,7 @@ export function GraphBrowserPage() {
   return (
     <div className="graph-browser">
        <header className="graph-browser-heading">
-        <div><span className="eyebrow">PESTKG / GRAPH</span><h1>{t('graph.title')}</h1></div>
+        <div><span className="eyebrow">PESTKG / GRAPH</span><h1 className="page-title" title={t('graph.title')}>{t('graph.title')}</h1></div>
         <div className="graph-release-note"><span title={releaseId ?? undefined}>{releaseId}</span><small>{t('graph.referencePack')} · <span title={catalog.data?.data.reference_pack_id || undefined}>{catalog.data?.data.reference_pack_id || '—'}</span></small></div>
       </header>
       <form className="graph-query" onSubmit={search}>
@@ -174,7 +175,7 @@ export function GraphBrowserPage() {
             </select>
           </label>
           <dl className="graph-scope-counts"><div><dt>{t('graph.nodes')}</dt><dd title={scope ? formatInteger(scope.nodes, i18n.language) : undefined}>{scope ? formatInteger(scope.nodes, i18n.language) : '—'}</dd></div><div><dt>{t('graph.storedRelations')}</dt><dd title={scope ? formatInteger(scope.edges, i18n.language) : undefined}>{scope ? formatInteger(scope.edges, i18n.language) : '—'}</dd></div></dl>
-          {scope?.kind === 'reference' ? <p className="graph-scope-status">{scope.coverage_status === 'BOUNDED_OFFICIAL_API_SUBGRAPH' ? t('graph.boundedOfficialApiSubgraph') : scope.coverage_status === 'LEGACY_DERIVED_REFERENCE_UNREVIEWED' ? t('graph.legacyReferenceImport') : t('graph.officialOntologySnapshot')}<br />{t('graph.regulatoryIdentityLinks')}{english ? ': 0' : '：0'}</p> : null}
+          {scope?.kind === 'reference' ? <p className="graph-scope-status">{scope.coverage_status === 'BOUNDED_OFFICIAL_API_SUBGRAPH' ? t('graph.boundedOfficialApiSubgraph') : scope.coverage_status === 'LEGACY_DERIVED_REFERENCE_UNREVIEWED' ? t('graph.legacyReferenceImport') : t('graph.officialOntologySnapshot')}<br />{t('graph.regulatoryIdentityLinks')}{english ? ': ' : '：'}{formatInteger(catalog.data?.data.exact_identity_links ?? 0, i18n.language)}</p> : null}
           <div id="graph-catalog" className={`graph-catalog-scroll${catalogOpen ? ' is-open' : ''}`}>
             <h3>{t('graph.categories')}<small>CATEGORIES</small></h3>
             <label className="graph-category-search"><Search size={14} aria-hidden="true" /><input aria-label={t('graph.searchCategories')} placeholder={t('graph.searchCategories')} value={categorySearch} onChange={(event) => setCategorySearch(event.target.value)} /></label>

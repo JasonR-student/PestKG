@@ -46,7 +46,7 @@ export function EntityPage() {
           <span className="entity-symbol"><Fingerprint size={24} /></span>
           <div>
             <span className="entity-type-label">{nodeTypeLabel(record.type, i18n.language)} · {record.jurisdiction || t('entity.releaseMetadata')} <small title={record.type}>({record.type})</small></span>
-            <h1>{preferredLabel(record, i18n.language)}</h1>
+            <h1 className="page-title" title={preferredLabel(record, i18n.language)}>{preferredLabel(record, i18n.language)}</h1>
             {record.label_en && record.label_en !== record.label_original ? <p>{record.label_en}</p> : null}
           </div>
         </div>

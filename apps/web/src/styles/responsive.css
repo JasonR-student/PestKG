@@ -167,6 +167,13 @@
     font-size: 26px;
   }
 
+  .page-header h1,
+  .overview-heading h1,
+  .entity-heading h1,
+  .graph-browser-heading h1 {
+    font-size: 20px;
+  }
+
   .release-summary {
     min-width: 0;
   }
@@ -330,7 +337,9 @@
   }
 
   .graph-browser-heading h1 {
-    overflow-wrap: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .graph-release-note {

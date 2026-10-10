@@ -8,6 +8,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { api } from '../../shared/api/client'
+import { liveAggregateQueryOptions } from '../../shared/api/query-options'
 import { ReleaseContext } from './release-context'
 
 function pathWithRelease(path: string, releaseId: string | null) {
@@ -24,6 +25,7 @@ export function ReleaseProvider({ children }: { children: ReactNode }) {
   const releasesQuery = useQuery({
     queryKey: ['releases'],
     queryFn: ({ signal }) => api.releases(signal),
+    ...liveAggregateQueryOptions,
   })
   const releases = useMemo(() => releasesQuery.data?.data ?? [], [releasesQuery.data])
   const requestedRelease = new URLSearchParams(location.search).get('release')

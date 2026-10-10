@@ -34,10 +34,12 @@ test('overview map opens a filtered exploration flow', async ({ page }) => {
   const request = await overviewRequest
   expect(request.headers()['x-pestkg-release']).toBe(releaseId)
   await expect(page).toHaveURL(new RegExp(`release=${releaseId}`))
-  await expect(page.getByLabel(/数据版本|Data release/)).toHaveValue(releaseId)
+  await expect(page.getByRole('combobox', { name: /数据版本|Release/ })).toHaveValue(releaseId)
   await expect(page).toHaveTitle(/PestKG|Pesticide/i)
   await expect(page.getByRole('heading', { name: /多辖区农药登记知识图谱|Cross-jurisdiction pesticide/ })).toBeVisible()
   await expect(page.locator('.metric-item strong')).toHaveCount(5)
+  const metricValues = await page.locator('.metric-item strong').allTextContents()
+  expect(metricValues.every((value) => !/[kMB]$/.test(value))).toBe(true)
   await expect(page.locator('.data-mode')).toHaveText(/全量数据模式|Full release/)
   await expect(page.getByText(/暂未公开发布|Distribution (?:blocked|restricted)/)).toBeVisible()
 
@@ -51,16 +53,40 @@ test('overview map opens a filtered exploration flow', async ({ page }) => {
 
 test('mobile workspace has no horizontal page overflow', async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith('mobile'))
-  for (const route of ['/', '/explore?jurisdiction=AU', '/downloads', '/compare']) {
+  for (const route of ['/', '/graph', '/explore?jurisdiction=AU', '/compare', '/downloads', '/methods']) {
     await page.goto(route)
     await expect(page.locator('main h1')).toBeVisible()
+    await expect(page.locator('main h1').first()).toHaveCSS('white-space', 'nowrap')
     if (route.startsWith('/explore') || route === '/compare') {
       await expect(page.getByRole('table')).toBeVisible()
     }
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)
     expect(overflow, route).toBe(false)
-    await expect(page.getByLabel(/数据版本|Data release/)).toBeVisible()
+    await expect(page.getByRole('combobox', { name: /数据版本|Release/ })).toBeVisible()
   }
+})
+
+test('uses live backend counts for methods and graph status', async ({ page }) => {
+  await page.route('**/api/v1/stats/overview*', async (route) => {
+    const response = await route.fetch()
+    const body = await response.json()
+    body.data.shared_nodes = 42
+    await route.fulfill({ response, body: JSON.stringify(body) })
+  })
+  await page.goto('/methods')
+  await expect(page.getByText(/Reviewed shared chemicals: 42|已审核共有化学实体：42/)).toBeVisible()
+
+  await page.route('**/api/v1/graph/catalog*', async (route) => {
+    const response = await route.fetch()
+    const body = await response.json()
+    body.data.exact_identity_links = 17
+    await route.fulfill({ response, body: JSON.stringify(body) })
+  })
+  await page.goto('/graph')
+  const referenceScope = page.locator('.graph-scope-label select option[value^="reference:"]').first()
+  await expect(referenceScope).toBeAttached()
+  await page.locator('.graph-scope-label select').selectOption(await referenceScope.getAttribute('value') ?? '')
+  await expect(page.locator('.graph-scope-status')).toContainText(/17/)
 })
 
 test('opens the versioned download catalog', async ({ page, request }) => {
@@ -122,7 +148,9 @@ test('searches entities, follows cursors, and exports filtered CSV', async ({ pa
   await expect(result).toBeVisible()
   await result.click()
   await expect(page).toHaveURL(/\/entity\//)
-  await expect(page.getByRole('heading', { name: 'Frutor Fungicide', exact: true })).toBeVisible()
+  const entityTitle = page.getByRole('heading', { name: 'Frutor Fungicide', exact: true })
+  await expect(entityTitle).toBeVisible()
+  await expect(entityTitle).toHaveCSS('white-space', 'nowrap')
 })
 
 test('switches to English and opens competency questions', async ({ page }) => {

@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 
 import { api } from '../../shared/api/client'
+import { liveAggregateQueryOptions } from '../../shared/api/query-options'
 import { useRelease } from '../release/useRelease'
 import { GlobalSearch } from './GlobalSearch'
 import { ReleaseSelector } from './ReleaseSelector'
@@ -36,6 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     queryKey: ['overview', releaseId],
     queryFn: ({ signal }) => api.overview(releaseId, signal),
     enabled: Boolean(releaseId),
+    ...liveAggregateQueryOptions,
   })
 
   const changeLanguage = async (language: 'zh' | 'en') => {

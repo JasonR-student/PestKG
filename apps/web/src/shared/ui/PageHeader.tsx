@@ -9,7 +9,7 @@ export function PageHeader({ title, description, actions }: Props) {
   return (
     <header className="page-header">
       <div>
-        <h1>{title}</h1>
+        <h1 className="page-title" title={title}>{title}</h1>
         {description ? <p>{description}</p> : null}
       </div>
       {actions ? <div className="page-actions">{actions}</div> : null}

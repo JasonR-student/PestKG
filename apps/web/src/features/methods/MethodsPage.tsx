@@ -3,6 +3,7 @@ import { CheckCircle2, GitMerge, Languages, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { api } from '../../shared/api/client'
+import { liveAggregateQueryOptions } from '../../shared/api/query-options'
 import { PageHeader } from '../../shared/ui/PageHeader'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
 import { formatInteger } from '../../shared/lib/format'
@@ -12,9 +13,10 @@ import { useRelease } from '../../app/release/useRelease'
 export function MethodsPage() {
   const { i18n, t } = useTranslation()
   const { releaseId } = useRelease()
-  const schema = useQuery({ queryKey: ['schema', releaseId], queryFn: ({ signal }) => api.schema(releaseId, signal), enabled: Boolean(releaseId) })
-  if (schema.isLoading) return <LoadingState />
-  if (schema.isError || !schema.data) return <ErrorState />
+  const schema = useQuery({ queryKey: ['schema', releaseId], queryFn: ({ signal }) => api.schema(releaseId, signal), enabled: Boolean(releaseId), ...liveAggregateQueryOptions })
+  const overview = useQuery({ queryKey: ['overview', releaseId], queryFn: ({ signal }) => api.overview(releaseId, signal), enabled: Boolean(releaseId), ...liveAggregateQueryOptions })
+  if (schema.isLoading || overview.isLoading) return <LoadingState />
+  if (schema.isError || overview.isError || !schema.data || !overview.data) return <ErrorState />
   const data = schema.data.data
 
   return (
@@ -22,7 +24,7 @@ export function MethodsPage() {
       <PageHeader title={t('methods.title')} description={t('methods.description')} />
       <section className="principle-strip">
         <div><ShieldCheck size={20} /><span><strong>{t('methods.traceableFacts')}</strong><small>source_record_id + source_url</small></span></div>
-        <div><GitMerge size={20} /><span><strong>{t('methods.identityReview')}</strong><small>{t('methods.reviewedGlobalChemicals')}</small></span></div>
+        <div><GitMerge size={20} /><span><strong>{t('methods.identityReview')}</strong><small>{t('methods.reviewedGlobalChemicals', { count: formatInteger(overview.data.data.shared_nodes, i18n.language) })}</small></span></div>
         <div><Languages size={20} /><span><strong>{t('methods.additiveEnglishLabels')}</strong><small>{t('methods.originalLabelsCanonical')}</small></span></div>
         <div><CheckCircle2 size={20} /><span><strong>{t('methods.independentReferences')}</strong><small>{t('methods.separateSourceNamespaces')}</small></span></div>
       </section>

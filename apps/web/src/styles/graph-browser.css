@@ -1,6 +1,7 @@
 .graph-browser { display: grid; gap: 12px; min-width: 0; }
 .graph-browser-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-bottom: 6px; }
-.graph-browser-heading h1 { margin: 4px 0; font-size: 27px; }
+.graph-browser-heading h1 { min-width: 0; margin: 4px 0; font-size: 27px; }
+.graph-browser-heading > div:first-child { min-width: 0; }
 .graph-browser-heading .eyebrow { color: var(--green); font-size: 10px; font-weight: 700; }
 .graph-release-note { display: grid; gap: 4px; max-width: 48%; color: var(--muted); text-align: right; font-size: 11px; overflow-wrap: anywhere; }
 .graph-release-note small { font-size: 10px; }

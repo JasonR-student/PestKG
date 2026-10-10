@@ -7,17 +7,18 @@ import { api } from '../../shared/api/client'
 import { CoverageChart } from './components/CoverageChart'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
 import { WorldMap } from './components/WorldMap'
-import { formatCompact, formatDate, formatInteger } from '../../shared/lib/format'
+import { formatDate, formatInteger } from '../../shared/lib/format'
 import { statusLabel } from '../../shared/lib/labels'
 import { jurisdictionName } from '../../shared/lib/jurisdictions'
 import { useRelease } from '../../app/release/useRelease'
+import { liveAggregateQueryOptions } from '../../shared/api/query-options'
 
 export function OverviewPage() {
   const { i18n, t } = useTranslation()
   const navigate = useNavigate()
   const { releaseId, buildUrl } = useRelease()
-  const overview = useQuery({ queryKey: ['overview', releaseId], queryFn: ({ signal }) => api.overview(releaseId, signal), enabled: Boolean(releaseId) })
-  const countries = useQuery({ queryKey: ['countries', releaseId], queryFn: ({ signal }) => api.countries(releaseId, signal), enabled: Boolean(releaseId) })
+  const overview = useQuery({ queryKey: ['overview', releaseId], queryFn: ({ signal }) => api.overview(releaseId, signal), enabled: Boolean(releaseId), ...liveAggregateQueryOptions })
+  const countries = useQuery({ queryKey: ['countries', releaseId], queryFn: ({ signal }) => api.countries(releaseId, signal), enabled: Boolean(releaseId), ...liveAggregateQueryOptions })
 
   if (overview.isLoading || countries.isLoading) return <LoadingState />
   if (overview.isError || countries.isError || !overview.data || !countries.data) {
@@ -42,7 +43,7 @@ export function OverviewPage() {
     <div className="page-stack">
       <section className="overview-heading">
         <div>
-          <h1>{t('overview.title')}</h1>
+          <h1 className="page-title" title={t('overview.title')}>{t('overview.title')}</h1>
           <p>{t('overview.description')}</p>
         </div>
         <div className={distributionBlocked ? 'release-summary release-summary--blocked' : 'release-summary'}>
@@ -57,7 +58,7 @@ export function OverviewPage() {
           <div className="metric-item" key={label}>
             <Icon size={17} aria-hidden="true" />
             <span>{label}</span>
-            <strong title={formatInteger(value, language)}>{formatCompact(value, language)}</strong>
+            <strong title={formatInteger(value, language)}>{formatInteger(value, language)}</strong>
           </div>
         ))}
       </section>
@@ -96,7 +97,7 @@ export function OverviewPage() {
                   <strong>{jurisdictionName(country.jurisdiction, english)}</strong>
                   <small>{country.jurisdiction}</small>
                 </span>
-                <span className="country-volume" title={formatInteger(country.nodes, language)}>{formatCompact(country.nodes, language)}</span>
+                <span className="country-volume" title={formatInteger(country.nodes, language)}>{formatInteger(country.nodes, language)}</span>
                 <ArrowRight size={15} aria-hidden="true" />
               </button>
             ))}

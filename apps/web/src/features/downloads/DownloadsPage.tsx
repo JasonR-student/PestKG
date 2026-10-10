@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2, Download, FileArchive, FileJson2, Quote, S
 import { useTranslation } from 'react-i18next'
 
 import { api } from '../../shared/api/client'
+import { liveAggregateQueryOptions } from '../../shared/api/query-options'
 import { PageHeader } from '../../shared/ui/PageHeader'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
 import { formatBytes, formatInteger } from '../../shared/lib/format'
@@ -13,7 +14,7 @@ import { useRelease } from '../../app/release/useRelease'
 export function DownloadsPage() {
   const { i18n, t } = useTranslation()
   const { releaseId, release: selectedRelease } = useRelease()
-  const releases = useQuery({ queryKey: ['releases'], queryFn: ({ signal }) => api.releases(signal) })
+  const releases = useQuery({ queryKey: ['releases'], queryFn: ({ signal }) => api.releases(signal), ...liveAggregateQueryOptions })
   if (releases.isLoading) return <LoadingState />
   if (releases.isError || !releases.data) return <ErrorState />
   const release = releases.data.data.find((item) => item.release_id === releaseId)

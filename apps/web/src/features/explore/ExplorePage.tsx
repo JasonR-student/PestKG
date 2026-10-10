@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { api } from '../../shared/api/client'
+import { liveAggregateQueryOptions } from '../../shared/api/query-options'
 import { GraphCanvas } from './components/GraphCanvas'
 import { PageHeader } from '../../shared/ui/PageHeader'
 import { ErrorState, LoadingState } from '../../shared/ui/QueryState'
@@ -49,7 +50,7 @@ export function ExplorePage() {
   const [depth, setDepth] = useState(1)
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState<string>()
-  const countries = useQuery({ queryKey: ['countries', releaseId], queryFn: ({ signal }) => api.countries(releaseId, signal), enabled: Boolean(releaseId) })
+  const countries = useQuery({ queryKey: ['countries', releaseId], queryFn: ({ signal }) => api.countries(releaseId, signal), enabled: Boolean(releaseId), ...liveAggregateQueryOptions })
   const results = useInfiniteQuery({
     queryKey: ['registration-uses', releaseId, filters],
     queryFn: ({ pageParam, signal }) => api.registrationUses(
@@ -65,6 +66,7 @@ export function ExplorePage() {
       return typeof nextCursor === 'string' ? nextCursor : undefined
     },
     enabled: Boolean(releaseId),
+    ...liveAggregateQueryOptions,
   })
   const resultRows = useMemo(
     () => results.data?.pages.flatMap((page) => page.data) ?? [],
